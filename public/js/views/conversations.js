@@ -432,7 +432,16 @@
       }
 
       const isOut = msg.direction === 'outbound';
-      const author = isOut ? (msg.sent_by === 'human' ? 'Tu' : 'Bot') : (msg.contact?.name || 'Contacto');
+      let author;
+      if (isOut) {
+        if (msg.sent_by === 'human') {
+          author = msg.sent_by_name || msg.metadata?.sent_by_user_name || window.auth.getUserDisplayName() || 'Tu';
+        } else {
+          author = 'Bot';
+        }
+      } else {
+        author = (msg.contact && msg.contact.name) || 'Contacto';
+      }
       const startNewGroup = author !== currentAuthor;
       if (startNewGroup) {
         if (currentGroup) html.push('</div>');
@@ -506,6 +515,7 @@
     inputField.disabled = true;
 
     const tempId = 'tmp-' + Date.now();
+    const currentUserName = window.auth.getUserDisplayName();
     const optimisticMsg = {
       id: tempId,
       conversation_id: state.activeConv.id,
@@ -513,6 +523,11 @@
       content: text,
       type: 'text',
       sent_by: 'human',
+      sent_by_name: currentUserName,
+      metadata: {
+        sent_by_user_name: currentUserName,
+        source: 'dashboard'
+      },
       created_at: new Date().toISOString(),
       is_pending: true
     };

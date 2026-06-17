@@ -1,48 +1,24 @@
 (function() {
   'use strict';
 
-  const API_BASE = (function() {
-    // En desarrollo y produccion, las llamadas son al mismo origen
-    return window.location.origin;
-  })();
+  const API_BASE = window.location.origin;
 
-  const TOKEN_KEY = 'alebrijes_token';
-  const USER_KEY = 'alebrijes_user';
+  // La gestion de tokens/usuarios la maneja auth.js (window.auth)
+  // Aqui solo hacemos las llamadas HTTP usando el token actual
 
-  function getToken() {
-    try {
-      return localStorage.getItem(TOKEN_KEY);
-    } catch (e) {
-      return null;
+  function getAuthToken() {
+    if (window.auth && window.auth.getToken) {
+      return window.auth.getToken();
     }
+    try { return localStorage.getItem('alebrijes_token'); } catch (e) { return null; }
   }
 
-  function setToken(token) {
-    try {
-      if (token) localStorage.setItem(TOKEN_KEY, token);
-      else localStorage.removeItem(TOKEN_KEY);
-    } catch (e) {}
-  }
-
-  function getUser() {
-    try {
-      const raw = localStorage.getItem(USER_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) {
-      return null;
+  function clearAuth() {
+    if (window.auth && window.auth.clearSession) {
+      window.auth.clearSession();
+    } else {
+      try { localStorage.removeItem('alebrijes_token'); } catch (e) {}
     }
-  }
-
-  function setUser(user) {
-    try {
-      if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
-      else localStorage.removeItem(USER_KEY);
-    } catch (e) {}
-  }
-
-  function clearSession() {
-    setToken(null);
-    setUser(null);
   }
 
   async function request(method, path, body) {
@@ -52,7 +28,7 @@
       'Accept': 'application/json'
     };
 
-    const token = getToken();
+    const token = getAuthToken();
     if (token) {
       headers['Authorization'] = 'Bearer ' + token;
     }
@@ -77,26 +53,16 @@
     let data = null;
     const contentType = response.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
-      try {
-        data = await response.json();
-      } catch (e) {
-        data = null;
-      }
+      try { data = await response.json(); } catch (e) { data = null; }
     } else {
-      try {
-        data = await response.text();
-      } catch (e) {
-        data = null;
-      }
+      try { data = await response.text(); } catch (e) { data = null; }
     }
 
     if (response.status === 401) {
-      clearSession();
-      if (!path.includes('/api/auth/')) {
-        // Solo redirigir si no estamos en el login
-        if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
-          window.location.href = '/';
-        }
+      clearAuth();
+      const onLogin = window.location.pathname === '/login.html' || window.location.pathname === '/' || window.location.pathname === '/index.html';
+      if (!onLogin && !path.includes('/api/auth/')) {
+        window.location.href = '/login.html';
       }
     }
 
@@ -109,19 +75,20 @@
   }
 
   const api = {
-    // Auth
+    // Auth (usado solo internamente; el frontend debe usar window.auth.signIn)
     async login(email, password) {
       const r = await request('POST', '/api/auth/login', { email, password });
-      if (r.ok) {
-        return { ok: true, data: r.data };
-      }
+      if (r.ok) return { ok: true, data: r.data };
       return { ok: false, error: r.error || 'Error al iniciar sesion' };
     },
 
     async me() {
       const r = await request('GET', '/api/auth/me');
       if (r.ok) {
-        setUser(r.data.user);
+        // Notificar a auth para que actualice el dashboard user
+        if (window.auth && window.auth.setDashboardUser) {
+          window.auth.setDashboardUser(r.data.user);
+        }
         return { ok: true, data: r.data };
       }
       return { ok: false, error: r.error };
@@ -193,14 +160,7 @@
 
     async deleteCatalogItem(id) {
       return request('DELETE', '/api/catalog/' + encodeURIComponent(id));
-    },
-
-    // Session helpers
-    getToken,
-    getUser,
-    setToken,
-    setUser,
-    clearSession
+    }
   };
 
   window.api = api;

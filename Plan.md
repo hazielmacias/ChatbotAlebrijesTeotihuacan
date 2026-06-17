@@ -431,7 +431,7 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 4.2 Cliente Supabase
 
-- [ ] **4.2.1** Crear `public/js/supabase-client.js`:
+- [1] **4.2.1** Crear `public/js/supabase-client.js`:
   - Inicializar cliente de Supabase con anon key
   - Exportar funciones: `signIn`, `signOut`, `getSession`, `onAuthStateChange`
   - Exportar funciones de Realtime: `subscribeToMessages`, `subscribeToConversations`, `unsubscribeAll`

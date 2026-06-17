@@ -57,6 +57,20 @@ module.exports = async function handler(req, res) {
       return res.status(409).json({ error: 'La conversacion esta cerrada.' });
     }
 
+    let responderName = null;
+    try {
+      const { data: dashUser } = await supabaseAdmin
+        .from('dashboard_users')
+        .select('display_name')
+        .eq('auth_user_id', auth.user.id)
+        .maybeSingle();
+      if (dashUser && dashUser.display_name) {
+        responderName = dashUser.display_name;
+      }
+    } catch (e) {
+      // No bloquear el envio si falla la consulta
+    }
+
     const sendResult = await sendAndStore({
       phone: conv.phone,
       conversationId: conv.id,
@@ -66,6 +80,7 @@ module.exports = async function handler(req, res) {
       metadata: {
         sent_by_user_id: auth.user.id,
         sent_by_user_email: auth.user.email,
+        sent_by_user_name: responderName,
         source: 'dashboard'
       }
     });
@@ -89,6 +104,13 @@ module.exports = async function handler(req, res) {
         content: trimmed,
         direction: 'outbound',
         sent_by: 'human',
+        sent_by_name: responderName,
+        metadata: {
+          sent_by_user_id: auth.user.id,
+          sent_by_user_email: auth.user.email,
+          sent_by_user_name: responderName,
+          source: 'dashboard'
+        },
         created_at: new Date().toISOString()
       },
       attempts: sendResult.attempts,
