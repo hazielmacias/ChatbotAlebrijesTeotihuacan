@@ -417,8 +417,8 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 4.1 Estructura base y estilos
 
-- [ ] **4.1.1** Crear `public/css/styles.css` — estilos generales del dashboard (layout, nav, cards, forms)
-- [ ] **4.1.2** Crear `public/css/whatsapp-theme.css` — estilos para la interfaz tipo WhatsApp Web:
+- [1] **4.1.1** Crear `public/css/styles.css` — estilos generales del dashboard (layout, nav, cards, forms)
+- [1] **4.1.2** Crear `public/css/whatsapp-theme.css` — estilos para la interfaz tipo WhatsApp Web:
   - Chat bubbles (verdes para enviados, grises para recibidos)
   - Timestamps alineados a la derecha dentro de cada burbuja
   - Avatares circulares con iniciales
@@ -427,7 +427,7 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
   - Panel de chat en el centro (flex-grow)
   - Indicador "en línea" / "última conexión"
   - Colores: fondo #eae6df, header #008069, bubbles salientes #d9fdd3, entrantes #ffffff
-- [ ] **4.1.3** Crear `public/css/chat.css` — estilos específicos del componente de chat
+- [1] **4.1.3** Crear `public/css/chat.css` — estilos específicos del componente de chat
 
 ### 4.2 Cliente Supabase
 

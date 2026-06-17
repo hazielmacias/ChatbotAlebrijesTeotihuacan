@@ -15,7 +15,12 @@
     "type": "git",
     "url": "git+https://github.com/alebrijesteotihuacan/ChatbotAlebrijesTeotihuacan.git"
   },
-  "keywords": ["whatsapp", "chatbot", "meta-api", "supabase"],
+  "keywords": [
+    "whatsapp",
+    "chatbot",
+    "meta-api",
+    "supabase"
+  ],
   "author": "Alebrijes Teotihuacan",
   "license": "ISC",
   "type": "commonjs",
@@ -32,6 +37,7 @@
     "helmet": "^8.2.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "sharp": "^0.35.1"
   }
 }
