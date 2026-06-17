@@ -4,9 +4,23 @@
   const router = {
     routes: {},
     currentRoute: null,
+    _beforeHooks: [],
 
     register(name, handler) {
       this.routes[name] = handler;
+    },
+
+    onBeforeNavigate(hook) {
+      if (typeof hook === 'function') {
+        this._beforeHooks.push(hook);
+      }
+    },
+
+    _runBeforeHooks() {
+      this._beforeHooks.forEach((hook) => {
+        try { hook(); }
+        catch (e) { console.warn('[router] beforeNavigate hook error:', e); }
+      });
     },
 
     async navigate(name) {
@@ -27,6 +41,8 @@
         }
         return;
       }
+
+      this._runBeforeHooks();
 
       this.currentRoute = name;
 

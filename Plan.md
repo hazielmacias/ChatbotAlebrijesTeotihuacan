@@ -438,12 +438,12 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 4.3 Login
 
-- [ ] **4.3.1** Crear `public/login.html`:
+- [1] **4.3.1** Crear `public/login.html`:
   - Formulario centrado con email y password
   - Logo/nombre del proyecto
   - Botón "Iniciar sesión"
   - Link a recuperar contraseña
-- [ ] **4.3.2** Crear `public/js/auth.js`:
+- [1] **4.3.2** Crear `public/js/auth.js`:
   - Manejar submit del formulario de login
   - Llamar a `signIn` de Supabase
   - Redirigir a `/dashboard.html` si éxito

@@ -230,6 +230,47 @@
     }
   }
 
+  function subscribeToAllMessages(onInsert) {
+    if (typeof onInsert !== 'function') {
+      console.warn('[supabase-client] onInsert debe ser funcion');
+      return null;
+    }
+
+    try {
+      const client = getClient();
+      const channelName = 'messages-all';
+      const channel = client
+        .channel(channelName)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages'
+          },
+          (payload) => {
+            try {
+              onInsert(payload.new, payload);
+            } catch (e) {
+              console.error('[supabase-client] all-messages callback error:', e);
+            }
+          }
+        )
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('[supabase-client] Suscrito a', channelName);
+          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+            console.warn('[supabase-client] Estado canal', channelName, ':', status);
+          }
+        });
+
+      return _trackChannel(channelName, channel);
+    } catch (e) {
+      console.error('[supabase-client] subscribeToAllMessages error:', e);
+      return null;
+    }
+  }
+
   function unsubscribe(channel) {
     try {
       const client = getClient();
@@ -285,6 +326,7 @@
     // Realtime
     subscribeToMessages,
     subscribeToConversations,
+    subscribeToAllMessages,
     unsubscribe,
     unsubscribeAll,
     getActiveChannels
