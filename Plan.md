@@ -377,11 +377,11 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 3.3 Mensajes
 
-- [ ] **3.3.1** Crear `api/messages/index.js`:
+- [1] **3.3.1** Crear `api/messages/index.js`:
   - `GET /api/messages?conversation_id=xxx`
   - Lista mensajes de una conversación, ordenados por timestamp ascendente
   - Retorna: array de mensajes
-- [ ] **3.3.2** Crear `api/messages/send.js`:
+- [1] **3.3.2** Crear `api/messages/send.js`:
   - `POST /api/messages/send`
   - Body: `{ conversation_id, content }`
   - Obtiene teléfono de la conversación
