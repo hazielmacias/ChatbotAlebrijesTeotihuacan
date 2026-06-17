@@ -168,6 +168,9 @@
       state.filter = btn.dataset.filter;
       applyFilters();
     });
+
+    // Suscribirse a cambios en conversaciones (Realtime)
+    setupConversationsRealtime();
   }
 
   async function loadConversations() {
@@ -296,6 +299,7 @@
 
     renderChatPanel();
     await loadMessages(id);
+    subscribeToActiveConversation();
   }
 
   function renderChatPanel() {
@@ -567,16 +571,47 @@
     applyFilters();
   }
 
-  // Realtime via polling (lightweight, no Supabase key needed client-side)
-  let pollingInterval = null;
+  // Realtime via Supabase (mejor que polling: <500ms latency)
+  let conversationsChannel = null;
+  let messagesChannel = null;
+  let fallbackPolling = null;
+
   function setupRealtimeGlobal() {
-    if (pollingInterval) clearInterval(pollingInterval);
-    pollingInterval = setInterval(async () => {
-      if (state.activeId && state.activeConv) {
+    // Esperar a que el cliente Supabase este listo
+    if (!window.supabaseClient) return;
+
+    if (!window.supabaseClient.isReady()) {
+      // Si Supabase JS no cargo, hacer fallback a polling
+      console.warn('[conversations] Supabase no disponible, usando polling');
+      setupPollingFallback();
+      return;
+    }
+
+    // Cancelar polling fallback si existe
+    if (fallbackPolling) {
+      clearInterval(fallbackPolling);
+      fallbackPolling = null;
+    }
+
+    // Suscribirse a cambios en la lista de conversaciones
+    try {
+      conversationsChannel = window.supabaseClient.subscribeToConversations(async (payload) => {
+        // Recargar lista cuando hay cualquier cambio
+        await loadConversations();
+      });
+    } catch (e) {
+      console.error('[conversations] Error subscribiendo a conversations:', e);
+      setupPollingFallback();
+    }
+  }
+
+  function setupPollingFallback() {
+    if (fallbackPolling) return;
+    fallbackPolling = setInterval(async () => {
+      if (state.activeId) {
         const result = await window.api.listMessages(state.activeId, { limit: 200 });
         if (result.ok) {
           const newMsgs = result.data.messages || [];
-          // Detect new messages
           const lastKnown = state.messages[state.messages.length - 1];
           if (!lastKnown || new Date(newMsgs[newMsgs.length - 1]?.created_at) > new Date(lastKnown.created_at)) {
             state.messages = newMsgs;
@@ -584,7 +619,6 @@
           }
         }
       }
-      // Refresh conversation list to update last_message
       const convResult = await window.api.listConversations({ limit: 100 });
       if (convResult.ok) {
         state.conversations = convResult.data.conversations || [];
@@ -593,10 +627,46 @@
     }, 5000);
   }
 
+  function subscribeToActiveConversation() {
+    if (!state.activeId || !window.supabaseClient) return;
+
+    // Limpiar suscripcion anterior
+    if (messagesChannel) {
+      window.supabaseClient.unsubscribe(messagesChannel);
+      messagesChannel = null;
+    }
+
+    if (!window.supabaseClient.isReady()) return;
+
+    try {
+      messagesChannel = window.supabaseClient.subscribeToMessages(state.activeId, (newMsg) => {
+        // Evitar duplicados si llega por polling y realtime
+        const exists = state.messages.find(m => m.id === newMsg.id);
+        if (!exists) {
+          state.messages.push(newMsg);
+          renderMessages();
+          // Auto-scroll al fondo
+          const body = document.getElementById('wa-chat-body');
+          if (body) body.scrollTop = body.scrollHeight;
+        }
+      });
+    } catch (e) {
+      console.error('[conversations] Error subscribiendo a messages:', e);
+    }
+  }
+
   function cleanup() {
-    if (pollingInterval) {
-      clearInterval(pollingInterval);
-      pollingInterval = null;
+    if (conversationsChannel && window.supabaseClient) {
+      window.supabaseClient.unsubscribe(conversationsChannel);
+      conversationsChannel = null;
+    }
+    if (messagesChannel && window.supabaseClient) {
+      window.supabaseClient.unsubscribe(messagesChannel);
+      messagesChannel = null;
+    }
+    if (fallbackPolling) {
+      clearInterval(fallbackPolling);
+      fallbackPolling = null;
     }
     state.activeId = null;
     state.activeConv = null;
