@@ -151,6 +151,7 @@
     bindEvents();
     loadConversations();
     setupRealtimeGlobal();
+    updateNavUnreadBadge();
   }
 
   function bindEvents() {
@@ -295,8 +296,10 @@
       el.classList.toggle('wa-conv-item--active', el.dataset.id === id);
     });
 
-    document.getElementById('wa-app').classList.add('wa-app--mobile-chat-open');
+    const waApp = document.getElementById('wa-app');
+    if (waApp) waApp.classList.add('wa-app--mobile-chat-open');
 
+    markConvAsRead(id);
     renderChatPanel();
     await loadMessages(id);
     subscribeToActiveConversation();
@@ -589,34 +592,132 @@
   // Realtime via Supabase (mejor que polling: <500ms latency)
   let conversationsChannel = null;
   let messagesChannel = null;
+  let messagesListChannel = null;
   let fallbackPolling = null;
 
+  function markConvAsRead(convId) {
+    const conv = state.conversations.find(c => c.id === convId);
+    if (conv && conv.unread_count > 0) {
+      conv.unread_count = 0;
+      applyFilters();
+      updateNavUnreadBadge();
+    }
+  }
+
+  function getTotalUnread() {
+    return state.conversations.reduce((acc, c) => acc + (c.unread_count || 0), 0);
+  }
+
+  function updateNavUnreadBadge() {
+    const link = document.querySelector('.app-nav__link[data-route="conversations"]');
+    if (!link) return;
+    let badge = link.querySelector('.app-nav__badge');
+    const total = getTotalUnread();
+    if (total > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'app-nav__badge';
+        const label = link.querySelector('span:not(.app-nav__badge)');
+        link.appendChild(badge);
+      }
+      badge.textContent = total > 99 ? '99+' : String(total);
+    } else if (badge) {
+      badge.remove();
+    }
+  }
+
+  function applyIncrementalConvUpdate(convId, patch) {
+    const idx = state.conversations.findIndex(c => c.id === convId);
+    if (idx < 0) return false;
+    Object.assign(state.conversations[idx], patch);
+    return true;
+  }
+
+  function applyNewMessageToConvList(newMsg) {
+    if (!newMsg || !newMsg.conversation_id) return;
+
+    const idx = state.conversations.findIndex(c => c.id === newMsg.conversation_id);
+    const preview = (newMsg.content || '').substring(0, 80).replace(/\n/g, ' ');
+
+    const lastMsgPatch = {
+      last_message: {
+        content: newMsg.content,
+        direction: newMsg.direction,
+        type: newMsg.type,
+        sent_by: newMsg.sent_by,
+        created_at: newMsg.created_at,
+        preview: preview
+      },
+      updated_at: newMsg.created_at
+    };
+
+    if (idx >= 0) {
+      const conv = state.conversations[idx];
+      const isActive = state.activeId === newMsg.conversation_id;
+      const isInbound = newMsg.direction === 'inbound';
+      const fromContact = isInbound && newMsg.sent_by === 'contact';
+
+      Object.assign(conv, lastMsgPatch);
+
+      if (fromContact && !isActive) {
+        conv.unread_count = (conv.unread_count || 0) + 1;
+      }
+
+      applyFilters();
+      updateNavUnreadBadge();
+    } else {
+      loadConversations();
+    }
+  }
+
   function setupRealtimeGlobal() {
-    // Esperar a que el cliente Supabase este listo
     if (!window.supabaseClient) return;
 
     if (!window.supabaseClient.isReady()) {
-      // Si Supabase JS no cargo, hacer fallback a polling
       console.warn('[conversations] Supabase no disponible, usando polling');
       setupPollingFallback();
       return;
     }
 
-    // Cancelar polling fallback si existe
     if (fallbackPolling) {
       clearInterval(fallbackPolling);
       fallbackPolling = null;
     }
 
-    // Suscribirse a cambios en la lista de conversaciones
     try {
-      conversationsChannel = window.supabaseClient.subscribeToConversations(async (payload) => {
-        // Recargar lista cuando hay cualquier cambio
-        await loadConversations();
+      conversationsChannel = window.supabaseClient.subscribeToConversations((payload) => {
+        if (!payload || !payload.new) return;
+        if (payload.eventType === 'UPDATE') {
+          const u = payload.new;
+          const updated = applyIncrementalConvUpdate(u.id, {
+            status: u.status,
+            bot_active: u.bot_active,
+            current_flow: u.current_flow,
+            current_step: u.current_step,
+            updated_at: u.updated_at
+          });
+          if (!updated) {
+            loadConversations();
+          } else {
+            applyFilters();
+          }
+        } else if (payload.eventType === 'INSERT') {
+          loadConversations();
+        }
       });
     } catch (e) {
       console.error('[conversations] Error subscribiendo a conversations:', e);
       setupPollingFallback();
+    }
+
+    if (typeof window.supabaseClient.subscribeToAllMessages === 'function') {
+      try {
+        messagesListChannel = window.supabaseClient.subscribeToAllMessages((newMsg) => {
+          applyNewMessageToConvList(newMsg);
+        });
+      } catch (e) {
+        console.error('[conversations] Error subscribiendo a all-messages:', e);
+      }
     }
   }
 
@@ -678,6 +779,10 @@
     if (messagesChannel && window.supabaseClient) {
       window.supabaseClient.unsubscribe(messagesChannel);
       messagesChannel = null;
+    }
+    if (messagesListChannel && window.supabaseClient) {
+      window.supabaseClient.unsubscribe(messagesListChannel);
+      messagesListChannel = null;
     }
     if (fallbackPolling) {
       clearInterval(fallbackPolling);

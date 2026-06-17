@@ -403,11 +403,11 @@
     --conv-list-width: 100%;
   }
 
-  .wa-app--mobile-conv-open .wa-conversations-panel {
+  .wa-app:not(.wa-app--mobile-chat-open) .wa-chat-panel {
     display: none;
   }
 
-  .wa-app--mobile-chat-open .wa-chat-panel {
+  .wa-app--mobile-chat-open .wa-conversations-panel {
     display: none;
   }
 }
