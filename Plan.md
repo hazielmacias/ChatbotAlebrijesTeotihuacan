@@ -391,7 +391,7 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 3.4 KPIs
 
-- [ ] **3.4.1** Crear `api/kpis/index.js`:
+- [x] **3.4.1** Crear `api/kpis/index.js`:
   - `GET /api/kpis`
   - Queries a Supabase:
     - Total de mensajes (count messages)
