@@ -116,7 +116,8 @@
     },
 
     async toggleBot(conversationId, botActive) {
-      return request('POST', '/api/conversations/' + encodeURIComponent(conversationId) + '/toggle-bot', {
+      return request('POST', '/api/conversations/toggle-bot', {
+        conversation_id: conversationId,
         bot_active: botActive
       });
     },

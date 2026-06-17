@@ -5,7 +5,7 @@ const { processIncomingMessage } = require('../src/bot/engine');
 
 const loginHandler = require('../api/auth/login');
 const conversationsHandler = require('../api/conversations/index');
-const toggleBotHandler = require('../api/conversations/[id]/toggle-bot');
+const toggleBotHandler = require('../api/conversations/toggle-bot');
 
 function mockReqRes(method, body, query = {}, headers = {}) {
   const req = { method, body, query, headers };
@@ -158,7 +158,7 @@ async function testListMethodNotAllowed(token) {
 
 async function testToggleBotActivate(token, convId) {
   console.log('\n--- Test 7: Reactivar bot (false -> true) ---');
-  const { req, res } = mockReqRes('POST', { bot_active: true }, { id: convId }, { authorization: `Bearer ${token}` });
+  const { req, res } = mockReqRes('POST', { bot_active: true, conversation_id: convId }, {}, { authorization: `Bearer ${token}` });
   await toggleBotHandler(req, res);
   console.log(`Status: ${res.statusCode}`);
   if (res.statusCode === 200) {
@@ -174,7 +174,7 @@ async function testToggleBotActivate(token, convId) {
 
 async function testToggleBotDeactivate(token, convId) {
   console.log('\n--- Test 8: Desactivar bot (true -> false) ---');
-  const { req, res } = mockReqRes('POST', { bot_active: false }, { id: convId }, { authorization: `Bearer ${token}` });
+  const { req, res } = mockReqRes('POST', { bot_active: false, conversation_id: convId }, {}, { authorization: `Bearer ${token}` });
   await toggleBotHandler(req, res);
   console.log(`Status: ${res.statusCode} | Reactivation: ${res.body.reactivation_sent}`);
   return res.statusCode === 200 && res.body.changed && res.body.new_bot_active === false && !res.body.reactivation_sent;
@@ -190,7 +190,7 @@ async function testToggleBotNoChange(token, convId) {
   const currentValue = current?.bot_active;
   console.log(`  Estado actual: ${currentValue}, intentando setear el mismo valor`);
 
-  const { req, res } = mockReqRes('POST', { bot_active: currentValue }, { id: convId }, { authorization: `Bearer ${token}` });
+  const { req, res } = mockReqRes('POST', { bot_active: currentValue, conversation_id: convId }, {}, { authorization: `Bearer ${token}` });
   await toggleBotHandler(req, res);
   console.log(`Status: ${res.statusCode} | Changed: ${res.body.changed}`);
   return res.statusCode === 200 && !res.body.changed;
@@ -199,7 +199,7 @@ async function testToggleBotNoChange(token, convId) {
 async function testToggleBotNotFound(token) {
   console.log('\n--- Test 10: Conversacion inexistente ---');
   const fakeId = '00000000-0000-0000-0000-000000000000';
-  const { req, res } = mockReqRes('POST', { bot_active: true }, { id: fakeId }, { authorization: `Bearer ${token}` });
+  const { req, res } = mockReqRes('POST', { bot_active: true, conversation_id: fakeId }, {}, { authorization: `Bearer ${token}` });
   await toggleBotHandler(req, res);
   console.log(`Status: ${res.statusCode}`);
   return res.statusCode === 404;
@@ -207,7 +207,7 @@ async function testToggleBotNotFound(token) {
 
 async function testToggleBotInvalidBody(token, convId) {
   console.log('\n--- Test 11: Body invalido (no boolean) ---');
-  const { req, res } = mockReqRes('POST', { bot_active: 'yes' }, { id: convId }, { authorization: `Bearer ${token}` });
+  const { req, res } = mockReqRes('POST', { bot_active: 'yes', conversation_id: convId }, {}, { authorization: `Bearer ${token}` });
   await toggleBotHandler(req, res);
   console.log(`Status: ${res.statusCode}`);
   return res.statusCode === 400;
@@ -215,7 +215,7 @@ async function testToggleBotInvalidBody(token, convId) {
 
 async function testToggleBotNoAuth() {
   console.log('\n--- Test 12: Toggle sin token ---');
-  const { req, res } = mockReqRes('POST', { bot_active: false }, { id: '00000000-0000-0000-0000-000000000000' });
+  const { req, res } = mockReqRes('POST', { bot_active: false, conversation_id: '00000000-0000-0000-0000-000000000000' }, {});
   await toggleBotHandler(req, res);
   console.log(`Status: ${res.statusCode}`);
   return res.statusCode === 401;
@@ -274,3 +274,4 @@ async function main() {
 }
 
 main();
+

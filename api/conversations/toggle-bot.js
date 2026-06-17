@@ -1,8 +1,8 @@
-const { requireAuth } = require('../../../src/middleware/auth');
-const { supabaseAdmin } = require('../../../src/lib/supabase');
-const { sendAndStore } = require('../../../src/bot/sender');
+const { requireAuth } = require('../../src/middleware/auth');
+const { supabaseAdmin } = require('../../src/lib/supabase');
+const { sendAndStore } = require('../../src/bot/sender');
 
-const REACTIVATION_MESSAGE = '🤖 *El bot ha sido reactivado en esta conversacion.*\n\nA partir de este momento retomare el control. Escribe *menu* o *0* para ver las opciones disponibles.';
+const REACTIVATION_MESSAGE = '*El bot ha sido reactivado en esta conversacion.*\n\nA partir de este momento retomare el control. Escribe *menu* o *0* para ver las opciones disponibles.';
 
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,18 +21,19 @@ module.exports = async function handler(req, res) {
   const auth = await requireAuth(req, res);
   if (!auth) return;
 
-  const { id } = req.query;
-  if (!id || typeof id !== 'string') {
-    return res.status(400).json({ error: 'ID de conversacion requerido.' });
-  }
-
   let body = req.body;
   if (typeof body === 'string') {
     try { body = JSON.parse(body); } catch (e) {}
   }
   if (!body || typeof body !== 'object') body = {};
 
-  if (typeof body.bot_active !== 'boolean') {
+  const conversationId = body.conversation_id || body.id;
+  const newBotActive = body.bot_active;
+
+  if (!conversationId || typeof conversationId !== 'string') {
+    return res.status(400).json({ error: 'conversation_id requerido.' });
+  }
+  if (typeof newBotActive !== 'boolean') {
     return res.status(400).json({ error: 'El campo bot_active debe ser boolean.' });
   }
 
@@ -40,7 +41,7 @@ module.exports = async function handler(req, res) {
     const { data: conv, error: fetchErr } = await supabaseAdmin
       .from('conversations')
       .select('id, contact_id, phone, status, bot_active')
-      .eq('id', id)
+      .eq('id', conversationId)
       .maybeSingle();
 
     if (fetchErr) {
@@ -52,7 +53,6 @@ module.exports = async function handler(req, res) {
     }
 
     const previousBotActive = conv.bot_active;
-    const newBotActive = body.bot_active;
 
     if (previousBotActive === newBotActive) {
       return res.status(200).json({
@@ -69,7 +69,7 @@ module.exports = async function handler(req, res) {
         bot_active: newBotActive,
         updated_at: new Date().toISOString()
       })
-      .eq('id', id)
+      .eq('id', conversationId)
       .select('id, contact_id, phone, status, bot_active, current_flow, current_step, updated_at')
       .single();
 
@@ -82,11 +82,11 @@ module.exports = async function handler(req, res) {
     let reactivationError = null;
 
     if (!previousBotActive && newBotActive) {
-      console.log(`[toggle-bot] Reactivando bot para conv ${id} (${conv.phone})`);
+      console.log(`[toggle-bot] Reactivando bot para conv ${conversationId} (${conv.phone})`);
       try {
         const result = await sendAndStore({
           phone: conv.phone,
-          conversationId: id,
+          conversationId: conversationId,
           content: REACTIVATION_MESSAGE,
           type: 'text',
           sentBy: 'bot',
