@@ -1,0 +1,37 @@
+{
+  "name": "alebrijes-teotihuacan-chatbot",
+  "version": "1.0.0",
+  "description": "Chatbot de WhatsApp para la Academia de Futbol Alebrijes de Oaxaca Teotihuacan",
+  "main": "api/index.js",
+  "scripts": {
+    "dev": "nodemon api/index.js",
+    "start": "node api/index.js",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alebrijesteotihuacan/ChatbotAlebrijesTeotihuacan.git"
+  },
+  "keywords": ["whatsapp", "chatbot", "meta-api", "supabase"],
+  "author": "Alebrijes Teotihuacan",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/alebrijesteotihuacan/ChatbotAlebrijesTeotihuacan/issues"
+  },
+  "homepage": "https://github.com/alebrijesteotihuacan/ChatbotAlebrijesTeotihuacan#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
+    "axios": "^1.18.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "helmet": "^8.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
