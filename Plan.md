@@ -219,12 +219,15 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 2.1 Módulos base
 
-- [ ] **2.1.1** Crear `src/lib/supabase.js`: cliente de Supabase con service_role key (para backend)
-- [ ] **2.1.2** Crear `src/lib/meta-api.js`: funciones para enviar mensajes de WhatsApp vía Meta API
+- [x] **2.1.1** Crear `src/lib/supabase.js`: cliente de Supabase con service_role key (para backend)
+- [x] **2.1.2** Crear `src/lib/meta-api.js`: funciones para enviar mensajes de WhatsApp vía Meta API
   - `sendMessage(phone, text)` — enviar texto
-  - `sendInteractiveMessage(phone, header, body, buttons)` — enviar mensaje con botones
+  - `sendInteractiveButtons(phone, bodyText, buttons, headerText)` — enviar mensaje con botones
+  - `sendInteractiveList(phone, bodyText, buttonLabel, sections, headerText, footerText)` — enviar lista
   - `sendImageMessage(phone, imageUrl, caption)` — enviar imagen
-- [ ] **2.1.3** Crear `src/middleware/auth.js`: middleware que valida token JWT de Supabase Auth en rutas protegidas
+  - `verifyWebhookSignature(rawBody, signature)` — validar firma del webhook
+  - `extractMessageFromWebhook(body)` — extraer datos del payload
+- [x] **2.1.3** Crear `src/middleware/auth.js`: middleware que valida token JWT de Supabase Auth en rutas protegidas
 
 ### 2.2 Webhook de WhatsApp
 
