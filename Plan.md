@@ -471,16 +471,16 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 4.5 Dashboard — Conversaciones
 
-- [ ] **4.5.1** Integrar vista de conversaciones en `dashboard.html` o crear página dedicada:
-  - Panel izquierdo: lista de conversaciones (scrollable)
-  - Cada item muestra: nombre/teléfono, último mensaje, timestamp, badge con mensajes nuevos
-  - Barra de búsqueda arriba de la lista
-  - Filtro por status (todas, activas, cerradas)
-  - Click en conversación → abrir vista de chat
-- [ ] **4.5.2** Suscripción Realtime:
-  - Al abrir una conversación, suscribirse a nuevos mensajes en `messages` donde `conversation_id = id`
-  - Al recibir mensaje nuevo, agregar burbuja al chat en tiempo real
-  - Actualizar lista de conversaciones cuando cambia `updated_at`
+- [x] **4.5.1** Integrar vista de conversaciones en `dashboard.html` o crear página dedicada:
+  - Panel izquierdo: lista de conversaciones (scrollable) — `wa-conversations-panel` + `wa-conv-list`
+  - Cada item muestra: nombre/teléfono, último mensaje, timestamp, badge con mensajes nuevos — `wa-conv-item` con avatares, preview, time, badge Bot/Humano + unread
+  - Barra de búsqueda arriba de la lista — `wa-search` con input `conv-search` (busca por nombre, teléfono o contenido)
+  - Filtro por status (todas, activas, cerradas) — `wa-conv-filters` con Todos/Activos/Cerrados/Bot/Humano
+  - Click en conversación → abrir vista de chat — `selectConversation()` + responsive mobile toggle
+- [x] **4.5.2** Suscripción Realtime:
+  - Al abrir una conversación, suscribirse a nuevos mensajes en `messages` donde `conversation_id = id` — `subscribeToActiveConversation()` con `subscribeToMessages()`
+  - Al recibir mensaje nuevo, agregar burbuja al chat en tiempo real — push a `state.messages` + `renderMessages()` con dedup
+  - Actualizar lista de conversaciones cuando cambia `updated_at` — `subscribeToConversations()` + `subscribeToAllMessages()` con updates incrementales (last_message, unread_count)
 
 ### 4.6 Dashboard — Chat estilo WhatsApp Web
 
