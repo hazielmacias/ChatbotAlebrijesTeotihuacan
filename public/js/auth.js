@@ -85,6 +85,17 @@
       });
       if (!r.ok) return null;
       const data = await r.json();
+      // El endpoint devuelve { user: {auth user}, profile: {display_name} }
+      // Combinamos para tener un objeto unificado
+      if (data.profile) {
+        return {
+          id: data.profile.id,
+          display_name: data.profile.display_name,
+          email: data.user?.email,
+          auth_user_id: data.user?.id,
+          created_at: data.profile.created_at
+        };
+      }
       return data.user || null;
     } catch (e) {
       return null;
@@ -151,7 +162,7 @@
       const meta = supa.user_metadata || {};
       if (meta.display_name) return meta.display_name;
     }
-    const user = this.getUser();
+    const user = getUser();
     if (user && user.email) {
       const local = user.email.split('@')[0];
       return local.charAt(0).toUpperCase() + local.slice(1);

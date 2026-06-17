@@ -86,8 +86,14 @@
       const r = await request('GET', '/api/auth/me');
       if (r.ok) {
         // Notificar a auth para que actualice el dashboard user
-        if (window.auth && window.auth.setDashboardUser) {
-          window.auth.setDashboardUser(r.data.user);
+        if (window.auth && window.auth.setDashboardUser && r.data.profile) {
+          window.auth.setDashboardUser({
+            id: r.data.profile.id,
+            display_name: r.data.profile.display_name,
+            email: r.data.user?.email,
+            auth_user_id: r.data.user?.id,
+            created_at: r.data.profile.created_at
+          });
         }
         return { ok: true, data: r.data };
       }
