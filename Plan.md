@@ -203,7 +203,7 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
   - Generar y copiar el `Access Token` permanente
 - [x] **1.3.5** Definir el `Verify Token` personalizado para el webhook (ej: `alebrijes_verify_2024`)
 - [x] **1.3.6** Anotar todas las credenciales en el `.env` local (NUNCA subir `.env` a GitHub)
-- [x] **1.3.7** Configurar webhook URL apuntando a `https://alebrijes-chatbot.vercel.app/api/webhook` (deploy listo, pendiente suscripción en Meta por falta de App Secret)
+- [x] **1.3.7** Configurar webhook URL apuntando a `https://alebrijes-chatbot.vercel.app/api/webhook` (suscripción activa en Meta: `active: true`, fields: `messages`)
 
 ### 1.4 Vercel — Deploy inicial
 
