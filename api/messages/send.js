@@ -65,7 +65,9 @@ module.exports = async function handler(req, res) {
         .eq('auth_user_id', auth.user.id)
         .maybeSingle();
       if (dashUser && dashUser.display_name) {
-        responderName = dashUser.display_name;
+        responderName = String(dashUser.display_name).trim().split(/\s+/)[0];
+      } else if (auth.user.user_metadata && auth.user.user_metadata.display_name) {
+        responderName = String(auth.user.user_metadata.display_name).trim().split(/\s+/)[0];
       }
     } catch (e) {
       // No bloquear el envio si falla la consulta

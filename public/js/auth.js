@@ -155,19 +155,24 @@
   }
 
   function getUserDisplayName() {
+    let raw = null;
     const dash = getDashboardUser();
-    if (dash && dash.display_name) return dash.display_name;
-    const supa = getSupabaseUser();
-    if (supa) {
-      const meta = supa.user_metadata || {};
-      if (meta.display_name) return meta.display_name;
+    if (dash && dash.display_name) raw = dash.display_name;
+    if (!raw) {
+      const supa = getSupabaseUser();
+      if (supa) {
+        const meta = supa.user_metadata || {};
+        if (meta.display_name) raw = meta.display_name;
+      }
     }
-    const user = getUser();
-    if (user && user.email) {
-      const local = user.email.split('@')[0];
-      return local.charAt(0).toUpperCase() + local.slice(1);
+    if (!raw) {
+      const user = getUser();
+      if (user && user.email) {
+        raw = user.email.split('@')[0];
+      }
     }
-    return 'Usuario';
+    if (!raw) return 'Usuario';
+    return raw.trim().split(/\s+/)[0];
   }
 
   function getUserEmail() {
