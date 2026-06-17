@@ -453,7 +453,7 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 4.4 Dashboard — KPIs
 
-- [ ] **4.4.1** Crear `public/dashboard.html`:
+- [x] **4.4.1** Crear `public/dashboard.html`:
   - Navbar con logo, nombre "Alebrijes Teotihuacan", botón de logout
   - Grid de KPI cards:
     - Total de mensajes
@@ -461,11 +461,13 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
     - Usuarios únicos
     - Mensajes hoy
   - Gráfico simple de mensajes por día (últimos 7 días) usando CSS bars (sin librería externa)
-- [ ] **4.4.2** Crear `public/js/dashboard.js`:
+- [x] **4.4.2** Crear `public/js/views/kpis.js` (módulo equivalente a `dashboard.js` en la arquitectura SPA con router):
   - Fetch a `GET /api/kpis` al cargar
-  - Renderizar KPIs en las cards
-  - Suscribirse a Supabase Realtime en tabla `messages` para actualizar contadores en vivo
+  - Renderizar KPIs en las cards (6 stat cards + gráfico 7 días + breakdown por estado)
+  - Suscribirse a Supabase Realtime en tabla `messages` (sin filtro) para actualizar contadores en vivo
   - Auto-refresh cada 30 segundos como fallback
+  - Debounce 1.5s en eventos Realtime para evitar rafaga
+  - Teardown automático al navegar fuera (libera interval + channel)
 
 ### 4.5 Dashboard — Conversaciones
 
