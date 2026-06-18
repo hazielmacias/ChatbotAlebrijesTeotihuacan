@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+﻿const crypto = require('crypto');
 
 // En Vercel, las env vars se cargan automaticamente, pero
 // NODEJS_HELPERS=0 puede interferir. Cargamos dotenv como fallback
@@ -143,3 +143,6 @@ module.exports = async function handler(req, res) {
 
   return res.status(405).json({ error: 'Method not allowed' });
 };
+
+// Last touched: 2026-06-17T18:45:38.5090755-06:00
+
