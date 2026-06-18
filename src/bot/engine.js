@@ -27,8 +27,8 @@ const CONTACT_INFO = {
 
 const POST_REGISTRATION_MESSAGES = {
   escuela: '🚨 *REQUISITOS OBLIGATORIOS PARA TU PRIMER DÍA:*\nPara que te hagamos válido este pase, el día de tu entrenamiento debes presentarte puntualmente en el Centro Recreativo Pascual Boing con:\n\n1️⃣ Esta imagen de tu pase de prueba (en tu celular o impresa).\n2️⃣ Ropa completamente blanca.\n3️⃣ Zapatos de fútbol (tacos).\n4️⃣ Tu propia hidratación.\n\n📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Lic. Areli Janette:* 55 1008 7435\n📌 *Centro de Formación Académica*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
-  tdp: '¡Tu *Pase de Semana de Prueba* está listo! 🎉\n\nRevisa los requisitos y la información de contacto que te compartimos anteriormente. ¡Te esperamos en la cancha para demostrar tu talento! ⚽',
-  piloto: '¡Tu *Pase de Semana de Prueba* está listo! 🎉\n\nRevisa los requisitos y la información de contacto que te compartimos anteriormente. ¡Te esperamos en la cancha para demostrar tu talento! ⚽'
+  tdp: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Lic. Athziri Velazquez:* 56 2128 9945\n📌 *Fuerzas Básicas y Tercera División Profesional*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
+  piloto: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Lic. Athziri Velazquez:* 56 2128 9945\n📌 *Fuerzas Básicas y Tercera División Profesional*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽'
 };
 
 async function getOrCreateContact(phone, name) {
