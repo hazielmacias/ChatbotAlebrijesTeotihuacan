@@ -163,20 +163,28 @@
       // Logout button in user menu (legacy)
       const legacyLogout = document.getElementById('logout-btn');
       if (legacyLogout) {
-        legacyLogout.addEventListener('click', () => {
-          if (confirm('Cerrar sesion?')) {
-            window.auth.logout();
-          }
+        legacyLogout.addEventListener('click', async () => {
+          const ok = await window.modal.confirm({
+            title: 'Cerrar sesion',
+            message: 'Se cerrara tu sesion actual. Tendras que volver a iniciar sesion para entrar al panel.',
+            type: 'warning',
+            confirmText: 'Cerrar sesion'
+          });
+          if (ok) window.auth.logout();
         });
       }
 
       // Logout button in sidebar
       const sidebarLogout = document.getElementById('btn-logout');
       if (sidebarLogout) {
-        sidebarLogout.addEventListener('click', () => {
-          if (confirm('Cerrar sesion?')) {
-            window.auth.logout();
-          }
+        sidebarLogout.addEventListener('click', async () => {
+          const ok = await window.modal.confirm({
+            title: 'Cerrar sesion',
+            message: 'Se cerrara tu sesion actual. Tendras que volver a iniciar sesion para entrar al panel.',
+            type: 'warning',
+            confirmText: 'Cerrar sesion'
+          });
+          if (ok) window.auth.logout();
         });
       }
 

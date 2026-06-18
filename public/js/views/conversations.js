@@ -775,7 +775,13 @@
     if (!state.activeConv) return;
     const conv = state.activeConv;
     const name = conv.contact?.name || formatPhone(conv.phone) || 'este contacto';
-    if (!confirm('Archivar la conversacion con ' + name + '?\nDejara de aparecer en Conversaciones y podras restaurarla desde Archivados.')) return;
+    const ok = await window.modal.confirm({
+      title: 'Archivar conversacion',
+      message: 'Archivar la conversacion con ' + name + '.\nDejara de aparecer en Conversaciones y podras restaurarla desde Archivados.',
+      type: 'warning',
+      confirmText: 'Archivar'
+    });
+    if (!ok) return;
 
     const result = await window.api.archiveConversation(conv.id, true);
     if (!result.ok) {

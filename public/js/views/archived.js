@@ -265,7 +265,13 @@
   async function restoreConversation(id) {
     const conv = state.conversations.find(c => c.id === id);
     const name = conv?.contact?.name || formatPhone(conv?.phone) || 'esta conversacion';
-    if (!confirm('Restaurar la conversacion con ' + name + '?')) return;
+    const ok = await window.modal.confirm({
+      title: 'Restaurar conversacion',
+      message: 'Restaurar la conversacion con ' + name + '. Volvera a aparecer en Conversaciones.',
+      type: 'info',
+      confirmText: 'Restaurar'
+    });
+    if (!ok) return;
 
     const result = await window.api.archiveConversation(id, false);
     if (!result.ok) {
