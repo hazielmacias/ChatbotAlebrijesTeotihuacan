@@ -107,6 +107,7 @@
       if (params.limit) query.set('limit', params.limit);
       if (params.status && params.status !== 'all') query.set('status', params.status);
       if (params.search) query.set('search', params.search);
+      if (params.archived) query.set('archived', 'true');
       const qs = query.toString();
       return request('GET', '/api/conversations' + (qs ? '?' + qs : ''));
     },
@@ -119,6 +120,13 @@
       return request('POST', '/api/conversations/toggle-bot', {
         conversation_id: conversationId,
         bot_active: botActive
+      });
+    },
+
+    async archiveConversation(conversationId, archived) {
+      return request('POST', '/api/conversations/archive', {
+        conversation_id: conversationId,
+        archived: !!archived
       });
     },
 
@@ -141,32 +149,6 @@
     // KPIs
     async getKpis() {
       return request('GET', '/api/kpis');
-    },
-
-    // Catalog (consolidado en api/catalog/index.js con ?id=xxx, PATCH/DELETE con id en body)
-    async listCatalog(params = {}) {
-      const query = new URLSearchParams();
-      if (params.category) query.set('category', params.category);
-      if (params.search) query.set('search', params.search);
-      if (params.include_inactive) query.set('include_inactive', 'true');
-      const qs = query.toString();
-      return request('GET', '/api/catalog' + (qs ? '?' + qs : ''));
-    },
-
-    async getCatalogItem(id) {
-      return request('GET', '/api/catalog?id=' + encodeURIComponent(id));
-    },
-
-    async createCatalogItem(data) {
-      return request('POST', '/api/catalog', data);
-    },
-
-    async updateCatalogItem(id, data) {
-      return request('PATCH', '/api/catalog', { id, ...data });
-    },
-
-    async deleteCatalogItem(id) {
-      return request('DELETE', '/api/catalog', { id });
     },
 
     // Dashboard (consolidado: ?type=stats|notifications|templates)

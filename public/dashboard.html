@@ -82,11 +82,11 @@
             <span>Notificaciones</span>
             <span class="app-nav__badge" id="notif-badge" hidden>0</span>
           </a>
-          <a href="#catalog" class="app-nav__link" data-route="catalog">
+          <a href="#archived" class="app-nav__link" data-route="archived">
             <svg class="app-nav__icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z"/>
+              <path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/>
             </svg>
-            <span>Catalogo</span>
+            <span>Archivados</span>
           </a>
           <a href="#settings" class="app-nav__link" data-route="settings">
             <svg class="app-nav__icon" viewBox="0 0 24 24" fill="currentColor">
@@ -116,6 +116,7 @@
 
   <link rel="stylesheet" href="/css/dashboard.css">
   <link rel="stylesheet" href="/css/notifications.css">
+  <link rel="stylesheet" href="/css/archived.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
   <script src="/js/config.js"></script>
   <script src="/js/supabase-client.js"></script>
@@ -125,8 +126,7 @@
   <script src="/js/views/dashboard.js"></script>
   <script src="/js/views/conversations.js"></script>
   <script src="/js/views/notifications.js"></script>
-  <script src="/js/views/kpis.js"></script>
-  <script src="/js/views/catalog.js"></script>
+  <script src="/js/views/archived.js"></script>
   <script src="/js/views/settings.js"></script>
   <script>
     (async function() {
@@ -191,8 +191,7 @@
       window.router.register('dashboard', window.dashboardView.render);
       window.router.register('conversations', window.conversationsView.render);
       window.router.register('notifications', window.notificationsView.render);
-      window.router.register('kpis', window.kpisView.render);
-      window.router.register('catalog', window.catalogView.render);
+      window.router.register('archived', window.archivedView.render);
       window.router.register('settings', window.settingsView.render);
 
       // Init en Dashboard

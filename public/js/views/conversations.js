@@ -347,6 +347,9 @@
           <div class="wa-chat-header__status">${escapeHtml(phone)}</div>
         </div>
         <div class="wa-chat-header__actions">
+          <button class="wa-icon-btn wa-chat-header__archive" id="btn-archive-conv" title="Archivar conversacion" aria-label="Archivar conversacion">
+            <svg viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
+          </button>
           <label class="wa-chat-bot-control ${isBot ? 'wa-chat-bot-control--on' : 'wa-chat-bot-control--off'}" id="bot-control-wrap" title="Click para ${isBot ? 'desactivar el bot y responder manualmente' : 'reactivar el bot'}">
             <span class="wa-chat-bot-control__label" id="bot-control-label">${isBot ? 'Bot activo' : 'Control manual'}</span>
             <span class="wa-switch">
@@ -394,6 +397,11 @@
     const toggleBtn = document.getElementById('btn-toggle-bot');
     if (toggleBtn) {
       toggleBtn.addEventListener('change', () => toggleBot(conv.id));
+    }
+
+    const archiveBtn = document.getElementById('btn-archive-conv');
+    if (archiveBtn) {
+      archiveBtn.addEventListener('click', () => archiveCurrentConversation());
     }
 
     const sendBtn = document.getElementById('msg-send');
@@ -673,6 +681,29 @@
     }
   }
 
+  async function archiveCurrentConversation() {
+    if (!state.activeConv) return;
+    const conv = state.activeConv;
+    const name = conv.contact?.name || formatPhone(conv.phone) || 'este contacto';
+    if (!confirm('Archivar la conversacion con ' + name + '?\nDejara de aparecer en Conversaciones y podras restaurarla desde Archivados.')) return;
+
+    const result = await window.api.archiveConversation(conv.id, true);
+    if (!result.ok) {
+      window.toast.error('Error al archivar: ' + (result.error || 'desconocido'));
+      return;
+    }
+
+    window.toast.success('Conversacion archivada');
+    state.conversations = state.conversations.filter(c => c.id !== conv.id);
+    state.activeId = null;
+    state.activeConv = null;
+    state.messages = [];
+    const waApp = document.getElementById('wa-app');
+    if (waApp) waApp.classList.remove('wa-app--mobile-chat-open');
+    applyFilters();
+    renderChatPanel();
+  }
+
   // Realtime via Supabase (mejor que polling: <500ms latency)
   let conversationsChannel = null;
   let messagesChannel = null;
@@ -773,6 +804,23 @@
         if (!payload || !payload.new) return;
         if (payload.eventType === 'UPDATE') {
           const u = payload.new;
+          if (u.archived_at) {
+            const idx = state.conversations.findIndex(c => c.id === u.id);
+            if (idx >= 0) {
+              state.conversations.splice(idx, 1);
+              if (state.activeId === u.id) {
+                state.activeId = null;
+                state.activeConv = null;
+                state.messages = [];
+                const waApp = document.getElementById('wa-app');
+                if (waApp) waApp.classList.remove('wa-app--mobile-chat-open');
+                renderChatPanel();
+              }
+              applyFilters();
+              updateNavUnreadBadge();
+            }
+            return;
+          }
           const updated = applyIncrementalConvUpdate(u.id, {
             status: u.status,
             bot_active: u.bot_active,

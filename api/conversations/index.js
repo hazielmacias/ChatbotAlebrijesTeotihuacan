@@ -11,6 +11,12 @@ function setCors(res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 }
 
+function parseBool(value) {
+  if (value === true || value === 'true' || value === '1' || value === 1) return true;
+  if (value === false || value === 'false' || value === '0' || value === 0) return false;
+  return null;
+}
+
 function parseIntSafe(value, fallback) {
   const n = parseInt(value, 10);
   return Number.isFinite(n) && n > 0 ? n : fallback;
@@ -28,11 +34,14 @@ module.exports = async function handler(req, res) {
   if (!auth) return;
 
   try {
-    const { status, search, page, limit } = req.query;
+    const { status, search, page, limit, archived } = req.query;
 
     const pageNum = Math.min(parseIntSafe(page, DEFAULT_PAGE), 10000);
     const limitNum = Math.min(parseIntSafe(limit, DEFAULT_LIMIT), MAX_LIMIT);
     const offset = (pageNum - 1) * limitNum;
+
+    const archivedFilter = parseBool(archived);
+    const showArchived = archivedFilter === true;
 
     let query = supabaseAdmin
       .from('conversations')
@@ -44,6 +53,7 @@ module.exports = async function handler(req, res) {
         bot_active,
         current_flow,
         current_step,
+        archived_at,
         created_at,
         updated_at,
         contacts ( id, phone, name, created_at )
@@ -53,6 +63,12 @@ module.exports = async function handler(req, res) {
 
     if (status && ['active', 'closed'].includes(status)) {
       query = query.eq('status', status);
+    }
+
+    if (showArchived) {
+      query = query.not('archived_at', 'is', null);
+    } else {
+      query = query.is('archived_at', null);
     }
 
     const { data: conversations, error, count } = await query;
@@ -106,6 +122,7 @@ module.exports = async function handler(req, res) {
         bot_active: c.bot_active,
         current_flow: c.current_flow,
         current_step: c.current_step,
+        archived_at: c.archived_at,
         created_at: c.created_at,
         updated_at: c.updated_at,
         contact: c.contacts ? {
@@ -150,7 +167,8 @@ module.exports = async function handler(req, res) {
       },
       filters: {
         status: status || 'all',
-        search: search || null
+        search: search || null,
+        archived: showArchived
       }
     });
   } catch (e) {

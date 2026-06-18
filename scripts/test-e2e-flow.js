@@ -229,30 +229,34 @@ async function main() {
     ok('5.4.10 KPIs disponibles: totals, today, direction_breakdown, conversations_by_status, 7days');
   } else fail_('5.4.10', 'status=' + kpis1.status);
 
-  // ===== 5.4.11: Plan visible en dashboard =====
-  header('5.4.11: Plan creado aparece en dashboard');
+  // ===== 5.4.11: Archivados =====
+  header('5.4.11: Archivados (archivar / listar / restaurar)');
 
-  const planName = 'E2E Plan Test ' + Date.now();
-  const create = await apiCall('POST', '/api/catalog', {
-    name: planName,
-    description: 'Plan creado en test E2E',
-    price: 1500,
-    category: 'escuela'
-  }, token);
-  if (create.status === 201 && create.body.plan) {
-    ok('5.4.11a Plan creado en dashboard: "' + create.body.plan.name + '" id=' + create.body.plan.id.substring(0, 8));
-  } else fail_('5.4.11a', 'status=' + create.status);
+  const testConv = await apiCall('GET', '/api/conversations?limit=1', null, token);
+  const convId = testConv.body.conversations?.[0]?.id;
 
-  // Verificar que aparece en GET /api/catalog
-  const list = await apiCall('GET', '/api/catalog?include_inactive=true', null, token);
-  const found = (list.body.plans || []).find(p => p.name === planName);
-  if (found) ok('5.4.11b Plan aparece en la lista del dashboard');
-  else fail_('5.4.11b', 'plan no aparece en lista');
+  if (!convId) {
+    fail_('5.4.11a', 'no hay conversaciones para test');
+  } else {
+    const arch = await apiCall('POST', '/api/conversations/archive', { conversation_id: convId, archived: true }, token);
+    if (arch.status === 200 && arch.body.conversation?.archived_at) {
+      ok('5.4.11a Conversacion archivada: archived_at=' + arch.body.conversation.archived_at);
+    } else fail_('5.4.11a', 'status=' + arch.status);
 
-  // Limpiar
-  if (create.body.plan?.id) {
-    await apiCall('DELETE', '/api/catalog/delete', { id: create.body.plan.id }, token);
-    ok('5.4.11c Plan desactivado al final del test');
+    const archList = await apiCall('GET', '/api/conversations?archived=true&limit=10', null, token);
+    const inArchived = (archList.body.conversations || []).find(c => c.id === convId);
+    if (inArchived) ok('5.4.11b Aparece en GET /api/conversations?archived=true');
+    else fail_('5.4.11b', 'no aparece en lista de archivados');
+
+    const mainList = await apiCall('GET', '/api/conversations?limit=200', null, token);
+    const inMain = (mainList.body.conversations || []).find(c => c.id === convId);
+    if (!inMain) ok('5.4.11c NO aparece en la lista principal (filtrado por default)');
+    else fail_('5.4.11c', 'aparece en lista principal - filtro no aplicado');
+
+    const restore = await apiCall('POST', '/api/conversations/archive', { conversation_id: convId, archived: false }, token);
+    if (restore.status === 200 && !restore.body.conversation?.archived_at) {
+      ok('5.4.11d Conversacion restaurada: archived_at=' + restore.body.conversation.archived_at);
+    } else fail_('5.4.11d', 'status=' + restore.status);
   }
 
   // ===== RESUMEN =====
