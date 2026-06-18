@@ -73,13 +73,28 @@
 
   // ========== Auth ==========
 
+  function translateAuthError(message) {
+    if (!message) return message;
+    const m = String(message).toLowerCase();
+    if (m.includes('invalid login credentials')) return 'Correo o contrasena incorrectos';
+    if (m.includes('invalid email or password')) return 'Correo o contrasena incorrectos';
+    if (m.includes('email not confirmed')) return 'Debes confirmar tu correo electronico antes de iniciar sesion';
+    if (m.includes('user not found')) return 'Correo o contrasena incorrectos';
+    if (m.includes('user already registered') || m.includes('already been registered')) return 'Este correo ya esta registrado';
+    if (m.includes('password should be at least')) return 'La contrasena debe tener al menos 6 caracteres';
+    if (m.includes('signup is disabled')) return 'El registro esta deshabilitado';
+    if (m.includes('email rate limit') || m.includes('rate limit')) return 'Demasiados intentos. Espera un momento.';
+    if (m.includes('network') || m.includes('fetch')) return 'Error de conexion. Intenta de nuevo.';
+    return message;
+  }
+
   async function signIn(email, password) {
     try {
       await waitForSupabase();
       const client = getClient();
       const { data, error } = await client.auth.signInWithPassword({ email, password });
       if (error) {
-        return { ok: false, error: error.message, code: error.code };
+        return { ok: false, error: translateAuthError(error.message), code: error.code };
       }
       return {
         ok: true,
@@ -88,7 +103,7 @@
         accessToken: data.session?.access_token
       };
     } catch (e) {
-      return { ok: false, error: e.message };
+      return { ok: false, error: translateAuthError(e.message) };
     }
   }
 
