@@ -1,6 +1,6 @@
 /* ========================================
-   Dashboard - Vista principal con stats
-   Apple Stats design (titulo uppercase small, numero bold grande)
+   Dashboard - Apple Health / Activity style
+   Anillos de actividad, sparklines, comparativas
    ======================================== */
 
 .dashboard-view {
@@ -25,8 +25,8 @@
   font-weight: var(--fw-bold);
   color: var(--color-text);
   margin: 0;
-  letter-spacing: -0.025em;
-  line-height: 1.1;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
 }
 
 .dashboard-header__subtitle {
@@ -34,6 +34,7 @@
   color: var(--color-text-muted);
   margin-top: var(--space-2);
   font-weight: var(--fw-medium);
+  letter-spacing: -0.005em;
 }
 
 .dashboard-header__date {
@@ -44,6 +45,7 @@
   gap: var(--space-2);
   font-weight: var(--fw-semibold);
   letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
 }
 
 .dashboard-header__date strong {
@@ -51,12 +53,12 @@
   font-weight: var(--fw-bold);
 }
 
-/* === Stat cards (Apple Stats) === */
+/* === KPI cards: Apple Health Activity Rings === */
 .dashboard-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--space-4);
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-6);
 }
 
 @media (max-width: 1100px) {
@@ -67,68 +69,168 @@
   .dashboard-stats { grid-template-columns: 1fr; }
 }
 
-.stat-tile {
+.kpi-card {
   position: relative;
-  padding: var(--space-5) var(--space-5) var(--space-6);
+  padding: var(--space-5);
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
   display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+  align-items: stretch;
+  gap: var(--space-4);
+  overflow: hidden;
 }
 
-.stat-tile:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, var(--kpi-tint, rgba(255, 94, 0, 0.04)) 0%, transparent 70%);
+  pointer-events: none;
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+}
+
+.kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
   border-color: var(--color-border-strong);
 }
 
-.stat-tile__head {
+.kpi-card--primary { --kpi-tint: rgba(255, 94, 0, 0.06); --kpi-color: var(--color-primary); }
+.kpi-card--info    { --kpi-tint: rgba(0, 80, 179, 0.06);  --kpi-color: var(--color-info); }
+.kpi-card--success { --kpi-tint: rgba(0, 177, 79, 0.06);  --kpi-color: var(--color-success); }
+.kpi-card--warning { --kpi-tint: rgba(255, 193, 7, 0.06);  --kpi-color: var(--color-warning); }
+
+/* === Activity Ring (signature Apple element) === */
+.kpi-card__ring-wrap {
+  flex-shrink: 0;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.kpi-card__ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.kpi-card__ring-bg {
+  fill: none;
+  stroke: var(--color-bg-elevated);
+  stroke-width: 6;
+}
+
+.kpi-card__ring-fill {
+  fill: none;
+  stroke: var(--kpi-color);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dasharray 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 0 6px var(--kpi-tint));
+}
+
+.kpi-card__ring-center {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-bold);
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   gap: var(--space-2);
+}
+
+.kpi-card__label {
   font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-weight: var(--fw-bold);
 }
 
-.stat-tile__icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-  color: var(--color-text-muted);
-}
-
-.stat-tile__value {
+.kpi-card__value {
   font-family: var(--font-display);
-  font-size: var(--fs-3xl);
+  font-size: var(--fs-2xl);
   font-weight: var(--fw-bold);
   color: var(--color-text);
   line-height: 1;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  margin-top: -2px;
 }
 
-.stat-tile__delta {
+.kpi-card__trend {
   display: flex;
   align-items: center;
   gap: 4px;
   font-size: var(--fs-xs);
-  color: var(--color-text-muted);
-  margin-top: auto;
-  font-weight: var(--fw-semibold);
-  letter-spacing: -0.005em;
-}
-
-.stat-tile__delta strong {
-  color: var(--color-text);
   font-weight: var(--fw-bold);
+  letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
 }
 
-/* === Keywords === */
+.kpi-card__trend--up   { color: var(--color-success); }
+.kpi-card__trend--down { color: var(--color-danger); }
+.kpi-card__trend--flat { color: var(--color-text-dim); }
+
+.kpi-card__trend svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.kpi-card__trend-label {
+  color: var(--color-text-muted);
+  font-weight: var(--fw-semibold);
+  margin-left: 2px;
+}
+
+/* === Sparkline (mini chart) === */
+.kpi-card__spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 28px;
+  margin-top: var(--space-1);
+}
+
+.kpi-card__spark-bar {
+  flex: 1;
+  background: var(--color-bg-elevated);
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.kpi-card__spark-bar--filled {
+  background: var(--kpi-color);
+  opacity: 0.85;
+}
+
+.kpi-card__spark-bar--filled:last-child {
+  opacity: 1;
+  transform: scaleY(1.05);
+}
+
+/* === Keywords (pills with subtle ring) === */
 .keywords-row {
   display: flex;
   gap: 6px;
@@ -148,6 +250,12 @@
   color: var(--color-text);
   font-weight: var(--fw-semibold);
   letter-spacing: -0.005em;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.keyword-pill:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-bg-card);
 }
 
 .keyword-pill__count {
@@ -159,14 +267,15 @@
   border-radius: var(--radius-full);
   min-width: 20px;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 /* === Charts grid === */
 .dashboard-charts {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1.6fr 1fr;
   gap: var(--space-4);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-4);
 }
 
 @media (max-width: 900px) {
@@ -176,21 +285,28 @@
 .chart-card {
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   padding: var(--space-5);
   transition: border-color 200ms ease, box-shadow 200ms ease;
+  position: relative;
 }
 
 .chart-card:hover {
   border-color: var(--color-border-strong);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .chart-card__head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   margin-bottom: var(--space-5);
   gap: var(--space-3);
+}
+
+.chart-card__title-group {
+  flex: 1;
+  min-width: 0;
 }
 
 .chart-card__title {
@@ -199,118 +315,244 @@
   font-weight: var(--fw-bold);
   color: var(--color-text);
   margin: 0;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.018em;
 }
 
 .chart-card__subtitle {
-  font-size: var(--fs-xs);
+  font-size: 10px;
   color: var(--color-text-muted);
-  margin-top: 2px;
-  font-weight: var(--fw-medium);
-  letter-spacing: 0.02em;
+  margin-top: 4px;
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-/* === Pie chart === */
-.pie-chart {
+.chart-card__total {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  color: var(--color-text);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* === Bar chart (Apple Health style) === */
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-2);
+  height: 220px;
+  padding: var(--space-2) 0 0;
+  position: relative;
+}
+
+.chart-bars::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 var(--space-6) 0;
+  background-image:
+    linear-gradient(to top, var(--color-border) 1px, transparent 1px);
+  background-size: 100% 25%;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.chart-bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  height: 100%;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 1;
+}
+
+.chart-bar__value {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.chart-bar:hover .chart-bar__value {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.chart-bar__fill {
+  width: 100%;
+  max-width: 36px;
+  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+  border-radius: 6px 6px 2px 2px;
+  min-height: 4px;
+  transition: transform 200ms ease, box-shadow 200ms ease, height 800ms cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  box-shadow: 0 2px 8px rgba(255, 94, 0, 0.15);
+}
+
+.chart-bar:hover .chart-bar__fill {
+  transform: scaleY(1.02);
+  transform-origin: bottom;
+  box-shadow: 0 4px 16px rgba(255, 94, 0, 0.25);
+}
+
+.chart-bar__label {
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* === Donut chart === */
+.donut {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.donut__chart {
   position: relative;
   width: 180px;
   height: 180px;
-  margin: var(--space-4) auto 0;
-  border-radius: 50%;
-  background: conic-gradient(
-    var(--color-primary) 0% 0%,
-    var(--color-info) 0% 0%,
-    var(--color-bg-card) 0% 100%
-  );
 }
 
-.pie-chart__center {
+.donut__svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.donut__track {
+  fill: none;
+  stroke: var(--color-bg-elevated);
+  stroke-width: 16;
+}
+
+.donut__segment {
+  fill: none;
+  stroke-width: 16;
+  stroke-linecap: round;
+  transition: stroke-dasharray 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.donut__segment--sent     { stroke: var(--color-primary); color: rgba(255, 94, 0, 0.4); }
+.donut__segment--received { stroke: var(--color-info);    color: rgba(0, 80, 179, 0.4); }
+
+.donut__center {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 110px;
-  height: 110px;
-  background: var(--color-bg-card);
-  border-radius: 50%;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
+  gap: 2px;
 }
 
-.pie-chart__total {
+.donut__total {
   font-family: var(--font-display);
   font-size: var(--fs-2xl);
   font-weight: var(--fw-bold);
   color: var(--color-text);
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
 }
 
-.pie-chart__label {
+.donut__label {
   font-size: 10px;
   color: var(--color-text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-top: 4px;
+  letter-spacing: 0.1em;
   font-weight: var(--fw-bold);
 }
 
-.pie-legend {
+.donut__legend {
   display: flex;
-  justify-content: center;
-  gap: var(--space-4);
-  margin-top: var(--space-4);
-  font-size: var(--fs-xs);
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
 }
 
-.pie-legend__item {
-  display: inline-flex;
+.donut__legend-item {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  color: var(--color-text);
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
   letter-spacing: -0.005em;
+  color: var(--color-text);
 }
 
-.pie-legend__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
+.donut__legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
-.pie-legend__dot--sent { background: var(--color-primary); }
-.pie-legend__dot--received { background: var(--color-info); }
+.donut__legend-dot--sent     { background: var(--color-primary); }
+.donut__legend-dot--received { background: var(--color-info); }
 
-/* === Activity by hour === */
-.hour-bars {
+.donut__legend-value {
+  margin-left: auto;
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.donut__legend-pct {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* === Activity by hour (mini bar chart) === */
+.hour-chart {
   display: flex;
   align-items: flex-end;
-  gap: 2px;
-  height: 140px;
+  gap: 3px;
+  height: 100px;
   margin-top: var(--space-3);
+  padding: var(--space-1) 0;
 }
 
 .hour-bar {
   flex: 1;
   background: var(--color-primary);
-  border-radius: 2px 2px 0 0;
+  border-radius: 3px 3px 0 0;
   min-height: 2px;
   position: relative;
-  transition: opacity 200ms ease;
-  opacity: 0.9;
+  transition: opacity 200ms ease, transform 200ms ease, height 800ms cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.85;
+  cursor: default;
 }
 
 .hour-bar:hover {
   opacity: 1;
+  transform: scaleY(1.05);
+  transform-origin: bottom;
+  box-shadow: 0 2px 8px rgba(255, 94, 0, 0.3);
 }
 
 .hour-bar[data-empty="true"] {
   background: var(--color-border);
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
 .hour-axis {
@@ -319,15 +561,51 @@
   margin-top: var(--space-2);
   font-size: 10px;
   color: var(--color-text-muted);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* === Custom tooltip === */
+.chart-tooltip {
+  position: absolute;
+  background: var(--color-text);
+  color: var(--color-bg);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-xs);
   font-weight: var(--fw-semibold);
-  letter-spacing: 0.02em;
+  letter-spacing: -0.005em;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -100%) translateY(-8px);
+  transition: opacity 150ms ease;
+  white-space: nowrap;
+  z-index: 5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: var(--color-text);
+}
+
+.chart-tooltip--visible {
+  opacity: 1;
 }
 
 /* === Recent messages list === */
 .dashboard-recent {
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
   transition: border-color 200ms ease;
 }
@@ -350,7 +628,7 @@
   font-weight: var(--fw-bold);
   color: var(--color-text);
   margin: 0;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.018em;
 }
 
 .recent-list {
@@ -425,6 +703,7 @@
   flex-shrink: 0;
   font-weight: var(--fw-semibold);
   letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
 }
 
 .recent-item__direction {

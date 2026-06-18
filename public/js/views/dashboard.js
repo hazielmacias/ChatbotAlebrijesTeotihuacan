@@ -45,11 +45,40 @@
     });
   }
 
-  function buildConicGradient(sentPct, receivedPct) {
-    return `conic-gradient(
-      var(--color-primary) 0% ${sentPct}%,
-      var(--color-info) ${sentPct}% ${sentPct + receivedPct}%
-      )`;
+  function computePct(part, total) {
+    if (!total || total === 0) return 0;
+    return Math.round((part / total) * 100);
+  }
+
+  function buildSparkline(arr) {
+    if (!arr || arr.length === 0) return '';
+    const max = Math.max(1, ...arr);
+    return arr.map((v, i) => {
+      const h = Math.max(2, (v / max) * 100);
+      const isLast = i === arr.length - 1;
+      return `<div class="kpi-card__spark-bar ${v > 0 ? 'kpi-card__spark-bar--filled' : ''}" style="height: ${h}%" data-index="${i}"></div>`;
+    }).join('');
+  }
+
+  function trendArrow(delta) {
+    if (delta == null) return { dir: 'flat', icon: 'M4 12h16', label: 'sin cambio' };
+    if (delta > 0) return { dir: 'up', icon: 'M7 14l5-5 5 5', label: 'aumento' };
+    if (delta < 0) return { dir: 'down', icon: 'M7 10l5 5 5-5', label: 'disminución' };
+    return { dir: 'flat', icon: 'M4 12h16', label: 'sin cambio' };
+  }
+
+  function renderRing(pct, color) {
+    const r = 36;
+    const circumference = 2 * Math.PI * r;
+    const offset = circumference * (1 - pct / 100);
+    return `
+      <svg class="kpi-card__ring" viewBox="0 0 80 80">
+        <circle class="kpi-card__ring-bg" cx="40" cy="40" r="${r}"/>
+        <circle class="kpi-card__ring-fill" cx="40" cy="40" r="${r}"
+          stroke-dasharray="${circumference}"
+          stroke-dashoffset="${offset}"/>
+      </svg>
+    `;
   }
 
   async function render(container) {
@@ -91,11 +120,33 @@
     const recent = d.recent_messages || [];
 
     const totalSvr = (svr.inbound || 0) + (svr.outbound || 0);
-    const sentPct = totalSvr > 0 ? Math.round((svr.outbound / totalSvr) * 100) : 50;
-    const recvPct = totalSvr > 0 ? 100 - sentPct : 50;
+    const sentPct = totalSvr > 0 ? computePct(svr.outbound, totalSvr) : 50;
+    const recvPct = 100 - sentPct;
 
     const maxConv = Math.max(1, ...convByDay.map(d => d.count));
     const maxHour = Math.max(1, ...hour);
+
+    // Sparklines: usaremos convByDay para conversaciones, msgByDay para mensajes,
+    // hour (24h) para actividad general
+    const convSpark = convByDay.map(d => d.count || 0);
+    const msgSpark = msgByDay.length === 7 ? msgByDay.map(d => d.count || 0) : convSpark;
+    const hourSpark = hour.map(c => c || 0);
+
+    // Tendencias: comparar últimos 3 días vs los 3 anteriores
+    function trendDelta(arr) {
+      if (!arr || arr.length < 6) return null;
+      const recent = arr.slice(-3).reduce((a, b) => a + b, 0);
+      const previous = arr.slice(-6, -3).reduce((a, b) => a + b, 0);
+      if (previous === 0) return recent > 0 ? 100 : null;
+      return Math.round(((recent - previous) / previous) * 100);
+    }
+
+    const convTrend = trendDelta(convSpark);
+    const msgTrend = trendDelta(msgSpark);
+    const passTrend = null;
+    const msgTodayTrend = t.messages_today != null && t.messages_yesterday != null
+      ? Math.round(((t.messages_today - t.messages_yesterday) / Math.max(1, t.messages_yesterday)) * 100)
+      : null;
 
     container.innerHTML = `
       <div class="dashboard-view">
@@ -109,122 +160,141 @@
           </div>
         </div>
 
-        <!-- Stat cards -->
+        <!-- KPI cards (Apple Health style) -->
         <div class="dashboard-stats">
-          <div class="stat-tile stat-tile--primary">
-            <div class="stat-tile__head">
-              <svg class="stat-tile__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
-              Conversaciones
+          <div class="kpi-card kpi-card--primary">
+            <div class="kpi-card__ring-wrap">
+              ${renderRing(convTrend != null ? Math.min(100, Math.max(0, 50 + convTrend / 2)) : 75, 'var(--color-primary)')}
+              <div class="kpi-card__ring-center">${formatNumber(t.conversations)}</div>
             </div>
-            <div class="stat-tile__value">${formatNumber(t.conversations)}</div>
-            <div class="stat-tile__delta">
-              <strong>${formatNumber(t.active_conversations)}</strong> activas
-            </div>
-          </div>
-
-          <div class="stat-tile stat-tile--info">
-            <div class="stat-tile__head">
-              <svg class="stat-tile__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4 0h-2v-2h2v2zm0-3H6V9h12v2z"/></svg>
-              Mensajes
-            </div>
-            <div class="stat-tile__value">${formatNumber(t.messages)}</div>
-            <div class="stat-tile__delta">
-              <strong>${formatNumber(t.messages_today)}</strong> hoy
+            <div class="kpi-card__body">
+              <div class="kpi-card__label">Conversaciones</div>
+              <div class="kpi-card__value">${formatNumber(t.active_conversations)}</div>
+              <div class="kpi-card__spark">${buildSparkline(convSpark)}</div>
+              ${convTrend != null ? renderTrend(convTrend, 'vs 3 dias') : ''}
             </div>
           </div>
 
-          <div class="stat-tile stat-tile--success">
-            <div class="stat-tile__head">
-              <svg class="stat-tile__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Escalados
+          <div class="kpi-card kpi-card--info">
+            <div class="kpi-card__ring-wrap">
+              ${renderRing(msgTodayTrend != null ? Math.min(100, Math.max(0, 50 + msgTodayTrend / 2)) : 65, 'var(--color-info)')}
+              <div class="kpi-card__ring-center">${formatNumber(t.messages_today || 0)}</div>
             </div>
-            <div class="stat-tile__value">${formatNumber(t.passes)}</div>
-            <div class="stat-tile__delta">
-              Conversaciones escaladas
+            <div class="kpi-card__body">
+              <div class="kpi-card__label">Mensajes hoy</div>
+              <div class="kpi-card__value">${formatNumber(t.messages)}</div>
+              <div class="kpi-card__spark">${buildSparkline(msgSpark)}</div>
+              ${msgTodayTrend != null ? renderTrend(msgTodayTrend, 'vs ayer') : ''}
             </div>
           </div>
 
-          <div class="stat-tile stat-tile--warning">
-            <div class="stat-tile__head">
-              <svg class="stat-tile__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-              Palabras Frecuentes
+          <div class="kpi-card kpi-card--success">
+            <div class="kpi-card__ring-wrap">
+              ${renderRing(Math.min(100, (t.passes || 0) * 10), 'var(--color-success)')}
+              <div class="kpi-card__ring-center">${formatNumber(t.passes)}</div>
             </div>
-            <div class="keywords-row">
-              ${kw.length === 0 ? '<span class="keyword-pill">Sin datos</span>' :
-                kw.map((k, i) => `
-                  <span class="keyword-pill" style="--tile-color: hsl(${25 + i * 35}, 80%, 55%);">
-                    ${escapeHtml(k.word)}
-                    <span class="keyword-pill__count">${k.count}</span>
-                  </span>
-                `).join('')}
+            <div class="kpi-card__body">
+              <div class="kpi-card__label">Escalados</div>
+              <div class="kpi-card__value">${formatNumber(t.passes)}</div>
+              <div class="kpi-card__spark">${buildSparkline(hourSpark.slice(0, 7))}</div>
+              <div class="kpi-card__trend kpi-card__trend--flat">
+                <span>Conversaciones escaladas</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card kpi-card--warning">
+            <div class="kpi-card__ring-wrap">
+              ${renderRing(kw.length > 0 ? 85 : 0, 'var(--color-warning)')}
+              <div class="kpi-card__ring-center">${kw.length}</div>
+            </div>
+            <div class="kpi-card__body">
+              <div class="kpi-card__label">Palabras Frecuentes</div>
+              <div class="kpi-card__value">${kw.length > 0 ? kw[0].word : 'Sin datos'}</div>
+              <div class="keywords-row" style="margin-top: var(--space-2);">
+                ${kw.length === 0 ? '<span class="keyword-pill">Sin datos</span>' :
+                  kw.slice(0, 4).map((k, i) => `
+                    <span class="keyword-pill" style="--tile-color: hsl(${25 + i * 35}, 80%, 55%);">
+                      ${escapeHtml(k.word)}
+                      <span class="keyword-pill__count">${k.count}</span>
+                    </span>
+                  `).join('')}
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Charts -->
         <div class="dashboard-charts">
-          <!-- Conversations per day (bar) -->
-          <div class="chart-card">
+          <div class="chart-card" id="chart-bar-wrap">
             <div class="chart-card__head">
-              <div>
-                <h3 class="chart-card__title">Conversaciones por dia</h3>
-                <p class="chart-card__subtitle">Ultimos 7 dias</p>
+              <div class="chart-card__title-group">
+                <h3 class="chart-card__title">Conversaciones por día</h3>
+                <p class="chart-card__subtitle">Últimos 7 días</p>
               </div>
+              <div class="chart-card__total">${formatNumber(convByDay.reduce((a, b) => a + b.count, 0))}</div>
             </div>
-            <div class="chart-bars">
+            <div class="chart-bars" id="chart-bars">
               ${convByDay.map(d => {
                 const h = Math.max(4, (d.count / maxConv) * 100);
                 return `
-                  <div class="chart-bar">
+                  <div class="chart-bar" data-label="${formatDateShort(d.date)}" data-value="${d.count}">
                     <div class="chart-bar__value">${d.count}</div>
-                    <div class="chart-bar__fill" style="height: ${h}%" title="${formatDateShort(d.date)}: ${d.count}"></div>
+                    <div class="chart-bar__fill" style="height: ${h}%"></div>
                     <div class="chart-bar__label">${formatDateShort(d.date)}</div>
                   </div>
                 `;
               }).join('')}
             </div>
+            <div class="chart-tooltip" id="chart-tooltip-bar"></div>
           </div>
 
-          <!-- Messages sent vs received (pie) -->
           <div class="chart-card">
             <div class="chart-card__head">
-              <div>
+              <div class="chart-card__title-group">
                 <h3 class="chart-card__title">Enviados vs Recibidos</h3>
                 <p class="chart-card__subtitle">Total mensajes</p>
               </div>
             </div>
-            <div class="pie-chart" style="background: ${buildConicGradient(sentPct, recvPct)}">
-              <div class="pie-chart__center">
-                <div class="pie-chart__total">${formatNumber(totalSvr)}</div>
-                <div class="pie-chart__label">Mensajes</div>
+            <div class="donut">
+              <div class="donut__chart">
+                ${renderDonut(sentPct, recvPct)}
+                <div class="donut__center">
+                  <div class="donut__total">${formatNumber(totalSvr)}</div>
+                  <div class="donut__label">Mensajes</div>
+                </div>
               </div>
-            </div>
-            <div class="pie-legend">
-              <span class="pie-legend__item">
-                <span class="pie-legend__dot pie-legend__dot--sent"></span>
-                Enviados: ${formatNumber(svr.outbound)} (${sentPct}%)
-              </span>
-              <span class="pie-legend__item">
-                <span class="pie-legend__dot pie-legend__dot--received"></span>
-                Recibidos: ${formatNumber(svr.inbound)} (${recvPct}%)
-              </span>
+              <div class="donut__legend">
+                <div class="donut__legend-item">
+                  <span class="donut__legend-dot donut__legend-dot--sent"></span>
+                  <span>Enviados</span>
+                  <span class="donut__legend-value">${formatNumber(svr.outbound)}</span>
+                  <span class="donut__legend-pct">${sentPct}%</span>
+                </div>
+                <div class="donut__legend-item">
+                  <span class="donut__legend-dot donut__legend-dot--received"></span>
+                  <span>Recibidos</span>
+                  <span class="donut__legend-value">${formatNumber(svr.inbound)}</span>
+                  <span class="donut__legend-pct">${recvPct}%</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Activity by hour (bar) -->
-        <div class="chart-card" style="margin-bottom: var(--space-6);">
+        <div class="chart-card" id="chart-hour-wrap" style="margin-bottom: var(--space-6);">
           <div class="chart-card__head">
-            <div>
+            <div class="chart-card__title-group">
               <h3 class="chart-card__title">Actividad por hora</h3>
-              <p class="chart-card__subtitle">Ultimas 24 horas (hora Mexico)</p>
+              <p class="chart-card__subtitle">Últimas 24 horas (hora México)</p>
             </div>
+            <div class="chart-card__total">${formatNumber(hour.reduce((a, b) => a + b, 0))}</div>
           </div>
-          <div class="hour-bars">
+          <div class="hour-chart" id="hour-chart">
             ${hour.map((count, h) => {
               const hH = count > 0 ? Math.max(4, (count / maxHour) * 100) : 2;
               const isEmpty = count === 0;
-              return `<div class="hour-bar" ${isEmpty ? 'data-empty="true"' : ''} style="height: ${hH}%" title="${h}:00 - ${count} mensajes"></div>`;
+              return `<div class="hour-bar" data-label="${h}:00" data-value="${count}" ${isEmpty ? 'data-empty="true"' : ''} style="height: ${hH}%"></div>`;
             }).join('')}
           </div>
           <div class="hour-axis">
@@ -234,12 +304,12 @@
             <span>18</span>
             <span>23</span>
           </div>
+          <div class="chart-tooltip" id="chart-tooltip-hour"></div>
         </div>
 
-        <!-- Recent messages -->
         <div class="dashboard-recent">
           <div class="dashboard-recent__head">
-            <h3 class="dashboard-recent__title">Ultimos mensajes</h3>
+            <h3 class="dashboard-recent__title">Últimos mensajes</h3>
           </div>
           <div class="recent-list">
             ${recent.length === 0 ? '<div class="empty-state" style="padding: var(--space-8);">Sin mensajes recientes</div>' :
@@ -267,13 +337,86 @@
       </div>
     `;
 
-    // Click en recent item -> ir a conversaciones
+    bindChartTooltips();
+    bindRecentClicks();
+  }
+
+  function renderTrend(delta, label) {
+    const arrow = trendArrow(delta);
+    const sign = delta > 0 ? '+' : '';
+    return `
+      <div class="kpi-card__trend kpi-card__trend--${arrow.dir}">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="${arrow.icon}"/></svg>
+        <span>${sign}${delta}%</span>
+        <span class="kpi-card__trend-label">${label}</span>
+      </div>
+    `;
+  }
+
+  function renderDonut(sentPct, recvPct) {
+    const r = 70;
+    const c = 2 * Math.PI * r;
+    const sentLen = c * (sentPct / 100);
+    const recvLen = c * (recvPct / 100);
+    return `
+      <svg class="donut__svg" viewBox="0 0 180 180">
+        <circle class="donut__track" cx="90" cy="90" r="${r}"/>
+        <circle class="donut__segment donut__segment--sent" cx="90" cy="90" r="${r}"
+          stroke-dasharray="${sentLen} ${c - sentLen}"
+          stroke-dashoffset="0"/>
+        <circle class="donut__segment donut__segment--received" cx="90" cy="90" r="${r}"
+          stroke-dasharray="${recvLen} ${c - recvLen}"
+          stroke-dashoffset="${-sentLen}"/>
+      </svg>
+    `;
+  }
+
+  function bindChartTooltips() {
+    const tooltip = document.getElementById('chart-tooltip-bar');
+    if (tooltip) {
+      const wrap = document.getElementById('chart-bar-wrap');
+      wrap.querySelectorAll('.chart-bar').forEach(bar => {
+        bar.addEventListener('mouseenter', (e) => {
+          const rect = bar.getBoundingClientRect();
+          const wrapRect = wrap.getBoundingClientRect();
+          tooltip.textContent = `${bar.dataset.label}: ${bar.dataset.value}`;
+          tooltip.style.left = (rect.left - wrapRect.left + rect.width / 2) + 'px';
+          tooltip.style.top = (rect.top - wrapRect.top - 6) + 'px';
+          tooltip.classList.add('chart-tooltip--visible');
+        });
+        bar.addEventListener('mouseleave', () => {
+          tooltip.classList.remove('chart-tooltip--visible');
+        });
+      });
+    }
+
+    const hourTooltip = document.getElementById('chart-tooltip-hour');
+    if (hourTooltip) {
+      const wrap = document.getElementById('chart-hour-wrap');
+      wrap.querySelectorAll('.hour-bar').forEach(bar => {
+        bar.addEventListener('mouseenter', () => {
+          const rect = bar.getBoundingClientRect();
+          const wrapRect = wrap.getBoundingClientRect();
+          hourTooltip.textContent = `${bar.dataset.label} · ${bar.dataset.value} mensajes`;
+          hourTooltip.style.left = (rect.left - wrapRect.left + rect.width / 2) + 'px';
+          hourTooltip.style.top = (rect.top - wrapRect.top - 6) + 'px';
+          hourTooltip.classList.add('chart-tooltip--visible');
+        });
+        bar.addEventListener('mouseleave', () => {
+          hourTooltip.classList.remove('chart-tooltip--visible');
+        });
+      });
+    }
+  }
+
+  function bindRecentClicks() {
+    const container = document.getElementById('dashboard-view');
+    if (!container) return;
     container.querySelectorAll('.recent-item').forEach(el => {
       el.addEventListener('click', () => {
         const convId = el.dataset.id;
         if (convId) {
           window.location.hash = '#conversations';
-          // Guardar el id para auto-seleccionar
           setTimeout(() => {
             if (window.conversationsView && window.conversationsView.selectById) {
               window.conversationsView.selectById(convId);
