@@ -1,5 +1,5 @@
 const { supabaseAdmin } = require('../lib/supabase');
-const { sendAndStore, sendImageAndStore } = require('./sender');
+const { sendAndStore, sendImageAndStore, sendDocumentAndStore } = require('./sender');
 
 const menuFlow = require('./flows/menu.json');
 const escuelaFlow = require('./flows/escuela.json');
@@ -20,9 +20,9 @@ const FLOWS = {
 const RESET_TRIGGERS = ['0', 'menu', 'menú', 'inicio', 'empezar', 'cancelar', 'salir', 'cancel'];
 
 const CONTACT_INFO = {
-  escuela: '👉 *Lic. Areli Janette:* 55 1008 7435',
-  tdp: '👉 *Lic. Athziri Velazquez:* 56 2128 9945',
-  piloto: '👉 *Lic. Athziri Velazquez:* 56 2128 9945'
+  escuela: '👉 *Lic. Areli Janette:* 55 1008 7435\n📌 *Centro de Formación Académica*',
+  tdp: '👉 *Lic. Athziri Velazquez:* 56 2128 9945\n📌 *Fuerzas Básicas y Tercera División Profesional*',
+  piloto: '👉 *Lic. Athziri Velazquez:* 56 2128 9945\n📌 *Equipo Piloto Liga de Expansión MX*'
 };
 
 async function getOrCreateContact(phone, name) {
@@ -325,7 +325,24 @@ async function executeStep(conversation, contact, flowKey, stepKey, flowData) {
     });
   }
 
-  console.log(`[bot-engine] Respuesta enviada: flow=${flowKey} step=${stepKey} sent_ok=${sent.ok} image=${step.send_image || 'none'} auto_advance=${!!step.auto_advance}`);
+  if (step.send_document) {
+    const docCategory = flowData?.category;
+    const shouldSendDoc = !step.send_document_category_filter || step.send_document_category_filter.includes(docCategory);
+    if (shouldSendDoc) {
+      await sendDocumentAndStore({
+        phone: contact.phone,
+        conversationId: conversation.id,
+        documentKey: step.send_document,
+        caption: '',
+        sentBy: 'bot',
+        metadata: { flow: flowKey, step: stepKey, document_key: step.send_document }
+      });
+    } else {
+      console.log(`[bot-engine] Documento omitido por filtro de categoria: doc=${step.send_document} cat=${docCategory}`);
+    }
+  }
+
+  console.log(`[bot-engine] Respuesta enviada: flow=${flowKey} step=${stepKey} sent_ok=${sent.ok} image=${step.send_image || 'none'} document=${step.send_document || 'none'} auto_advance=${!!step.auto_advance}`);
 
   if (step.auto_advance && step.next_flow && step.next_step) {
     return await executeStep(
@@ -479,7 +496,12 @@ async function processIncomingMessage(messageData) {
     }
 
     if (currentStep.side_effects?.save_registration) {
-      await saveRegistration(conversation.id, from, category, parsed);
+      try {
+        await saveRegistration(conversation.id, from, category, parsed);
+        console.log(`[bot-engine] Registration OK cat=${category} conv=${conversation.id}`);
+      } catch (regErr) {
+        console.error('[bot-engine] Error guardando registration (no bloqueante):', regErr);
+      }
     }
 
     const nextFlow = currentStep.next_flow;
@@ -491,6 +513,8 @@ async function processIncomingMessage(messageData) {
       current_step: nextStep,
       flow_data: nextFlowData
     });
+
+    console.log(`[bot-engine] free_text completado: ${currentFlowKey}/${currentStepKey} -> ${nextFlow}/${nextStep}`);
 
     return await executeStep(conversation, contact, nextFlow, nextStep, nextFlowData);
   }

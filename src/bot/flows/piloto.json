@@ -1,22 +1,14 @@
 {
   "flow_key": "piloto",
-  "name": "Equipo Piloto (Liga de Expansion MX)",
-  "description": "Flujo de inscripcion para Equipo Piloto Liga de Expansion MX (jovenes nacidos entre 2002 y 2004).",
+  "name": "Equipo Piloto (DEPRECATED)",
+  "description": "DEPRECATED: La opción 3 del menú ahora redirige a tdp/info con category=piloto. Este flujo se mantiene como stub para conversaciones existentes que pudieran estar en este estado.",
   "steps": {
     "info": {
-      "message": "¡El salto al profesionalismo de alto nivel!\n\nEl *Equipo Piloto* es tu vitrina directa hacia la *Liga de Expansion MX*. Tu talento sera evaluado por nuestro staff de inteligencia deportiva directamente en nuestras instalaciones en el Centro Recreativo Pascual Boing. Al finalizar tu semana de prueba, se determinara tu incorporacion inmediata.\n\nPara generar tu registro, comparteme en un solo mensaje:\n\n📋 *Nombre completo:*\n📋 *Año de nacimiento* (Debe ser entre 2002 y 2004):\n📋 *Posicion principal y perfil (Diestro/Zurdo):*",
-      "input_type": "free_text",
-      "validation": {
-        "type": "birth_year_range",
-        "min": 2002,
-        "max": 2004,
-        "fail_message": "⚠️ Lo sentimos, esta categoria es para jovenes *nacidos entre 2002 y 2004*. Tu año de nacimiento no esta en el rango permitido.\n\nSi crees que esto es un error, contactanos directamente con una persona del equipo.\n\n📲 Te redirigimos al menu principal para que elijas la opcion correcta.",
-        "fail_flow": "menu",
-        "fail_step": "start"
-      },
-      "side_effects": { "save_registration": true, "flow_data_update": { "category": "piloto" } },
-      "next_flow": "cierre",
-      "next_step": "success"
+      "message": "Esta opción ha sido consolidada. Te redirigimos al menú principal para que elijas la opción correcta.",
+      "options": {
+        "0": { "next_flow": "menu", "next_step": "start" },
+        "menu": { "next_flow": "menu", "next_step": "start" }
+      }
     }
   }
 }

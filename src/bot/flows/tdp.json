@@ -1,21 +1,23 @@
 {
   "flow_key": "tdp",
-  "name": "Tercera Division Profesional (Liga TDP)",
-  "description": "Flujo de inscripcion para Filtro Final Nacional Liga TDP (jovenes nacidos entre 2005 y 2012).",
+  "name": "Fuerzas Básicas, TDP y Equipo Piloto",
+  "description": "Flujo unificado para Fuerzas Básicas, Tercera División Profesional (Liga TDP) y Equipo Piloto (Liga de Expansión MX).",
   "steps": {
     "info": {
-      "message": "¡Excelente! A continuacion, te presento los detalles de nuestra *Liga TDP*:\n\n*GRACIAS POR TU INTERES EN ALEBRIJES TEOTIHUACAN* ⚽🔥\n\n*✅ FILTRO FINAL NACIONAL*\nAsiste al Filtro Final Nacional en *Templo Alebrije*, Teotihuacan, EdoMex. Ahi nuestro staff de visores e inteligencia deportiva evalua tu talento por 1 semana. Con base en tu desempeno se define si te integras al club.\n\n*✅ DETALLES DEL FILTRO*\n📅 Fecha: lunes 29 de junio a sabado 04 de julio\n⏱️ Duracion: 1 semana\n🔍 Evaluacion: Staff de visores + inteligencia deportiva\n\n🏆 Resultado: Se entrega al finalizar tu semana. Si eres seleccionado, te incorporas de inmediato.\n📍 Sede: Centro Recreativo Pascual Boing, Teotihuacan, EdoMex\n📲 Ubicacion: https://maps.app.goo.gl/nXnXtADvzofWVusk9\n\n*⚠️ QUE INCLUYE TU PARTICIPACION*\n✔️ Seguro contra accidentes/lesiones hasta $50,000 MXN. Cobertura 1 mes\n✔️ Uniforme oficial de visoria: jersey + short + medias\n✔️ Zapatera oficial del club\n✔️ Hidratacion todas las sesiones\n✔️ Fisioterapeutas en cancha\n✔️ Canchas empastadas\n✔️ Partidos vs equipos TDP y Fuerzas Basicas\n✔️ Evaluacion tecnica de inteligencia deportiva\n✔️ Seguridad privada\n✔️ Transmision de tu juego con narracion + entrevista en Facebook\n\nPara generar tu acceso a este filtro, comparteme en un solo mensaje:\n\n📋 *Nombre completo:*\n📋 *Año de nacimiento* (Debe ser entre 2005 y 2012):\n📋 *Posicion principal:*",
+      "message": "¡Excelente elección! A continuación te presento los detalles de nuestra categoría:\n\n*FUERZAS BÁSICAS Y TERCERA DIVISIÓN PROFESIONAL* ⚽🔥\n\nSolicita una *semana de pruebas sin costo* para entrenar y jugar durante este periodo con el equipo de Tercera División Profesional. De igual manera le generamos su pase con su nombre.\n\n*✅ DETALLES DE LA SEMANA DE PRUEBAS*\n📅 Fecha: La fecha la da el asesor\n⏱️ Duración: 1 semana\n🔍 Evaluación: Staff de visores + inteligencia deportiva\n🏆 Resultado: Se entrega al finalizar tu semana. Si eres seleccionado, te incorporas de inmediato.\n📍 Sede: Centro Recreativo Pascual Boing, Teotihuacán, EdoMex\n📲 Ubicación: https://maps.app.goo.gl/nXnXtADvzofWVusk9\n\n*⚠️ QUÉ INCLUYE TU PARTICIPACIÓN*\n✔️ El club te protege al gestionarte un seguro frente accidentes y lesiones deportivas de hasta 50000 MXN con vigencia de un mes.\n✔️ Uniforme oficial de visoría: jersey + short + medias\n✔️ Zapatería oficial del club\n✔️ Hidratación todas las sesiones\n✔️ Fisioterapeutas en cancha\n✔️ Canchas empastadas\n✔️ Partidos vs equipos TDP y Fuerzas Básicas\n✔️ Evaluación técnica de inteligencia deportiva\n✔️ Seguridad privada\n✔️ Transmisión de tu juego con narración + entrevista en Facebook\n\nPara generar tu *Pase de Semana de Prueba sin costo*, compárteme en un solo mensaje:\n\n📋 *Nombre completo:*\n📋 *Año de nacimiento:*\n📋 *Posición principal:*",
       "send_image": "filtro",
       "input_type": "free_text",
       "validation": {
         "type": "birth_year_range",
-        "min": 2005,
+        "min": 2002,
         "max": 2012,
-        "fail_message": "⚠️ Lo sentimos, esta categoria es para jovenes *nacidos entre 2005 y 2012*. Tu año de nacimiento no esta en el rango permitido.\n\nSi crees que esto es un error, contactanos directamente con una persona del equipo.\n\n📲 Te redirigimos al menu principal para que elijas la opcion correcta.",
+        "fail_message": "⚠️ Lo sentimos, esta categoría es para jóvenes *nacidos entre 2002 y 2012*. Tu año de nacimiento no está en el rango permitido.\n\nSi crees que esto es un error, contactanos directamente con una persona del equipo.\n\n📲 Te redirigimos al menú principal para que elijas la opción correcta.",
         "fail_flow": "menu",
         "fail_step": "start"
       },
-      "side_effects": { "save_registration": true, "flow_data_update": { "category": "tdp" } },
+      "side_effects": {
+        "save_registration": true
+      },
       "next_flow": "cierre",
       "next_step": "success"
     }

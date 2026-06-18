@@ -127,6 +127,29 @@ async function sendImageMessage(phone, imageUrl, caption) {
   }
 }
 
+async function sendDocumentMessage(phone, documentUrl, filename, caption) {
+  try {
+    const document = { link: documentUrl };
+    if (filename) document.filename = filename;
+    if (caption) document.caption = caption;
+
+    const response = await axios.post(
+      `${BASE_URL}/messages`,
+      {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: phone,
+        type: 'document',
+        document
+      },
+      { headers, timeout: 30000 }
+    );
+    return { ok: true, data: response.data };
+  } catch (error) {
+    return handleError('sendDocumentMessage', error);
+  }
+}
+
 function verifyWebhookSignature(rawBody, signatureHeader) {
   if (!APP_SECRET) {
     return { valid: false, reason: 'APP_SECRET not configured' };
@@ -200,6 +223,7 @@ module.exports = {
   sendInteractiveButtons,
   sendInteractiveList,
   sendImageMessage,
+  sendDocumentMessage,
   verifyWebhookSignature,
   extractMessageFromWebhook
 };

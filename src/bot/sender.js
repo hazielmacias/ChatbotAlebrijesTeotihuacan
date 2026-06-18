@@ -6,6 +6,14 @@ const IMAGE_URLS = {
   filtro: process.env.FILTRO_IMAGE_URL || 'https://alebrijes-chatbot.vercel.app/filtro.jpeg'
 };
 
+const DOCUMENT_URLS = {
+  escuela_pdf: process.env.ESCUELA_PDF_URL || 'https://alebrijes-chatbot.vercel.app/AlebrijesTeotihuacanEscuela.pdf'
+};
+
+const DOCUMENT_FILENAMES = {
+  escuela_pdf: 'AlebrijesTeotihuacanEscuela.pdf'
+};
+
 const RETRY_CONFIG = {
   maxRetries: 3,
   initialDelayMs: 1000,
@@ -264,6 +272,63 @@ async function sendOnly(phone, content) {
   }
 }
 
+function resolveDocumentUrl(documentKey) {
+  return DOCUMENT_URLS[documentKey] || null;
+}
+
+async function sendDocumentAndStore({
+  phone,
+  conversationId,
+  documentKey,
+  caption = '',
+  sentBy = 'bot',
+  metadata = {}
+}) {
+  const documentUrl = resolveDocumentUrl(documentKey);
+  if (!phone || !conversationId || !documentUrl) {
+    return { ok: false, error: 'Missing required params (phone, conversationId, documentKey)' };
+  }
+
+  const startTime = Date.now();
+  const filename = DOCUMENT_FILENAMES[documentKey] || 'document.pdf';
+  const content = `[documento: ${documentKey}] ${caption}`;
+  const fullMetadata = { ...metadata, document_key: documentKey, document_url: documentUrl, document_filename: filename };
+
+  const sendResult = await retryWithBackoff(async () => {
+    return await metaApi.sendDocumentMessage(phone, documentUrl, filename, caption);
+  }, `sendDocumentAndStore:${documentKey}`);
+
+  if (!sendResult.ok) {
+    const errorInfo = classifyError(sendResult.code || 0);
+    console.error(`[sender] Meta API fallo (document): code=${sendResult.code} (${errorInfo.category}) attempts=${sendResult.attempts} - ${sendResult.error}`);
+    recordMetric(errorInfo.category, false);
+    await persistFailedMessage(conversationId, content, 'document', sentBy, { ...errorInfo, code: sendResult.code }, fullMetadata);
+    return {
+      ok: false,
+      error: sendResult.error,
+      errorCode: sendResult.code,
+      errorCategory: errorInfo.category,
+      retriable: errorInfo.retry,
+      attempts: sendResult.attempts
+    };
+  }
+
+  const waId = sendResult.data?.messages?.[0]?.id || null;
+  const dbRow = await saveOutbound(conversationId, content, 'document', sentBy, fullMetadata, waId);
+  const elapsed = Date.now() - startTime;
+
+  console.log(`[sender] Documento OK: key=${documentKey} wa_id=${waId} db_id=${dbRow?.id} elapsed=${elapsed}ms attempts=${sendResult.attempts}`);
+  recordMetric('success', true);
+
+  return {
+    ok: true,
+    messageId: waId,
+    dbId: dbRow?.id,
+    attempts: sendResult.attempts,
+    elapsedMs: elapsed
+  };
+}
+
 function getMetrics() {
   return { ...METRICS, byCategory: { ...METRICS.byCategory } };
 }
@@ -279,8 +344,10 @@ function resetMetrics() {
 module.exports = {
   sendAndStore,
   sendImageAndStore,
+  sendDocumentAndStore,
   sendOnly,
   resolveImageUrl,
+  resolveDocumentUrl,
   getMetrics,
   resetMetrics,
   classifyError,

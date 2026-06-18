@@ -1,10 +1,10 @@
 {
   "flow_key": "escuela",
-  "name": "Centro de Iniciacion Deportiva (Escuela)",
-  "description": "Flujo de inscripcion para la Escuela (ninos de 6 a 11 anos).",
+  "name": "Centro de Iniciación Deportiva (Escuela)",
+  "description": "Flujo de inscripción para la Escuela (niños de 6 a 11 años).",
   "steps": {
     "info": {
-      "message": "¡Excelente eleccion! Nuestra Escuela es el lugar ideal para los fundamentos y la pasion por el futbol.\n\nTenemos una *Inversion Transparente*:\n✅ Costo de Inscripcion: *$0*\n✅ Mensualidad fija: *$550 MXN* (Sin letras chiquitas)\n\nContamos con dos horarios de entrenamiento, ¿cual prefieres? (Escribe *A* o *B*)\n\n*A. Turno Matutino (Alto Rendimiento):* Lunes a Viernes de 08:00 a 10:30 hrs.\n*B. Turno Vespertino (Iniciacion y Desarrollo):* Martes, Miercoles y Jueves de 16:00 a 18:30 hrs.",
+      "message": "¡Excelente elección! Nuestra Escuela es el lugar ideal para los fundamentos y la pasión por el fútbol.\n\nTenemos una *Inversión Transparente*:\n✅ Costo de Inscripción: *$0*\n✅ Mensualidad fija: *$550 MXN* (Sin letras chiquitas)\n\nContamos con dos horarios de entrenamiento, ¿cuál prefieres? (Escribe *A* o *B*)\n\n*A. Turno Matutino (Alto Rendimiento):* Lunes a Viernes de 08:00 a 10:30 hrs.\n*B. Turno Vespertino (Iniciación y Desarrollo):* Martes, Miércoles y Jueves de 16:00 a 18:30 hrs.",
       "options": {
         "a": { "next_flow": "escuela", "next_step": "collect_data", "flow_data_update": { "category": "escuela", "schedule": "A" } },
         "b": { "next_flow": "escuela", "next_step": "collect_data", "flow_data_update": { "category": "escuela", "schedule": "B" } },
@@ -13,13 +13,13 @@
       }
     },
     "collect_data": {
-      "message": "Para generar tu *Pase de Semana de Prueba sin costo*, por favor comparteme los siguientes datos en un solo mensaje:\n\n📋 *Nombre completo del jugador:*\n📋 *Edad exacta:*\n📋 *Posicion en la que juega:*\n📋 *Nombre del tutor o responsable:*",
+      "message": "Para generar tu *Pase de Semana de Prueba sin costo*, por favor compárteme los siguientes datos en un solo mensaje:\n\n📋 *Nombre completo del jugador:*\n📋 *Edad exacta:*\n📋 *Posición en la que juega:*\n📋 *Nombre del tutor o responsable:*",
       "input_type": "free_text",
       "validation": {
         "type": "age_range",
         "min": 6,
         "max": 11,
-        "fail_message": "⚠️ Lo sentimos, la Escuela es para ninos de *6 a 11 anos*. Tu edad no esta en el rango permitido para esta categoria.\n\nSi crees que esto es un error, contactanos directamente con una persona del equipo.\n\n📲 Te redirigimos al menu principal para que elijas la opcion correcta.",
+        "fail_message": "⚠️ Lo sentimos, la Escuela es para niños de *6 a 11 años*. Tu edad no está en el rango permitido para esta categoría.\n\nSi crees que esto es un error, contactanos directamente con una persona del equipo.\n\n📲 Te redirigimos al menú principal para que elijas la opción correcta.",
         "fail_flow": "menu",
         "fail_step": "start"
       },
