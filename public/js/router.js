@@ -130,12 +130,19 @@
     };
   };
 
-  // Iconos SVG inline por tipo de notificacion
+  // Iconos SVG inline por tipo de notificacion (minimalistas, stroke 1.75)
   const TOAST_ICONS = {
-    success: '<svg class="toast__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>',
-    error: '<svg class="toast__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>',
-    warning: '<svg class="toast__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>',
-    info: '<svg class="toast__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>'
+    success: '<svg class="toast__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>',
+    error: '<svg class="toast__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+    warning: '<svg class="toast__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>',
+    info: '<svg class="toast__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>'
+  };
+
+  const TOAST_TITLES = {
+    success: 'Listo',
+    error: 'Error',
+    warning: 'Atencion',
+    info: 'Informacion'
   };
 
   const MODAL_ICONS = {
@@ -163,13 +170,28 @@
       el.className = 'toast toast--' + type;
       el.setAttribute('role', type === 'error' ? 'alert' : 'status');
       const dur = (duration != null) ? duration : (type === 'error' ? 6000 : 4000);
-      el.innerHTML = (TOAST_ICONS[type] || TOAST_ICONS.info) + '<span class="toast__message"></span>';
+      el.innerHTML =
+        (TOAST_ICONS[type] || TOAST_ICONS.info) +
+        '<div class="toast__body">' +
+          '<div class="toast__title"></div>' +
+          '<div class="toast__message"></div>' +
+        '</div>' +
+        '<button type="button" class="toast__close" aria-label="Cerrar">' +
+          '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>' +
+        '</button>';
+      el.querySelector('.toast__title').textContent = TOAST_TITLES[type] || '';
       el.querySelector('.toast__message').textContent = String(message);
       this.container.appendChild(el);
-      setTimeout(() => {
+
+      let removed = false;
+      const dismiss = () => {
+        if (removed || !el.parentNode) return;
+        removed = true;
         el.classList.add('toast--leaving');
         setTimeout(() => { if (el.parentNode) el.remove(); }, 220);
-      }, dur);
+      };
+      el.querySelector('.toast__close').addEventListener('click', dismiss);
+      setTimeout(dismiss, dur);
     },
 
     success(msg) { this.show(msg, 'success'); },
