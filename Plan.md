@@ -627,42 +627,47 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 6.3 UX y pulido
 
-- [x] **6.3.1** Pantalla de "sin conversación seleccionada" en el chat (similar WhatsApp Web):
+- [1] **6.3.1** Pantalla de "sin conversación seleccionada" en el chat (similar WhatsApp Web):
   - Implementada en `public/js/views/conversations.js` líneas 137-147 (`.wa-chat-empty`)
   - SVG ilustrativo de WhatsApp + título "Selecciona una conversacion" + mensaje
   - Solo se muestra cuando no hay conversación activa
-- [x] **6.3.2** Indicador de "escribiendo..." cuando el bot está procesando:
+- [1] **6.3.2** Indicador de "escribiendo..." cuando el bot está procesando:
   - `showBotTyping()`: cuando llega un mensaje inbound via Realtime y `bot_active=true`, muestra 3 dots animados en el body del chat
   - `hideBotTyping()`: cuando llega la respuesta del bot, oculta el indicator
   - Safety net: si el bot no responde en 30s, oculta el typing
   - User typing: cuando el agente escribe en el input, "Escribiendo..." aparece en el status del header (se oculta a los 2s sin escribir)
-- [x] **6.3.3** Responsive: dashboard funciona en móvil (lista de conversaciones ocultable):
+- [1] **6.3.3** Responsive: dashboard funciona en móvil (lista de conversaciones ocultable):
   - `public/css/whatsapp-theme.css` media query `@media (max-width: 768px)`
   - Toggle via clase `.wa-app--mobile-chat-open` agregada al abrir una conversación
   - Default: muestra lista, oculta chat. Con clase: oculta lista, muestra chat
   - Botón "atrás" en el header del chat (visible solo en mobile)
-- [x] **6.3.4** Toast de confirmación para acciones:
+- [1] **6.3.4** Toast de confirmación para acciones:
   - `window.toast.success()`, `.error()`, `.warning()`, `.info()` definidos en `public/js/router.js`
   - Usado en: toggle bot, send message, save plan, delete plan, login, error de API, etc.
   - CSS en `styles.css`: `.toast-container`, `.toast--success/error/warning/info`
-- [x] **6.3.5** Loading spinners en llamadas a API:
+- [1] **6.3.5** Loading spinners en llamadas a API:
   - `.spinner` y `.spinner--lg` en `styles.css` (animación CSS pura, sin librerías)
   - Usados en: lista de conversaciones (carga inicial), mensajes (carga inicial), dashboard views (kpis, catalog, settings)
   - Modal save: botón con texto "Guardando..." mientras espera API
-- [x] **6.3.6** Push a GitHub y deploy automático en Vercel:
+- [1] **6.3.6** Push a GitHub y deploy automático en Vercel:
   - Vercel conectado al repo `hazielmacias/ChatbotAlebrijesTeotihuacan`
   - Cada `git push origin main` dispara deploy automático
   - Verificado en múltiples commits durante el desarrollo (24+ deploys)
 
 ### 6.4 Documentación
 
-- [ ] **6.4.1** Crear `README.md` con:
-  - Descripción del proyecto
-  - Instrucciones de setup local (`npm install`, configurar `.env`, `npm run dev`)
-  - Instrucciones de deploy (`git push` → Vercel auto-deploy)
-  - Estructura del proyecto
-  - Variables de entorno necesarias
-  - Comandos útiles
+- [x] **6.4.1** `README.md` creado con todas las secciones:
+  - **Descripcion del proyecto**: Chatbot WhatsApp + dashboard para academia de futbol
+  - **Stack tecnologico**: Node.js 18+, Vercel serverless, Supabase, Meta Cloud API
+  - **Estructura del proyecto**: arbol completo de archivos con descripcion de cada uno
+  - **Setup local**: requisitos, `git clone`, `npm install`, `cp .env.example .env`, `setup-dashboard-users.js`, `npm run dev`, ngrok para webhook
+  - **Deploy en Vercel**: instrucciones de import + env vars + webhook en Meta Console
+  - **Variables de entorno**: tabla con 10 variables, donde obtener cada una, donde se usa
+  - **Comandos utiles**: dev, tests (6 scripts), setup, git
+  - **Arquitectura**: diagramas ASCII de flujo inbound + dashboard Realtime + estados de conversacion
+  - **Stack visual**: paleta institucional, tipografia, replica WhatsApp Web
+  - **Seguridad**: que variables son publicas/privadas, firma HMAC, RLS
+  - **Limitaciones conocidas**: integracion catalogo↔bot revertida, Vercel build cache
 
 ---
 
