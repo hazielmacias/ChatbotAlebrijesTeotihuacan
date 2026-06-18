@@ -238,15 +238,43 @@
       margin-bottom: 36px;
     }
 
+    .login-card__logo-wrap {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      margin: 0 0 28px 0;
+    }
+
+    .login-card__logo-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 50%, var(--color-tiliche-rosa) 100%);
+      opacity: 0.18;
+      filter: blur(8px);
+      z-index: 0;
+    }
+
+    .login-card__logo-wrap::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 60%, var(--color-tiliche-rosa) 100%);
+      z-index: 1;
+    }
+
     .login-card__logo {
-      width: 72px;
-      height: 72px;
-      margin: 0 0 24px 0;
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
       display: block;
-      border-radius: 20px;
+      border-radius: 22px;
       background: var(--color-bg-card);
-      border: 1px solid var(--color-border);
-      padding: 8px;
+      padding: 12px;
+      box-shadow: 0 8px 24px rgba(255, 94, 0, 0.12);
     }
 
     .login-card__title {
@@ -390,9 +418,8 @@
       </div>
 
       <div class="login-page__brand-content">
-        <div class="login-page__brand-eyebrow">Panel de administracion</div>
         <h1 class="login-page__brand-title">Tu academia, <em>bien gestionada.</em></h1>
-        <p class="login-page__brand-subtitle">Monitorea conversaciones, responde como humano y mantén el control de tu chatbot desde un solo lugar.</p>
+        <p class="login-page__brand-subtitle">Alebrijes de Oaxaca Teotihuacán, Chatbot.</p>
       </div>
 
       <div class="login-page__brand-footer">
@@ -411,7 +438,9 @@
     <section class="login-page__form-wrap">
       <div class="login-card" id="login-card">
         <div class="login-card__header">
-          <img class="login-card__logo" src="/logo-alebrijes.png" alt="">
+          <div class="login-card__logo-wrap">
+            <img class="login-card__logo" src="/logo-alebrijes.png" alt="Alebrijes Teotihuacan">
+          </div>
           <h1 class="login-card__title">Iniciar sesión</h1>
           <p class="login-card__subtitle">Ingresa tus credenciales para continuar</p>
         </div>
