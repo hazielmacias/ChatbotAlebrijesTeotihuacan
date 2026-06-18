@@ -1,13 +1,41 @@
 ﻿{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
-  "functions": {
-    "api/webhook.js": {
-      "maxDuration": 30
-    },
-    "api/**/*.js": {
-      "maxDuration": 30
-    }
-  }
+    "version":  2,
+    "functions":  {
+                      "api/webhook.js":  {
+                                             "maxDuration":  30
+                                         },
+                      "api/auth/login.js":  {
+                                                "maxDuration":  30
+                                            },
+                      "api/auth/me.js":  {
+                                             "maxDuration":  30
+                                         },
+                      "api/catalog/delete.js":  {
+                                                    "maxDuration":  30
+                                                },
+                      "api/catalog/get.js":  {
+                                                 "maxDuration":  30
+                                             },
+                      "api/catalog/index.js":  {
+                                                   "maxDuration":  30
+                                               },
+                      "api/catalog/update.js":  {
+                                                    "maxDuration":  30
+                                                },
+                      "api/conversations/index.js":  {
+                                                         "maxDuration":  30
+                                                     },
+                      "api/conversations/toggle-bot.js":  {
+                                                              "maxDuration":  30
+                                                          },
+                      "api/kpis/index.js":  {
+                                                "maxDuration":  30
+                                            },
+                      "api/messages/index.js":  {
+                                                    "maxDuration":  30
+                                                },
+                      "api/messages/send.js":  {
+                                                   "maxDuration":  30
+                                               }
+                  }
 }
-
