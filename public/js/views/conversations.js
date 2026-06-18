@@ -710,12 +710,6 @@
       Object.assign(conv, result.data.conversation);
     }
 
-    if (newVal) {
-      window.toast.success('Bot reactivado - ahora el bot responde');
-    } else {
-      window.toast.success('Control manual activado - tu respondes al contacto');
-    }
-
     applyFilters();
   }
 
