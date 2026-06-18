@@ -541,6 +541,7 @@
       }
 
       const isOut = msg.direction === 'outbound';
+      const isBotMsg = isOut && msg.sent_by === 'bot';
       let author;
       if (isOut) {
         if (msg.sent_by === 'human') {
@@ -572,10 +573,17 @@
         ? '<svg class="wa-msg__status--read" viewBox="0 0 18 18"><path d="M17.4 4.2L7.6 14L4.2 10.6L5.2 9.6L7.6 12L16.4 3.2L17.4 4.2Z"/><path d="M13.4 4.2L7.6 10L6.6 9L12.4 3.2L13.4 4.2Z"/></svg>'
         : '';
 
+      const botBadge = isBotMsg
+        ? '<span class="wa-msg__bot-badge" title="Respondido por el bot"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M17.5 2h-11A4.5 4.5 0 0 0 2 6.5v11A4.5 4.5 0 0 0 6.5 22h11a4.5 4.5 0 0 0 4.5-4.5v-11A4.5 4.5 0 0 0 17.5 2zM7 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm10 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm-5 7c-2.5 0-4.71-1.28-6-3.22.16-.1.33-.18.5-.25.6-.25 1.27-.4 2-.4h7c.73 0 1.4.15 2 .4.17.07.34.15.5.25C16.71 17.72 14.5 19 12 19z"/></svg>Bot</span>'
+        : '';
+
       html.push(`
-        <div class="wa-msg wa-msg--${isOut ? 'out' : 'in'} ${isError ? 'wa-msg--error' : ''}" data-id="${msg.id}">
+        <div class="wa-msg wa-msg--${isOut ? 'out' : 'in'} ${isBotMsg ? 'wa-msg--bot' : ''} ${isError ? 'wa-msg--error' : ''}" data-id="${msg.id}">
           <div class="wa-msg__bubble">
-            <span class="wa-msg__author">${escapeHtml(author)}</span>
+            <div class="wa-msg__author-row">
+              <span class="wa-msg__author">${escapeHtml(author)}</span>
+              ${botBadge}
+            </div>
             ${content}
             <div class="wa-msg__meta">
               ${isError ? '<span class="wa-msg__error-badge">No enviado</span>' : ''}
