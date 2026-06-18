@@ -144,6 +144,16 @@
       justify-content: center;
       border-radius: var(--radius-xl);
     }
+
+    .login-card--loading {
+      min-height: 520px;
+    }
+
+    .login-card--loading .login-card__header,
+    .login-card--loading .login-form,
+    .login-card--loading .login-footer {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -218,6 +228,7 @@
       const submitBtn = document.getElementById('login-submit');
       const loadingEl = document.getElementById('login-loading');
       const forgotLink = document.getElementById('forgot-link');
+      const card = document.querySelector('.login-card');
 
       function showError(message) {
         errorEl.textContent = message;
@@ -231,10 +242,12 @@
 
       function setLoading(loading) {
         if (loading) {
+          card.classList.add('login-card--loading');
           loadingEl.classList.add('login-loading--visible');
           submitBtn.disabled = true;
           submitBtn.textContent = 'Ingresando...';
         } else {
+          card.classList.remove('login-card--loading');
           loadingEl.classList.remove('login-loading--visible');
           submitBtn.disabled = false;
           submitBtn.textContent = 'Iniciar sesion';
