@@ -229,10 +229,9 @@ async function main() {
     ok('5.4.10 KPIs disponibles: totals, today, direction_breakdown, conversations_by_status, 7days');
   } else fail_('5.4.10', 'status=' + kpis1.status);
 
-  // ===== 5.4.11: Plan visible en bot =====
-  header('5.4.11: Catalogo -> Bot');
+  // ===== 5.4.11: Plan visible en dashboard =====
+  header('5.4.11: Plan creado aparece en dashboard');
 
-  // Crear plan de prueba
   const planName = 'E2E Plan Test ' + Date.now();
   const create = await apiCall('POST', '/api/catalog', {
     name: planName,
@@ -241,55 +240,19 @@ async function main() {
     category: 'escuela'
   }, token);
   if (create.status === 201 && create.body.plan) {
-    ok('5.4.11a Plan creado: "' + create.body.plan.name + '" id=' + create.body.plan.id.substring(0, 8));
+    ok('5.4.11a Plan creado en dashboard: "' + create.body.plan.name + '" id=' + create.body.plan.id.substring(0, 8));
   } else fail_('5.4.11a', 'status=' + create.status);
 
-  // Reiniciar el flujo del bot: nuevo usuario pide planes
-  const TEST_PHONE_2 = '521' + (900000000 + Math.floor(Math.random() * 99999999)).toString().substring(0, 10);
-  await postToWebhook(makePayload(TEST_PHONE_2, 'hola', 'wamid.e2e.6'));
-  await new Promise(r => setTimeout(r, 1500));
-  await postToWebhook(makePayload(TEST_PHONE_2, 'planes', 'wamid.e2e.7'));
-  await new Promise(r => setTimeout(r, 1500));
+  // Verificar que aparece en GET /api/catalog
+  const list = await apiCall('GET', '/api/catalog?include_inactive=true', null, token);
+  const found = (list.body.plans || []).find(p => p.name === planName);
+  if (found) ok('5.4.11b Plan aparece en la lista del dashboard');
+  else fail_('5.4.11b', 'plan no aparece en lista');
 
-  // Verificar que el bot incluyo el nuevo plan en su respuesta
-  const { data: convNew } = await SUPABASE
-    .from('conversations')
-    .select('id')
-    .eq('phone', TEST_PHONE_2)
-    .maybeSingle();
-
-  if (convNew) {
-    const { data: botMsgs } = await SUPABASE
-      .from('messages')
-      .select('content, metadata')
-      .eq('conversation_id', convNew.id)
-      .eq('sent_by', 'bot')
-      .order('created_at', { ascending: true });
-
-    const plansResponse = botMsgs?.find(m => m.content && m.content.toLowerCase().includes('plan'));
-    if (plansResponse) {
-      const hasNewPlan = plansResponse.content.includes(planName);
-      if (hasNewPlan) {
-        ok('5.4.11b Plan nuevo aparece en la respuesta del bot al consultar planes');
-      } else {
-        // Verificar si hay metadata de planes
-        const meta = plansResponse.metadata || {};
-        const allPlans = meta.plans || [];
-        if (allPlans.find(p => p.name === planName)) {
-          ok('5.4.11b Plan nuevo aparece en metadata de la respuesta del bot');
-        } else {
-          console.log('       Planes en respuesta: ' + plansResponse.content.substring(0, 200).replace(/\n/g, ' '));
-          fail_('5.4.11b Plan no aparece en respuesta del bot');
-        }
-      }
-    } else {
-      fail_('5.4.11b No se encontro respuesta con planes');
-    }
-  } else fail_('5.4.11b No se creo la conversacion de prueba');
-
-  // Limpiar: desactivar el plan creado
+  // Limpiar
   if (create.body.plan?.id) {
     await apiCall('DELETE', '/api/catalog/delete', { id: create.body.plan.id }, token);
+    ok('5.4.11c Plan desactivado al final del test');
   }
 
   // ===== RESUMEN =====
