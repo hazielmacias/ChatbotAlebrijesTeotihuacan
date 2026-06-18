@@ -17,6 +17,8 @@ const FLOWS = {
   faq: faqFlow
 };
 
+console.log('[bot-engine:BOOT] FLOWS loaded. menu.steps:', Object.keys(menuFlow.steps || {}).join(','), '| menu.start.options:', Object.keys(menuFlow.steps?.start?.options || {}).join(','));
+
 const RESET_TRIGGERS = ['0', 'menu', 'menú', 'inicio', 'empezar', 'cancelar', 'salir', 'cancel'];
 
 const CONTACT_INFO = {
