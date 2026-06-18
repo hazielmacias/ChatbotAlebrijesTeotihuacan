@@ -327,8 +327,8 @@
   transition: stroke-width 150ms ease;
 }
 
-.donut__segment--sent     { stroke: var(--color-primary); }
-.donut__segment--received { stroke: var(--color-info); }
+.donut__segment--sent     { stroke: var(--color-success); }
+.donut__segment--received { stroke: var(--color-border-strong); }
 
 .donut__center {
   position: absolute;
@@ -383,8 +383,8 @@
   flex-shrink: 0;
 }
 
-.donut__legend-dot--sent     { background: var(--color-primary); }
-.donut__legend-dot--received { background: var(--color-info); }
+.donut__legend-dot--sent     { background: var(--color-success); }
+.donut__legend-dot--received { background: var(--color-border-strong); }
 
 .donut__legend-value {
   margin-left: auto;
@@ -494,7 +494,7 @@
 .recent-item__wa {
   width: 32px;
   height: 32px;
-  background: var(--color-bg-elevated);
+  background: #25d366;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -505,7 +505,7 @@
 .recent-item__wa svg {
   width: 16px;
   height: 16px;
-  fill: var(--color-text-muted);
+  fill: #ffffff;
 }
 
 .recent-item__body {
