@@ -325,10 +325,10 @@
           <div class="wa-chat-header__status">${escapeHtml(phone)}</div>
         </div>
         <div class="wa-chat-header__actions">
-          <label class="wa-chat-bot-control ${isBot ? 'wa-chat-bot-control--on' : 'wa-chat-bot-control--off'}" id="bot-control-wrap">
-            <span class="wa-chat-bot-control__label">${isBot ? 'Bot activo' : 'Humano'}</span>
+          <label class="wa-chat-bot-control ${isBot ? 'wa-chat-bot-control--on' : 'wa-chat-bot-control--off'}" id="bot-control-wrap" title="Click para ${isBot ? 'desactivar el bot y responder manualmente' : 'reactivar el bot'}">
+            <span class="wa-chat-bot-control__label" id="bot-control-label">${isBot ? 'Bot activo' : 'Control manual'}</span>
             <span class="wa-switch">
-              <input type="checkbox" class="wa-switch__input" id="btn-toggle-bot" data-id="${conv.id}" ${isBot ? 'checked' : ''} aria-label="Alternar bot">
+              <input type="checkbox" class="wa-switch__input" id="btn-toggle-bot" data-id="${conv.id}" ${isBot ? 'checked' : ''} aria-label="${isBot ? 'Desactivar bot' : 'Activar bot'}">
               <span class="wa-switch__slider"></span>
             </span>
           </label>
@@ -338,7 +338,7 @@
       ${!isBot ? `
         <div class="wa-chat-banner">
           <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-          Conversacion tomada por un agente humano. El bot no respondera hasta que se reactive.
+          Control manual: el bot no respondera hasta que se reactive.
         </div>
       ` : ''}
 
@@ -575,22 +575,53 @@
     const conv = state.conversations.find(c => c.id === conversationId);
     if (!conv) return;
 
-    const newVal = !conv.bot_active;
+    const previousVal = conv.bot_active;
+    const newVal = !previousVal;
+
+    updateToggleVisuals(conversationId, newVal);
+    conv.bot_active = newVal;
+
     const result = await window.api.toggleBot(conversationId, newVal);
 
     if (!result.ok) {
+      updateToggleVisuals(conversationId, previousVal);
+      conv.bot_active = previousVal;
       window.toast.error('Error al cambiar el bot: ' + (result.error || 'desconocido'));
-      renderChatPanel();
       return;
     }
 
-    conv.bot_active = newVal;
     if (result.data.conversation) {
       Object.assign(conv, result.data.conversation);
     }
-    window.toast.success(newVal ? 'Bot reactivado' : 'Bot desactivado - ahora tu respondes');
-    renderChatPanel();
+
+    if (newVal) {
+      window.toast.success('Bot reactivado - ahora el bot responde');
+    } else {
+      window.toast.success('Control manual activado - tu respondes al contacto');
+    }
+
     applyFilters();
+    renderChatPanel();
+  }
+
+  function updateToggleVisuals(conversationId, isBot) {
+    const wrap = document.getElementById('bot-control-wrap');
+    const label = document.getElementById('bot-control-label');
+    const checkbox = document.getElementById('btn-toggle-bot');
+    if (wrap) {
+      wrap.classList.toggle('wa-chat-bot-control--on', isBot);
+      wrap.classList.toggle('wa-chat-bot-control--off', !isBot);
+      wrap.title = isBot
+        ? 'Click para desactivar el bot y responder manualmente'
+        : 'Click para reactivar el bot';
+    }
+    if (label) {
+      label.textContent = isBot ? 'Bot activo' : 'Control manual';
+    }
+    if (checkbox) {
+      checkbox.checked = isBot;
+      checkbox.setAttribute('aria-label', isBot ? 'Desactivar bot' : 'Activar bot');
+    }
   }
 
   // Realtime via Supabase (mejor que polling: <500ms latency)
