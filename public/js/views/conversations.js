@@ -325,10 +325,13 @@
           <div class="wa-chat-header__status">${escapeHtml(phone)}</div>
         </div>
         <div class="wa-chat-header__actions">
-          <button class="wa-chat-bot-toggle ${isBot ? 'wa-chat-bot-toggle--on' : 'wa-chat-bot-toggle--off'}" id="btn-toggle-bot" data-id="${conv.id}">
-            <span class="wa-chat-bot-toggle__dot"></span>
-            ${isBot ? 'Bot activo' : 'Tomado por humano'}
-          </button>
+          <label class="wa-chat-bot-control ${isBot ? 'wa-chat-bot-control--on' : 'wa-chat-bot-control--off'}" id="bot-control-wrap">
+            <span class="wa-chat-bot-control__label">${isBot ? 'Bot activo' : 'Humano'}</span>
+            <span class="wa-switch">
+              <input type="checkbox" class="wa-switch__input" id="btn-toggle-bot" data-id="${conv.id}" ${isBot ? 'checked' : ''} aria-label="Alternar bot">
+              <span class="wa-switch__slider"></span>
+            </span>
+          </label>
         </div>
       </header>
 
@@ -368,7 +371,7 @@
 
     const toggleBtn = document.getElementById('btn-toggle-bot');
     if (toggleBtn) {
-      toggleBtn.addEventListener('click', () => toggleBot(conv.id));
+      toggleBtn.addEventListener('change', () => toggleBot(conv.id));
     }
 
     const sendBtn = document.getElementById('msg-send');
@@ -577,6 +580,7 @@
 
     if (!result.ok) {
       window.toast.error('Error al cambiar el bot: ' + (result.error || 'desconocido'));
+      renderChatPanel();
       return;
     }
 
