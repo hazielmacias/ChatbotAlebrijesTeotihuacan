@@ -245,9 +245,14 @@
     container.innerHTML = `
       <div class="app-view" id="kpis-view">
         <div class="view-header">
-          <div>
-            <h1 class="view-header__title">Indicadores</h1>
-            <p class="view-header__subtitle">Resumen de actividad del chatbot</p>
+          <div class="view-header__main">
+            <div class="view-header__icon">
+              <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+            </div>
+            <div class="view-header__title-block">
+              <h1 class="view-header__title">Indicadores</h1>
+              <p class="view-header__subtitle">Resumen de actividad del chatbot</p>
+            </div>
           </div>
           <div class="view-header__actions">
             <span class="badge badge--active" data-kpi-live-indicator>En vivo</span>
@@ -263,9 +268,14 @@
       container.innerHTML = `
         <div class="app-view">
           <div class="view-header">
-            <div>
-              <h1 class="view-header__title">Indicadores</h1>
-              <p class="view-header__subtitle">Resumen de actividad del chatbot</p>
+            <div class="view-header__main">
+              <div class="view-header__icon">
+                <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+              </div>
+              <div class="view-header__title-block">
+                <h1 class="view-header__title">Indicadores</h1>
+                <p class="view-header__subtitle">Resumen de actividad del chatbot</p>
+              </div>
             </div>
           </div>
           <div class="empty-state">
@@ -281,9 +291,14 @@
     container.innerHTML = `
       <div class="app-view">
         <div class="view-header">
-          <div>
-            <h1 class="view-header__title">Indicadores</h1>
-            <p class="view-header__subtitle">Resumen de actividad &middot; <span data-kpi-header-date>${escapeHtml(k.today?.date || '')}</span></p>
+          <div class="view-header__main">
+            <div class="view-header__icon">
+              <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+            </div>
+            <div class="view-header__title-block">
+              <h1 class="view-header__title">Indicadores</h1>
+              <p class="view-header__subtitle">Resumen de actividad &middot; <span data-kpi-header-date>${escapeHtml(k.today?.date || '')}</span></p>
+            </div>
           </div>
           <div class="view-header__actions">
             <span class="badge badge--active" data-kpi-live-indicator>En vivo</span>

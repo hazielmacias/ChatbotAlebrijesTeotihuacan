@@ -50,33 +50,79 @@
     return Math.round((part / total) * 100);
   }
 
-  function buildSparkline(arr) {
+  function trendDelta(arr) {
+    if (!arr || arr.length < 6) return null;
+    const recent = arr.slice(-3).reduce((a, b) => a + b, 0);
+    const previous = arr.slice(-6, -3).reduce((a, b) => a + b, 0);
+    if (previous === 0) return recent > 0 ? 100 : null;
+    return Math.round(((recent - previous) / previous) * 100);
+  }
+
+  function buildSparkline(arr, color) {
     if (!arr || arr.length === 0) return '';
     const max = Math.max(1, ...arr);
-    return arr.map((v, i) => {
-      const h = Math.max(2, (v / max) * 100);
-      const isLast = i === arr.length - 1;
-      return `<div class="kpi-card__spark-bar ${v > 0 ? 'kpi-card__spark-bar--filled' : ''}" style="height: ${h}%" data-index="${i}"></div>`;
-    }).join('');
-  }
-
-  function trendArrow(delta) {
-    if (delta == null) return { dir: 'flat', icon: 'M4 12h16', label: 'sin cambio' };
-    if (delta > 0) return { dir: 'up', icon: 'M7 14l5-5 5 5', label: 'aumento' };
-    if (delta < 0) return { dir: 'down', icon: 'M7 10l5 5 5-5', label: 'disminución' };
-    return { dir: 'flat', icon: 'M4 12h16', label: 'sin cambio' };
-  }
-
-  function renderRing(pct, color) {
-    const r = 36;
-    const circumference = 2 * Math.PI * r;
-    const offset = circumference * (1 - pct / 100);
+    const w = 140;
+    const h = 36;
+    const stepX = w / (arr.length - 1 || 1);
+    const points = arr.map((v, i) => {
+      const x = i * stepX;
+      const y = h - (v / max) * (h - 4) - 2;
+      return [x, y];
+    });
+    const path = points.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+    const areaPath = path + ` L${w},${h} L0,${h} Z`;
     return `
-      <svg class="kpi-card__ring" viewBox="0 0 80 80">
-        <circle class="kpi-card__ring-bg" cx="40" cy="40" r="${r}"/>
-        <circle class="kpi-card__ring-fill" cx="40" cy="40" r="${r}"
-          stroke-dasharray="${circumference}"
-          stroke-dashoffset="${offset}"/>
+      <svg class="kpi-spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="sparkGrad-${color}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--kpi-color, ${color})" stop-opacity="0.28"/>
+            <stop offset="100%" stop-color="var(--kpi-color, ${color})" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="${areaPath}" fill="url(#sparkGrad-${color})" class="kpi-spark__area"/>
+        <path d="${path}" fill="none" stroke="var(--kpi-color, ${color})" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="kpi-spark__line"/>
+        <circle cx="${points[points.length-1][0].toFixed(1)}" cy="${points[points.length-1][1].toFixed(1)}" r="3" fill="var(--kpi-color, ${color})" class="kpi-spark__dot"/>
+      </svg>
+    `;
+  }
+
+  function renderTripleRing(pcts, color) {
+    const size = 200;
+    const cx = size / 2;
+    const cy = size / 2;
+    const r1 = 80;
+    const r2 = 64;
+    const r3 = 48;
+    const c1 = 2 * Math.PI * r1;
+    const c2 = 2 * Math.PI * r2;
+    const c3 = 2 * Math.PI * r3;
+
+    function seg(r, c, pct) {
+      const len = c * (pct / 100);
+      return `<circle cx="${cx}" cy="${cy}" r="${r}"
+        fill="none"
+        stroke="url(#ringGrad-${color})"
+        stroke-width="10"
+        stroke-linecap="round"
+        stroke-dasharray="${len.toFixed(2)} ${(c - len).toFixed(2)}"
+        stroke-dashoffset="0"
+        class="kpi-ring__segment"/>`;
+    }
+
+    return `
+      <svg class="kpi-ring" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+        <defs>
+          <linearGradient id="ringGrad-${color}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--kpi-color-light, ${color})"/>
+            <stop offset="100%" stop-color="var(--kpi-color, ${color})"/>
+          </linearGradient>
+        </defs>
+        <circle cx="${cx}" cy="${cy}" r="${r1}" fill="none" stroke="var(--color-bg-elevated)" stroke-width="10" class="kpi-ring__track"/>
+        <circle cx="${cx}" cy="${cy}" r="${r2}" fill="none" stroke="var(--color-bg-elevated)" stroke-width="10" class="kpi-ring__track"/>
+        <circle cx="${cx}" cy="${cy}" r="${r3}" fill="none" stroke="var(--color-bg-elevated)" stroke-width="10" class="kpi-ring__track"/>
+        ${seg(r1, c1, pcts[0])}
+        ${seg(r2, c2, pcts[1])}
+        ${seg(r3, c3, pcts[2])}
       </svg>
     `;
   }
@@ -126,92 +172,124 @@
     const maxConv = Math.max(1, ...convByDay.map(d => d.count));
     const maxHour = Math.max(1, ...hour);
 
-    // Sparklines: usaremos convByDay para conversaciones, msgByDay para mensajes,
-    // hour (24h) para actividad general
     const convSpark = convByDay.map(d => d.count || 0);
     const msgSpark = msgByDay.length === 7 ? msgByDay.map(d => d.count || 0) : convSpark;
     const hourSpark = hour.map(c => c || 0);
 
-    // Tendencias: comparar últimos 3 días vs los 3 anteriores
-    function trendDelta(arr) {
-      if (!arr || arr.length < 6) return null;
-      const recent = arr.slice(-3).reduce((a, b) => a + b, 0);
-      const previous = arr.slice(-6, -3).reduce((a, b) => a + b, 0);
-      if (previous === 0) return recent > 0 ? 100 : null;
-      return Math.round(((recent - previous) / previous) * 100);
-    }
-
     const convTrend = trendDelta(convSpark);
     const msgTrend = trendDelta(msgSpark);
-    const passTrend = null;
-    const msgTodayTrend = t.messages_today != null && t.messages_yesterday != null
-      ? Math.round(((t.messages_today - t.messages_yesterday) / Math.max(1, t.messages_yesterday)) * 100)
-      : null;
+
+    // Compute KPI ring percentages (cap at 100)
+    const convRingPcts = [
+      Math.min(100, Math.max(20, (convTrend != null ? 50 + convTrend / 2 : 75))),
+      Math.min(100, t.active_conversations && t.conversations ? Math.round((t.active_conversations / t.conversations) * 100) : 60),
+      Math.min(100, convSpark.length > 0 ? Math.round((convSpark[convSpark.length-1] / Math.max(...convSpark)) * 100) : 50)
+    ];
+    const msgRingPcts = [
+      Math.min(100, msgTrend != null ? 50 + msgTrend / 2 : 65),
+      totalSvr > 0 ? Math.round((svr.outbound / totalSvr) * 100) : 50,
+      Math.min(100, hourSpark.length > 0 ? Math.round((hourSpark[hourSpark.length-1] / Math.max(...hourSpark)) * 100) : 50)
+    ];
+    const passRingPcts = [
+      Math.min(100, t.passes ? 30 + Math.min(70, t.passes * 5) : 0),
+      Math.min(100, totalSvr > 0 ? Math.round((svr.inbound / totalSvr) * 100) : 50),
+      Math.min(100, kw.length > 0 ? Math.min(100, kw.length * 20) : 0)
+    ];
+    const kwRingPcts = [
+      Math.min(100, kw.length > 0 ? 85 : 0),
+      Math.min(100, kw.length > 1 ? 65 : 0),
+      Math.min(100, kw.length > 0 ? Math.round((kw[0].count / Math.max(1, kw.reduce((a,b)=>a+b.count,0))) * 100) : 0)
+    ];
 
     container.innerHTML = `
       <div class="dashboard-view">
         <div class="dashboard-header">
-          <div>
-            <h1 class="dashboard-header__title">Dashboard</h1>
-            <p class="dashboard-header__subtitle">Resumen de actividad del chatbot</p>
+          <div class="view-header__main">
+            <div class="view-header__icon">
+              <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7zm-4 6h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+            </div>
+            <div class="view-header__title-block">
+              <h1 class="dashboard-header__title">Dashboard</h1>
+              <p class="dashboard-header__subtitle">Resumen de actividad del chatbot</p>
+            </div>
           </div>
           <div class="dashboard-header__date">
             <span>${formatFullDate()}</span>
           </div>
         </div>
 
-        <!-- KPI cards (Apple Health style) -->
+        <!-- KPI cards (Apple Health triple-ring style) -->
         <div class="dashboard-stats">
           <div class="kpi-card kpi-card--primary">
             <div class="kpi-card__ring-wrap">
-              ${renderRing(convTrend != null ? Math.min(100, Math.max(0, 50 + convTrend / 2)) : 75, 'var(--color-primary)')}
-              <div class="kpi-card__ring-center">${formatNumber(t.conversations)}</div>
+              ${renderTripleRing(convRingPcts, 'primary')}
+              <div class="kpi-card__ring-center">
+                <div class="kpi-card__ring-value">${formatNumber(t.conversations)}</div>
+                <div class="kpi-card__ring-label">Total</div>
+              </div>
             </div>
             <div class="kpi-card__body">
-              <div class="kpi-card__label">Conversaciones</div>
-              <div class="kpi-card__value">${formatNumber(t.active_conversations)}</div>
-              <div class="kpi-card__spark">${buildSparkline(convSpark)}</div>
-              ${convTrend != null ? renderTrend(convTrend, 'vs 3 dias') : ''}
+              <div class="kpi-card__head">
+                <div class="kpi-card__label">Conversaciones</div>
+                <div class="kpi-card__value">${formatNumber(t.active_conversations)}<span class="kpi-card__value-suffix">activas</span></div>
+              </div>
+              <div class="kpi-card__spark">${buildSparkline(convSpark, 'primary')}</div>
+              ${convTrend != null ? renderTrend(convTrend, 'vs 3 días') : ''}
             </div>
           </div>
 
           <div class="kpi-card kpi-card--info">
             <div class="kpi-card__ring-wrap">
-              ${renderRing(msgTodayTrend != null ? Math.min(100, Math.max(0, 50 + msgTodayTrend / 2)) : 65, 'var(--color-info)')}
-              <div class="kpi-card__ring-center">${formatNumber(t.messages_today || 0)}</div>
+              ${renderTripleRing(msgRingPcts, 'info')}
+              <div class="kpi-card__ring-center">
+                <div class="kpi-card__ring-value">${formatNumber(t.messages_today || 0)}</div>
+                <div class="kpi-card__ring-label">Hoy</div>
+              </div>
             </div>
             <div class="kpi-card__body">
-              <div class="kpi-card__label">Mensajes hoy</div>
-              <div class="kpi-card__value">${formatNumber(t.messages)}</div>
-              <div class="kpi-card__spark">${buildSparkline(msgSpark)}</div>
-              ${msgTodayTrend != null ? renderTrend(msgTodayTrend, 'vs ayer') : ''}
+              <div class="kpi-card__head">
+                <div class="kpi-card__label">Mensajes</div>
+                <div class="kpi-card__value">${formatNumber(t.messages)}<span class="kpi-card__value-suffix">totales</span></div>
+              </div>
+              <div class="kpi-card__spark">${buildSparkline(msgSpark, 'info')}</div>
+              ${msgTrend != null ? renderTrend(msgTrend, 'vs 3 días') : ''}
             </div>
           </div>
 
           <div class="kpi-card kpi-card--success">
             <div class="kpi-card__ring-wrap">
-              ${renderRing(Math.min(100, (t.passes || 0) * 10), 'var(--color-success)')}
-              <div class="kpi-card__ring-center">${formatNumber(t.passes)}</div>
+              ${renderTripleRing(passRingPcts, 'success')}
+              <div class="kpi-card__ring-center">
+                <div class="kpi-card__ring-value">${formatNumber(t.passes)}</div>
+                <div class="kpi-card__ring-label">Escalados</div>
+              </div>
             </div>
             <div class="kpi-card__body">
-              <div class="kpi-card__label">Escalados</div>
-              <div class="kpi-card__value">${formatNumber(t.passes)}</div>
-              <div class="kpi-card__spark">${buildSparkline(hourSpark.slice(0, 7))}</div>
+              <div class="kpi-card__head">
+                <div class="kpi-card__label">Conversaciones escaladas</div>
+                <div class="kpi-card__value">${formatNumber(t.passes)}<span class="kpi-card__value-suffix">totales</span></div>
+              </div>
+              <div class="kpi-card__spark">${buildSparkline(hourSpark.slice(0, 7), 'success')}</div>
               <div class="kpi-card__trend kpi-card__trend--flat">
-                <span>Conversaciones escaladas</span>
+                <span>Acumulado histórico</span>
               </div>
             </div>
           </div>
 
           <div class="kpi-card kpi-card--warning">
             <div class="kpi-card__ring-wrap">
-              ${renderRing(kw.length > 0 ? 85 : 0, 'var(--color-warning)')}
-              <div class="kpi-card__ring-center">${kw.length}</div>
+              ${renderTripleRing(kwRingPcts, 'warning')}
+              <div class="kpi-card__ring-center">
+                <div class="kpi-card__ring-value">${kw.length}</div>
+                <div class="kpi-card__ring-label">Top</div>
+              </div>
             </div>
             <div class="kpi-card__body">
-              <div class="kpi-card__label">Palabras Frecuentes</div>
-              <div class="kpi-card__value">${kw.length > 0 ? kw[0].word : 'Sin datos'}</div>
-              <div class="keywords-row" style="margin-top: var(--space-2);">
+              <div class="kpi-card__head">
+                <div class="kpi-card__label">Palabras Frecuentes</div>
+                <div class="kpi-card__value">${kw.length > 0 ? escapeHtml(kw[0].word) : 'Sin datos'}<span class="kpi-card__value-suffix">${kw.length > 0 ? kw[0].count + ' menciones' : ''}</span></div>
+              </div>
+              <div class="keywords-row">
                 ${kw.length === 0 ? '<span class="keyword-pill">Sin datos</span>' :
                   kw.slice(0, 4).map((k, i) => `
                     <span class="keyword-pill" style="--tile-color: hsl(${25 + i * 35}, 80%, 55%);">
@@ -342,7 +420,11 @@
   }
 
   function renderTrend(delta, label) {
-    const arrow = trendArrow(delta);
+    const arrow = delta > 0
+      ? { dir: 'up', icon: 'M7 14l5-5 5 5' }
+      : delta < 0
+        ? { dir: 'down', icon: 'M7 10l5 5 5-5' }
+        : { dir: 'flat', icon: 'M4 12h16' };
     const sign = delta > 0 ? '+' : '';
     return `
       <div class="kpi-card__trend kpi-card__trend--${arrow.dir}">
@@ -360,11 +442,23 @@
     const recvLen = c * (recvPct / 100);
     return `
       <svg class="donut__svg" viewBox="0 0 180 180">
+        <defs>
+          <linearGradient id="donutSent" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FF7A1A"/>
+            <stop offset="100%" stop-color="#E04E00"/>
+          </linearGradient>
+          <linearGradient id="donutRecv" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0066E0"/>
+            <stop offset="100%" stop-color="#003D8A"/>
+          </linearGradient>
+        </defs>
         <circle class="donut__track" cx="90" cy="90" r="${r}"/>
         <circle class="donut__segment donut__segment--sent" cx="90" cy="90" r="${r}"
+          stroke="url(#donutSent)"
           stroke-dasharray="${sentLen} ${c - sentLen}"
           stroke-dashoffset="0"/>
         <circle class="donut__segment donut__segment--received" cx="90" cy="90" r="${r}"
+          stroke="url(#donutRecv)"
           stroke-dasharray="${recvLen} ${c - recvLen}"
           stroke-dashoffset="${-sentLen}"/>
       </svg>
@@ -376,7 +470,7 @@
     if (tooltip) {
       const wrap = document.getElementById('chart-bar-wrap');
       wrap.querySelectorAll('.chart-bar').forEach(bar => {
-        bar.addEventListener('mouseenter', (e) => {
+        bar.addEventListener('mouseenter', () => {
           const rect = bar.getBoundingClientRect();
           const wrapRect = wrap.getBoundingClientRect();
           tooltip.textContent = `${bar.dataset.label}: ${bar.dataset.value}`;
