@@ -153,9 +153,7 @@
             <button class="wa-conv-filter" data-filter="bot">Bot</button>
             <button class="wa-conv-filter" data-filter="human">Humano</button>
           </div>
-          <div class="wa-conv-list" id="conv-list">
-            <div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>
-          </div>
+          <div class="wa-conv-list" id="conv-list"></div>
         </div>
 
         <div class="wa-chat-panel" id="wa-chat-panel">
@@ -199,15 +197,18 @@
   async function loadConversations() {
     state.loading = true;
     const listEl = document.getElementById('conv-list');
+    let loader = null;
     if (listEl) {
+      const existingLoader = listEl.querySelector('.loading-overlay');
+      if (existingLoader) existingLoader.remove();
       const hasItems = listEl.querySelector('.wa-conv-item');
-      const hasLoader = listEl.querySelector('.loading-overlay');
-      if (!hasItems && !hasLoader) {
-        listEl.innerHTML = '<div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>';
+      if (!hasItems) {
+        loader = window.withDelayedLoader(listEl);
       }
     }
 
     const result = await window.api.listConversations({ limit: 100 });
+    if (loader) loader.hide();
     if (!result.ok) {
       if (listEl) {
         listEl.innerHTML = '<div class="empty-state"><p class="empty-state__message">Error al cargar conversaciones</p></div>';

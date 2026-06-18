@@ -96,6 +96,40 @@
 
   window.router = router;
 
+  // Delayed loader: appends a loading overlay inside parent if the operation takes longer than delayMs.
+  // Use this in views so fast menu navigation does not flash a loading screen.
+  window.withDelayedLoader = function(parent, delayMs) {
+    delayMs = delayMs || 300;
+    let shown = false;
+    let timeoutId = null;
+    let loaderEl = null;
+
+    const show = function() {
+      shown = true;
+      if (parent) {
+        loaderEl = document.createElement('div');
+        loaderEl.className = 'loading-overlay';
+        loaderEl.setAttribute('role', 'status');
+        loaderEl.setAttribute('aria-label', 'Cargando');
+        loaderEl.innerHTML = '<div class="brand-loader"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div>';
+        parent.appendChild(loaderEl);
+      }
+    };
+
+    timeoutId = setTimeout(show, delayMs);
+
+    return {
+      hide: function() {
+        clearTimeout(timeoutId);
+        if (loaderEl && loaderEl.parentNode) {
+          loaderEl.remove();
+        }
+        shown = false;
+      },
+      shown: function() { return shown; }
+    };
+  };
+
   // Toast helper
   const toast = {
     container: null,

@@ -16,20 +16,21 @@
 
   async function render(container) {
     container.innerHTML = `
-      <div class="app-view">
+      <div class="app-view" id="settings-view">
         <div class="view-header">
           <div>
             <h1 class="view-header__title">Ajustes</h1>
             <p class="view-header__subtitle">Edita las plantillas de mensajes del bot</p>
           </div>
         </div>
-        <div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>
       </div>
     `;
+    const loader = window.withDelayedLoader(container);
 
     state.loading = true;
     const result = await window.api.getTemplates();
     state.loading = false;
+    loader.hide();
 
     if (!result.ok) {
       container.innerHTML = `

@@ -176,6 +176,7 @@
   flex: 1;
   overflow-y: auto;
   background: var(--wa-sidebar);
+  position: relative;
 }
 
 .wa-conv-item {

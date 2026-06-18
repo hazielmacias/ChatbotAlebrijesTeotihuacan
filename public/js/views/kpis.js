@@ -243,7 +243,7 @@
     activeContainer = container;
 
     container.innerHTML = `
-      <div class="app-view">
+      <div class="app-view" id="kpis-view">
         <div class="view-header">
           <div>
             <h1 class="view-header__title">Indicadores</h1>
@@ -253,11 +253,12 @@
             <span class="badge badge--active" data-kpi-live-indicator>En vivo</span>
           </div>
         </div>
-        <div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>
       </div>
     `;
+    const loader = window.withDelayedLoader(container);
 
     const result = await window.api.getKpis();
+    loader.hide();
     if (!result.ok) {
       container.innerHTML = `
         <div class="app-view">

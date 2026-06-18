@@ -53,15 +53,13 @@
   }
 
   async function render(container) {
-    container.innerHTML = `
-      <div class="dashboard-view" id="dashboard-view">
-        <div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>
-      </div>
-    `;
+    container.innerHTML = '<div class="dashboard-view" id="dashboard-view"></div>';
+    const loader = window.withDelayedLoader(container);
 
     state.loading = true;
     const result = await window.api.getDashboardStats();
     state.loading = false;
+    loader.hide();
 
     if (!result.ok) {
       container.innerHTML = `

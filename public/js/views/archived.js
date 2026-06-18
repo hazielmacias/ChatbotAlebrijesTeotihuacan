@@ -110,9 +110,7 @@
           </div>
         </header>
 
-        <div class="archived-view__list" id="archived-list">
-          <div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>
-        </div>
+        <div class="archived-view__list" id="archived-list"></div>
       </div>
     `;
 
@@ -132,15 +130,18 @@
   async function loadArchived() {
     state.loading = true;
     const listEl = document.getElementById('archived-list');
+    let loader = null;
     if (listEl) {
+      const existingLoader = listEl.querySelector('.loading-overlay');
+      if (existingLoader) existingLoader.remove();
       const hasItems = listEl.querySelector('.archived-item');
-      const hasLoader = listEl.querySelector('.loading-overlay');
-      if (!hasItems && !hasLoader) {
-        listEl.innerHTML = '<div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>';
+      if (!hasItems) {
+        loader = window.withDelayedLoader(listEl);
       }
     }
 
     const result = await window.api.listArchivedConversations({ limit: 100 });
+    if (loader) loader.hide();
     if (!result.ok) {
       if (listEl) {
         listEl.innerHTML = '<div class="empty-state"><p class="empty-state__message">Error al cargar archivados</p></div>';
