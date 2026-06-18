@@ -45,11 +45,6 @@
     });
   }
 
-  function computePct(part, total) {
-    if (!total || total === 0) return 0;
-    return Math.round((part / total) * 100);
-  }
-
   function trendDelta(arr) {
     if (!arr || arr.length < 6) return null;
     const recent = arr.slice(-3).reduce((a, b) => a + b, 0);
@@ -58,72 +53,20 @@
     return Math.round(((recent - previous) / previous) * 100);
   }
 
-  function buildSparkline(arr, color) {
-    if (!arr || arr.length === 0) return '';
-    const max = Math.max(1, ...arr);
-    const w = 140;
-    const h = 36;
-    const stepX = w / (arr.length - 1 || 1);
-    const points = arr.map((v, i) => {
-      const x = i * stepX;
-      const y = h - (v / max) * (h - 4) - 2;
-      return [x, y];
-    });
-    const path = points.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
-    const areaPath = path + ` L${w},${h} L0,${h} Z`;
+  function renderTrend(delta, label) {
+    if (delta == null) return '';
+    const arrow = delta > 0
+      ? { dir: 'up', path: 'M7 14l5-5 5 5' }
+      : delta < 0
+        ? { dir: 'down', path: 'M7 10l5 5 5-5' }
+        : { dir: 'flat', path: 'M4 12h16' };
+    const sign = delta > 0 ? '+' : '';
     return `
-      <svg class="kpi-spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="sparkGrad-${color}" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="var(--kpi-color, ${color})" stop-opacity="0.28"/>
-            <stop offset="100%" stop-color="var(--kpi-color, ${color})" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-        <path d="${areaPath}" fill="url(#sparkGrad-${color})" class="kpi-spark__area"/>
-        <path d="${path}" fill="none" stroke="var(--kpi-color, ${color})" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="kpi-spark__line"/>
-        <circle cx="${points[points.length-1][0].toFixed(1)}" cy="${points[points.length-1][1].toFixed(1)}" r="3" fill="var(--kpi-color, ${color})" class="kpi-spark__dot"/>
-      </svg>
-    `;
-  }
-
-  function renderTripleRing(pcts, color) {
-    const size = 200;
-    const cx = size / 2;
-    const cy = size / 2;
-    const r1 = 80;
-    const r2 = 64;
-    const r3 = 48;
-    const c1 = 2 * Math.PI * r1;
-    const c2 = 2 * Math.PI * r2;
-    const c3 = 2 * Math.PI * r3;
-
-    function seg(r, c, pct) {
-      const len = c * (pct / 100);
-      return `<circle cx="${cx}" cy="${cy}" r="${r}"
-        fill="none"
-        stroke="url(#ringGrad-${color})"
-        stroke-width="10"
-        stroke-linecap="round"
-        stroke-dasharray="${len.toFixed(2)} ${(c - len).toFixed(2)}"
-        stroke-dashoffset="0"
-        class="kpi-ring__segment"/>`;
-    }
-
-    return `
-      <svg class="kpi-ring" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
-        <defs>
-          <linearGradient id="ringGrad-${color}" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="var(--kpi-color-light, ${color})"/>
-            <stop offset="100%" stop-color="var(--kpi-color, ${color})"/>
-          </linearGradient>
-        </defs>
-        <circle cx="${cx}" cy="${cy}" r="${r1}" fill="none" stroke="var(--color-bg-elevated)" stroke-width="10" class="kpi-ring__track"/>
-        <circle cx="${cx}" cy="${cy}" r="${r2}" fill="none" stroke="var(--color-bg-elevated)" stroke-width="10" class="kpi-ring__track"/>
-        <circle cx="${cx}" cy="${cy}" r="${r3}" fill="none" stroke="var(--color-bg-elevated)" stroke-width="10" class="kpi-ring__track"/>
-        ${seg(r1, c1, pcts[0])}
-        ${seg(r2, c2, pcts[1])}
-        ${seg(r3, c3, pcts[2])}
-      </svg>
+      <span class="kpi-card__delta kpi-card__delta--${arrow.dir}">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="${arrow.path}"/></svg>
+        <span>${sign}${delta}%</span>
+        <span class="kpi-card__delta-label">${label}</span>
+      </span>
     `;
   }
 
@@ -166,8 +109,7 @@
     const recent = d.recent_messages || [];
 
     const totalSvr = (svr.inbound || 0) + (svr.outbound || 0);
-    const sentPct = totalSvr > 0 ? computePct(svr.outbound, totalSvr) : 50;
-    const recvPct = 100 - sentPct;
+    const sentPct = totalSvr > 0 ? Math.round((svr.outbound / totalSvr) * 100) : 50;
 
     const maxConv = Math.max(1, ...convByDay.map(d => d.count));
     const maxHour = Math.max(1, ...hour);
@@ -179,28 +121,6 @@
     const convTrend = trendDelta(convSpark);
     const msgTrend = trendDelta(msgSpark);
 
-    // Compute KPI ring percentages (cap at 100)
-    const convRingPcts = [
-      Math.min(100, Math.max(20, (convTrend != null ? 50 + convTrend / 2 : 75))),
-      Math.min(100, t.active_conversations && t.conversations ? Math.round((t.active_conversations / t.conversations) * 100) : 60),
-      Math.min(100, convSpark.length > 0 ? Math.round((convSpark[convSpark.length-1] / Math.max(...convSpark)) * 100) : 50)
-    ];
-    const msgRingPcts = [
-      Math.min(100, msgTrend != null ? 50 + msgTrend / 2 : 65),
-      totalSvr > 0 ? Math.round((svr.outbound / totalSvr) * 100) : 50,
-      Math.min(100, hourSpark.length > 0 ? Math.round((hourSpark[hourSpark.length-1] / Math.max(...hourSpark)) * 100) : 50)
-    ];
-    const passRingPcts = [
-      Math.min(100, t.passes ? 30 + Math.min(70, t.passes * 5) : 0),
-      Math.min(100, totalSvr > 0 ? Math.round((svr.inbound / totalSvr) * 100) : 50),
-      Math.min(100, kw.length > 0 ? Math.min(100, kw.length * 20) : 0)
-    ];
-    const kwRingPcts = [
-      Math.min(100, kw.length > 0 ? 85 : 0),
-      Math.min(100, kw.length > 1 ? 65 : 0),
-      Math.min(100, kw.length > 0 ? Math.round((kw[0].count / Math.max(1, kw.reduce((a,b)=>a+b.count,0))) * 100) : 0)
-    ];
-
     container.innerHTML = `
       <div class="dashboard-view">
         <div class="dashboard-header">
@@ -210,101 +130,58 @@
             </div>
             <div class="view-header__title-block">
               <h1 class="dashboard-header__title">Dashboard</h1>
-              <p class="dashboard-header__subtitle">Resumen de actividad del chatbot</p>
+              <p class="dashboard-header__subtitle">${formatFullDate()}</p>
             </div>
-          </div>
-          <div class="dashboard-header__date">
-            <span>${formatFullDate()}</span>
           </div>
         </div>
 
-        <!-- KPI cards (Apple Health triple-ring style) -->
+        <!-- KPI cards: minimalist -->
         <div class="dashboard-stats">
-          <div class="kpi-card kpi-card--primary">
-            <div class="kpi-card__ring-wrap">
-              ${renderTripleRing(convRingPcts, 'primary')}
-              <div class="kpi-card__ring-center">
-                <div class="kpi-card__ring-value">${formatNumber(t.conversations)}</div>
-                <div class="kpi-card__ring-label">Total</div>
-              </div>
-            </div>
-            <div class="kpi-card__body">
-              <div class="kpi-card__head">
-                <div class="kpi-card__label">Conversaciones</div>
-                <div class="kpi-card__value">${formatNumber(t.active_conversations)}<span class="kpi-card__value-suffix">activas</span></div>
-              </div>
-              <div class="kpi-card__spark">${buildSparkline(convSpark, 'primary')}</div>
-              ${convTrend != null ? renderTrend(convTrend, 'vs 3 días') : ''}
+          <div class="kpi-card">
+            <div class="kpi-card__label">Conversaciones</div>
+            <div class="kpi-card__value">${formatNumber(t.conversations)}</div>
+            <div class="kpi-card__row">
+              <span class="kpi-card__suffix">${formatNumber(t.active_conversations || 0)} activas</span>
+              ${renderTrend(convTrend, 'vs 3 días')}
             </div>
           </div>
 
-          <div class="kpi-card kpi-card--info">
-            <div class="kpi-card__ring-wrap">
-              ${renderTripleRing(msgRingPcts, 'info')}
-              <div class="kpi-card__ring-center">
-                <div class="kpi-card__ring-value">${formatNumber(t.messages_today || 0)}</div>
-                <div class="kpi-card__ring-label">Hoy</div>
-              </div>
-            </div>
-            <div class="kpi-card__body">
-              <div class="kpi-card__head">
-                <div class="kpi-card__label">Mensajes</div>
-                <div class="kpi-card__value">${formatNumber(t.messages)}<span class="kpi-card__value-suffix">totales</span></div>
-              </div>
-              <div class="kpi-card__spark">${buildSparkline(msgSpark, 'info')}</div>
-              ${msgTrend != null ? renderTrend(msgTrend, 'vs 3 días') : ''}
+          <div class="kpi-card">
+            <div class="kpi-card__label">Mensajes</div>
+            <div class="kpi-card__value">${formatNumber(t.messages)}</div>
+            <div class="kpi-card__row">
+              <span class="kpi-card__suffix">${formatNumber(t.messages_today || 0)} hoy</span>
+              ${renderTrend(msgTrend, 'vs 3 días')}
             </div>
           </div>
 
-          <div class="kpi-card kpi-card--success">
-            <div class="kpi-card__ring-wrap">
-              ${renderTripleRing(passRingPcts, 'success')}
-              <div class="kpi-card__ring-center">
-                <div class="kpi-card__ring-value">${formatNumber(t.passes)}</div>
-                <div class="kpi-card__ring-label">Escalados</div>
-              </div>
-            </div>
-            <div class="kpi-card__body">
-              <div class="kpi-card__head">
-                <div class="kpi-card__label">Conversaciones escaladas</div>
-                <div class="kpi-card__value">${formatNumber(t.passes)}<span class="kpi-card__value-suffix">totales</span></div>
-              </div>
-              <div class="kpi-card__spark">${buildSparkline(hourSpark.slice(0, 7), 'success')}</div>
-              <div class="kpi-card__trend kpi-card__trend--flat">
-                <span>Acumulado histórico</span>
-              </div>
+          <div class="kpi-card">
+            <div class="kpi-card__label">Escalados</div>
+            <div class="kpi-card__value">${formatNumber(t.passes)}</div>
+            <div class="kpi-card__row">
+              <span class="kpi-card__suffix">Conversaciones escaladas</span>
             </div>
           </div>
 
-          <div class="kpi-card kpi-card--warning">
-            <div class="kpi-card__ring-wrap">
-              ${renderTripleRing(kwRingPcts, 'warning')}
-              <div class="kpi-card__ring-center">
-                <div class="kpi-card__ring-value">${kw.length}</div>
-                <div class="kpi-card__ring-label">Top</div>
-              </div>
-            </div>
-            <div class="kpi-card__body">
-              <div class="kpi-card__head">
-                <div class="kpi-card__label">Palabras Frecuentes</div>
-                <div class="kpi-card__value">${kw.length > 0 ? escapeHtml(kw[0].word) : 'Sin datos'}<span class="kpi-card__value-suffix">${kw.length > 0 ? kw[0].count + ' menciones' : ''}</span></div>
-              </div>
-              <div class="keywords-row">
-                ${kw.length === 0 ? '<span class="keyword-pill">Sin datos</span>' :
-                  kw.slice(0, 4).map((k, i) => `
-                    <span class="keyword-pill" style="--tile-color: hsl(${25 + i * 35}, 80%, 55%);">
+          <div class="kpi-card">
+            <div class="kpi-card__label">Palabras Frecuentes</div>
+            ${kw.length > 0
+              ? `<div class="kpi-card__value">${escapeHtml(kw[0].word)}</div>
+                <div class="keywords-row">
+                  ${kw.slice(1, 4).map(k => `
+                    <span class="keyword-pill">
                       ${escapeHtml(k.word)}
                       <span class="keyword-pill__count">${k.count}</span>
                     </span>
                   `).join('')}
-              </div>
-            </div>
+                </div>`
+              : `<div class="kpi-card__value" style="font-size: 18px; color: var(--color-text-muted);">Sin datos</div>`}
           </div>
         </div>
 
         <!-- Charts -->
         <div class="dashboard-charts">
-          <div class="chart-card" id="chart-bar-wrap">
+          <div class="chart-card">
             <div class="chart-card__head">
               <div class="chart-card__title-group">
                 <h3 class="chart-card__title">Conversaciones por día</h3>
@@ -312,11 +189,11 @@
               </div>
               <div class="chart-card__total">${formatNumber(convByDay.reduce((a, b) => a + b.count, 0))}</div>
             </div>
-            <div class="chart-bars" id="chart-bars">
+            <div class="chart-bars">
               ${convByDay.map(d => {
-                const h = Math.max(4, (d.count / maxConv) * 100);
+                const h = Math.max(2, (d.count / maxConv) * 100);
                 return `
-                  <div class="chart-bar" data-label="${formatDateShort(d.date)}" data-value="${d.count}">
+                  <div class="chart-bar">
                     <div class="chart-bar__value">${d.count}</div>
                     <div class="chart-bar__fill" style="height: ${h}%"></div>
                     <div class="chart-bar__label">${formatDateShort(d.date)}</div>
@@ -324,7 +201,6 @@
                 `;
               }).join('')}
             </div>
-            <div class="chart-tooltip" id="chart-tooltip-bar"></div>
           </div>
 
           <div class="chart-card">
@@ -336,7 +212,7 @@
             </div>
             <div class="donut">
               <div class="donut__chart">
-                ${renderDonut(sentPct, recvPct)}
+                ${renderDonut(sentPct, 100 - sentPct)}
                 <div class="donut__center">
                   <div class="donut__total">${formatNumber(totalSvr)}</div>
                   <div class="donut__label">Mensajes</div>
@@ -353,26 +229,26 @@
                   <span class="donut__legend-dot donut__legend-dot--received"></span>
                   <span>Recibidos</span>
                   <span class="donut__legend-value">${formatNumber(svr.inbound)}</span>
-                  <span class="donut__legend-pct">${recvPct}%</span>
+                  <span class="donut__legend-pct">${100 - sentPct}%</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="chart-card" id="chart-hour-wrap" style="margin-bottom: var(--space-6);">
+        <div class="chart-card" style="margin-bottom: var(--space-6);">
           <div class="chart-card__head">
             <div class="chart-card__title-group">
               <h3 class="chart-card__title">Actividad por hora</h3>
-              <p class="chart-card__subtitle">Últimas 24 horas (hora México)</p>
+              <p class="chart-card__subtitle">Últimas 24 horas</p>
             </div>
             <div class="chart-card__total">${formatNumber(hour.reduce((a, b) => a + b, 0))}</div>
           </div>
-          <div class="hour-chart" id="hour-chart">
+          <div class="hour-chart">
             ${hour.map((count, h) => {
-              const hH = count > 0 ? Math.max(4, (count / maxHour) * 100) : 2;
+              const hH = count > 0 ? Math.max(2, (count / maxHour) * 100) : 2;
               const isEmpty = count === 0;
-              return `<div class="hour-bar" data-label="${h}:00" data-value="${count}" ${isEmpty ? 'data-empty="true"' : ''} style="height: ${hH}%"></div>`;
+              return `<div class="hour-bar" ${isEmpty ? 'data-empty="true"' : ''} style="height: ${hH}%" title="${h}:00 - ${count} mensajes"></div>`;
             }).join('')}
           </div>
           <div class="hour-axis">
@@ -382,7 +258,6 @@
             <span>18</span>
             <span>23</span>
           </div>
-          <div class="chart-tooltip" id="chart-tooltip-hour"></div>
         </div>
 
         <div class="dashboard-recent">
@@ -399,7 +274,7 @@
                 return `
                   <div class="recent-item" data-id="${m.conversation_id}">
                     <div class="recent-item__wa">
-                      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                      <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4 0h-2v-2h2v2zm0-3H6V9h12v2z"/></svg>
                     </div>
                     <div class="recent-item__body">
                       <div class="recent-item__name">${escapeHtml(name)}</div>
@@ -415,24 +290,7 @@
       </div>
     `;
 
-    bindChartTooltips();
     bindRecentClicks();
-  }
-
-  function renderTrend(delta, label) {
-    const arrow = delta > 0
-      ? { dir: 'up', icon: 'M7 14l5-5 5 5' }
-      : delta < 0
-        ? { dir: 'down', icon: 'M7 10l5 5 5-5' }
-        : { dir: 'flat', icon: 'M4 12h16' };
-    const sign = delta > 0 ? '+' : '';
-    return `
-      <div class="kpi-card__trend kpi-card__trend--${arrow.dir}">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="${arrow.icon}"/></svg>
-        <span>${sign}${delta}%</span>
-        <span class="kpi-card__trend-label">${label}</span>
-      </div>
-    `;
   }
 
   function renderDonut(sentPct, recvPct) {
@@ -442,65 +300,15 @@
     const recvLen = c * (recvPct / 100);
     return `
       <svg class="donut__svg" viewBox="0 0 180 180">
-        <defs>
-          <linearGradient id="donutSent" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#FF7A1A"/>
-            <stop offset="100%" stop-color="#E04E00"/>
-          </linearGradient>
-          <linearGradient id="donutRecv" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#0066E0"/>
-            <stop offset="100%" stop-color="#003D8A"/>
-          </linearGradient>
-        </defs>
         <circle class="donut__track" cx="90" cy="90" r="${r}"/>
         <circle class="donut__segment donut__segment--sent" cx="90" cy="90" r="${r}"
-          stroke="url(#donutSent)"
           stroke-dasharray="${sentLen} ${c - sentLen}"
           stroke-dashoffset="0"/>
         <circle class="donut__segment donut__segment--received" cx="90" cy="90" r="${r}"
-          stroke="url(#donutRecv)"
           stroke-dasharray="${recvLen} ${c - recvLen}"
           stroke-dashoffset="${-sentLen}"/>
       </svg>
     `;
-  }
-
-  function bindChartTooltips() {
-    const tooltip = document.getElementById('chart-tooltip-bar');
-    if (tooltip) {
-      const wrap = document.getElementById('chart-bar-wrap');
-      wrap.querySelectorAll('.chart-bar').forEach(bar => {
-        bar.addEventListener('mouseenter', () => {
-          const rect = bar.getBoundingClientRect();
-          const wrapRect = wrap.getBoundingClientRect();
-          tooltip.textContent = `${bar.dataset.label}: ${bar.dataset.value}`;
-          tooltip.style.left = (rect.left - wrapRect.left + rect.width / 2) + 'px';
-          tooltip.style.top = (rect.top - wrapRect.top - 6) + 'px';
-          tooltip.classList.add('chart-tooltip--visible');
-        });
-        bar.addEventListener('mouseleave', () => {
-          tooltip.classList.remove('chart-tooltip--visible');
-        });
-      });
-    }
-
-    const hourTooltip = document.getElementById('chart-tooltip-hour');
-    if (hourTooltip) {
-      const wrap = document.getElementById('chart-hour-wrap');
-      wrap.querySelectorAll('.hour-bar').forEach(bar => {
-        bar.addEventListener('mouseenter', () => {
-          const rect = bar.getBoundingClientRect();
-          const wrapRect = wrap.getBoundingClientRect();
-          hourTooltip.textContent = `${bar.dataset.label} · ${bar.dataset.value} mensajes`;
-          hourTooltip.style.left = (rect.left - wrapRect.left + rect.width / 2) + 'px';
-          hourTooltip.style.top = (rect.top - wrapRect.top - 6) + 'px';
-          hourTooltip.classList.add('chart-tooltip--visible');
-        });
-        bar.addEventListener('mouseleave', () => {
-          hourTooltip.classList.remove('chart-tooltip--visible');
-        });
-      });
-    }
   }
 
   function bindRecentClicks() {
