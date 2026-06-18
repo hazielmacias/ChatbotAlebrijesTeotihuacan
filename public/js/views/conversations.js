@@ -32,6 +32,12 @@
     lastMessageTime: null
   };
 
+  function syncActiveConv() {
+    if (!state.activeId) return;
+    const fresh = state.conversations.find(c => c.id === state.activeId);
+    if (fresh) state.activeConv = fresh;
+  }
+
   function hashColor(str) {
     if (!str) return AVATAR_COLORS[0];
     let hash = 0;
@@ -218,6 +224,7 @@
     }
 
     state.conversations = result.data.conversations || [];
+    syncActiveConv();
     state.loading = false;
     applyFilters();
   }
@@ -643,6 +650,9 @@
     updateChatInputForBot(newVal);
     updateManualBanner(newVal);
     conv.bot_active = newVal;
+    if (state.activeConv && state.activeConv.id === conversationId) {
+      state.activeConv.bot_active = newVal;
+    }
 
     const result = await window.api.toggleBot(conversationId, newVal);
 
@@ -651,6 +661,9 @@
       updateChatInputForBot(previousVal);
       updateManualBanner(previousVal);
       conv.bot_active = previousVal;
+      if (state.activeConv && state.activeConv.id === conversationId) {
+        state.activeConv.bot_active = previousVal;
+      }
       window.toast.error('Error al cambiar el bot: ' + (result.error || 'desconocido'));
       return;
     }
@@ -909,6 +922,7 @@
       const convResult = await window.api.listConversations({ limit: 100 });
       if (convResult.ok) {
         state.conversations = convResult.data.conversations || [];
+        syncActiveConv();
         applyFilters();
       }
     }, 5000);
