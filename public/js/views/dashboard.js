@@ -70,6 +70,31 @@
     `;
   }
 
+  function renderSparkline(data, variant) {
+    if (!data || data.length < 2) return '';
+    const width = 120;
+    const height = 36;
+    const max = Math.max(...data, 1);
+    const min = Math.min(...data, 0);
+    const range = max - min || 1;
+    const stepX = width / (data.length - 1);
+    const points = data.map((v, i) => {
+      const x = i * stepX;
+      const y = height - ((v - min) / range) * (height - 6) - 3;
+      return [x, y];
+    });
+    const pathLine = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+    const pathArea = `${pathLine} L${width},${height} L0,${height} Z`;
+    const lastPoint = points[points.length - 1];
+    return `
+      <svg class="kpi-card__sparkline kpi-card__sparkline--${variant}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+        <path class="kpi-card__sparkline-area" d="${pathArea}"/>
+        <path class="kpi-card__sparkline-line" d="${pathLine}"/>
+        <circle class="kpi-card__sparkline-dot" cx="${lastPoint[0].toFixed(1)}" cy="${lastPoint[1].toFixed(1)}" r="2.5"/>
+      </svg>
+    `;
+  }
+
   async function render(container) {
     container.innerHTML = '<div class="dashboard-view" id="dashboard-view"></div>';
     const loader = window.withDelayedLoader(container);
@@ -144,6 +169,7 @@
               <span class="kpi-card__suffix">${formatNumber(t.active_conversations || 0)} activas</span>
               ${renderTrend(convTrend, 'vs 3 días')}
             </div>
+            ${renderSparkline(convSpark, 'primary')}
           </div>
 
           <div class="kpi-card">
@@ -153,6 +179,7 @@
               <span class="kpi-card__suffix">${formatNumber(t.messages_today || 0)} hoy</span>
               ${renderTrend(msgTrend, 'vs 3 días')}
             </div>
+            ${renderSparkline(msgSpark, 'info')}
           </div>
 
           <div class="kpi-card">
@@ -161,6 +188,7 @@
             <div class="kpi-card__row">
               <span class="kpi-card__suffix">Conversaciones escaladas</span>
             </div>
+            ${renderSparkline(convSpark, 'danger')}
           </div>
 
           <div class="kpi-card">
@@ -174,8 +202,10 @@
                       <span class="keyword-pill__count">${k.count}</span>
                     </span>
                   `).join('')}
-                </div>`
-              : `<div class="kpi-card__value" style="font-size: 18px; color: var(--color-text-muted);">Sin datos</div>`}
+                </div>
+                ${renderSparkline(msgSpark, 'muted')}`
+              : `<div class="kpi-card__value" style="font-size: 18px; color: var(--color-text-muted);">Sin datos</div>
+                ${renderSparkline(msgSpark, 'muted')}`}
           </div>
         </div>
 
