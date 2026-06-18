@@ -133,7 +133,11 @@
     state.loading = true;
     const listEl = document.getElementById('archived-list');
     if (listEl) {
-      listEl.innerHTML = '<div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader brand-loader--sm"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>';
+      const hasItems = listEl.querySelector('.archived-item');
+      const hasLoader = listEl.querySelector('.loading-overlay');
+      if (!hasItems && !hasLoader) {
+        listEl.innerHTML = '<div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>';
+      }
     }
 
     const result = await window.api.listArchivedConversations({ limit: 100 });

@@ -200,7 +200,11 @@
     state.loading = true;
     const listEl = document.getElementById('conv-list');
     if (listEl) {
-      listEl.innerHTML = '<div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader brand-loader--sm"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>';
+      const hasItems = listEl.querySelector('.wa-conv-item');
+      const hasLoader = listEl.querySelector('.loading-overlay');
+      if (!hasItems && !hasLoader) {
+        listEl.innerHTML = '<div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>';
+      }
     }
 
     const result = await window.api.listConversations({ limit: 100 });
@@ -368,7 +372,7 @@
       ` : ''}
 
       <div class="wa-chat-body" id="wa-chat-body">
-        <div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader brand-loader--sm"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>
+        <div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>
       </div>
 
       <div class="wa-chat-input ${isBot ? 'wa-chat-input--disabled' : ''}" id="wa-chat-input">

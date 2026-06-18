@@ -809,16 +809,11 @@
 .brand-loader__logo {
   width: 96px;
   height: 96px;
+  max-width: none;
   object-fit: contain;
   border-radius: var(--radius-lg);
   animation: brand-loader-pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   will-change: transform, opacity;
-}
-
-.brand-loader--sm .brand-loader__logo {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-md);
 }
 
 @keyframes brand-loader-pulse {
