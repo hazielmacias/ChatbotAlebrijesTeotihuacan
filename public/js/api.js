@@ -154,7 +154,7 @@
     },
 
     async getCatalogItem(id) {
-      return request('GET', '/api/catalog/' + encodeURIComponent(id));
+      return request('GET', '/api/catalog/get?id=' + encodeURIComponent(id));
     },
 
     async createCatalogItem(data) {
@@ -162,11 +162,11 @@
     },
 
     async updateCatalogItem(id, data) {
-      return request('PATCH', '/api/catalog/' + encodeURIComponent(id), data);
+      return request('PATCH', '/api/catalog/update', { id, ...data });
     },
 
     async deleteCatalogItem(id) {
-      return request('DELETE', '/api/catalog/' + encodeURIComponent(id));
+      return request('DELETE', '/api/catalog/delete', { id });
     }
   };
 

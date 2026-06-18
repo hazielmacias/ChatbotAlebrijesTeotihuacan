@@ -113,7 +113,8 @@ async function handleList(req, res) {
     }
 
     if (search && typeof search === 'string' && search.trim()) {
-      query = query.ilike('name', `%${search.trim()}%`);
+      const term = '%' + search.trim() + '%';
+      query = query.or(`name.ilike.${term},description.ilike.${term},category.ilike.${term}`);
     }
 
     const { data, error } = await query;

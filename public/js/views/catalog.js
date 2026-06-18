@@ -6,7 +6,8 @@
     includeInactive: false,
     search: '',
     editingPlan: null,
-    modalOpen: false
+    modalOpen: false,
+    confirmCallback: null
   };
 
   function escapeHtml(text) {
@@ -45,6 +46,16 @@
             </button>
           </div>
         </div>
+
+        <div class="toolbar" style="display: flex; gap: var(--space-3); margin-bottom: var(--space-4);">
+          <div class="wa-search" style="flex: 1; max-width: 400px; padding: 0; background: transparent; border: 0;">
+            <div class="wa-search__input-wrap">
+              <svg viewBox="0 0 24 24" width="18" height="18"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <input type="text" class="wa-search__input" id="plan-search" placeholder="Buscar por nombre, categoria o descripcion" value="${escapeHtml(state.search)}" autocomplete="off">
+            </div>
+          </div>
+        </div>
+
         <div class="loading-overlay"><div class="spinner spinner--lg"></div></div>
       </div>
     `;
@@ -53,6 +64,17 @@
     document.getElementById('include-inactive').addEventListener('change', async (e) => {
       state.includeInactive = e.target.checked;
       await loadPlans();
+    });
+
+    const searchInput = document.getElementById('plan-search');
+    let searchTimer = null;
+    searchInput.addEventListener('input', (e) => {
+      const value = e.target.value;
+      if (searchTimer) clearTimeout(searchTimer);
+      searchTimer = setTimeout(async () => {
+        state.search = value.trim();
+        await loadPlans();
+      }, 300);
     });
 
     await loadPlans();
@@ -67,13 +89,25 @@
     if (!result.ok) {
       const main = document.querySelector('.app-view');
       if (main) {
-        main.innerHTML += `<div class="empty-state" style="margin-top:var(--space-8)"><h3 class="empty-state__title">Error</h3><p class="empty-state__message">${escapeHtml(result.error || 'desconocido')}</p></div>`;
+        const oldErr = main.querySelector('.empty-state');
+        if (oldErr) oldErr.remove();
+        main.appendChild(buildError(result.error || 'desconocido'));
       }
       return;
     }
 
     state.plans = result.data.plans || [];
     renderTable();
+  }
+
+  function buildError(msg) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.innerHTML = `
+      <h3 class="empty-state__title">Error al cargar</h3>
+      <p class="empty-state__message">${escapeHtml(msg)}</p>
+    `;
+    return empty;
   }
 
   function renderTable() {
@@ -83,14 +117,15 @@
     if (existingTable) existingTable.remove();
     const existingEmpty = main.querySelector('.empty-state');
     if (existingEmpty) existingEmpty.remove();
+    const loading = main.querySelector('.loading-overlay');
+    if (loading) loading.remove();
 
     if (state.plans.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'empty-state';
-      empty.innerHTML = `
-        <h3 class="empty-state__title">Sin planes</h3>
-        <p class="empty-state__message">Crea el primer plan para que aparezca en el catalogo.</p>
-      `;
+      empty.innerHTML = state.search
+        ? '<h3 class="empty-state__title">Sin resultados</h3><p class="empty-state__message">No se encontraron planes con "' + escapeHtml(state.search) + '".</p>'
+        : '<h3 class="empty-state__title">Sin planes</h3><p class="empty-state__message">Crea el primer plan para que aparezca en el catalogo.</p>';
       main.appendChild(empty);
       return;
     }
@@ -110,26 +145,32 @@
           </tr>
         </thead>
         <tbody>
-          ${state.plans.map(p => `
-            <tr data-id="${p.id}">
-              <td>
-                <div style="font-weight: var(--fw-medium); color: var(--color-text);">${escapeHtml(p.name)}</div>
-                ${p.description ? `<div style="font-size: var(--fs-xs); color: var(--color-text-muted); margin-top: 2px; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(p.description)}</div>` : ''}
-              </td>
-              <td>${p.category ? `<span class="badge badge--bot">${escapeHtml(p.category)}</span>` : '<span style="color: var(--color-text-dim);">-</span>'}</td>
-              <td style="font-weight: var(--fw-semibold);">${formatPrice(p.price)}</td>
-              <td>${p.is_active
-                ? '<span class="badge badge--active">Activo</span>'
-                : '<span class="badge badge--inactive">Inactivo</span>'}</td>
-              <td style="color: var(--color-text-muted); font-size: var(--fs-sm);">${formatDate(p.created_at)}</td>
-              <td>
-                <div class="table__actions">
-                  <button class="btn btn--ghost btn--sm" data-action="edit" data-id="${p.id}">Editar</button>
-                  ${p.is_active ? `<button class="btn btn--ghost btn--sm" data-action="delete" data-id="${p.id}" style="color: var(--color-danger);">Desactivar</button>` : ''}
-                </div>
-              </td>
-            </tr>
-          `).join('')}
+          ${state.plans.map(p => {
+            const rowStyle = p.is_active ? '' : 'style="opacity: 0.55;"';
+            const statusBadge = p.is_active
+              ? '<span class="badge badge--active">Activo</span>'
+              : '<span class="badge badge--inactive">Inactivo</span>';
+            const toggleLabel = p.is_active ? 'Desactivar' : 'Activar';
+            const toggleClass = p.is_active ? 'btn--danger-soft' : 'btn--success-soft';
+            return `
+              <tr data-id="${p.id}" ${rowStyle}>
+                <td>
+                  <div style="font-weight: var(--fw-medium); color: var(--color-text);">${escapeHtml(p.name)}</div>
+                  ${p.description ? `<div style="font-size: var(--fs-xs); color: var(--color-text-muted); margin-top: 2px; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(p.description)}</div>` : ''}
+                </td>
+                <td>${p.category ? `<span class="badge badge--bot">${escapeHtml(p.category)}</span>` : '<span style="color: var(--color-text-dim);">-</span>'}</td>
+                <td style="font-weight: var(--fw-semibold);">${formatPrice(p.price)}</td>
+                <td>${statusBadge}</td>
+                <td style="color: var(--color-text-muted); font-size: var(--fs-sm);">${formatDate(p.created_at)}</td>
+                <td>
+                  <div class="table__actions">
+                    <button class="btn btn--ghost btn--sm" data-action="edit" data-id="${p.id}">Editar</button>
+                    <button class="btn btn--ghost btn--sm ${toggleClass}" data-action="toggle" data-id="${p.id}" style="font-weight: var(--fw-semibold);">${toggleLabel}</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('')}
         </tbody>
       </table>
     `;
@@ -142,11 +183,11 @@
         if (plan) openModal(plan);
       });
     });
-    wrap.querySelectorAll('[data-action="delete"]').forEach(btn => {
+    wrap.querySelectorAll('[data-action="toggle"]').forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.id;
         const plan = state.plans.find(p => p.id === id);
-        if (plan) confirmDelete(plan);
+        if (plan) confirmToggle(plan);
       });
     });
   }
@@ -224,6 +265,8 @@
       e.preventDefault();
       await savePlan(close);
     });
+
+    setTimeout(() => document.getElementById('plan-name').focus(), 50);
   }
 
   async function savePlan(close) {
@@ -285,15 +328,76 @@
     await loadPlans();
   }
 
-  async function confirmDelete(plan) {
-    if (!confirm('Desactivar el plan "' + plan.name + '"?\n\nNo se eliminara, pero dejara de ser visible.')) return;
-    const result = await window.api.deleteCatalogItem(plan.id);
-    if (!result.ok) {
-      window.toast.error('Error: ' + (result.error || 'desconocido'));
-      return;
-    }
-    window.toast.success('Plan desactivado');
-    await loadPlans();
+  function confirmToggle(plan) {
+    const isActive = !!plan.is_active;
+    const action = isActive ? 'desactivar' : 'activar';
+    const actionCap = isActive ? 'Desactivar' : 'Activar';
+    openConfirm({
+      title: actionCap + ' plan',
+      message: isActive
+        ? 'El plan "' + plan.name + '" dejara de ser visible para el bot y el dashboard. Los datos no se eliminan.'
+        : 'El plan "' + plan.name + '" sera visible nuevamente para el bot y el dashboard.',
+      confirmText: actionCap,
+      confirmVariant: isActive ? 'danger' : 'primary',
+      onConfirm: async () => {
+        if (isActive) {
+          const result = await window.api.deleteCatalogItem(plan.id);
+          if (!result.ok) {
+            window.toast.error('Error: ' + (result.error || 'desconocido'));
+            return;
+          }
+          window.toast.success('Plan desactivado');
+        } else {
+          const result = await window.api.updateCatalogItem(plan.id, { is_active: true });
+          if (!result.ok) {
+            window.toast.error('Error: ' + (result.error || 'desconocido'));
+            return;
+          }
+          window.toast.success('Plan activado');
+        }
+        await loadPlans();
+      }
+    });
+  }
+
+  function openConfirm(opts) {
+    closeConfirm();
+    state.confirmCallback = opts.onConfirm;
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop modal-backdrop--open';
+    backdrop.id = 'confirm-modal';
+    const variant = opts.confirmVariant || 'primary';
+    const confirmBtnClass = variant === 'danger' ? 'btn--danger' : 'btn--primary';
+    backdrop.innerHTML = `
+      <div class="modal" style="max-width: 420px;" onclick="event.stopPropagation()">
+        <div class="modal__header">
+          <h3 class="modal__title">${escapeHtml(opts.title || 'Confirmar')}</h3>
+        </div>
+        <div class="modal__body">
+          <p style="color: var(--color-text-muted); line-height: 1.5; margin: 0;">${escapeHtml(opts.message || '')}</p>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--secondary" id="confirm-cancel">Cancelar</button>
+          <button type="button" class="btn ${confirmBtnClass}" id="confirm-ok">${escapeHtml(opts.confirmText || 'Confirmar')}</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(backdrop);
+
+    const close = () => closeConfirm();
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) close(); });
+    document.getElementById('confirm-cancel').addEventListener('click', close);
+    document.getElementById('confirm-ok').addEventListener('click', async () => {
+      const cb = state.confirmCallback;
+      close();
+      if (typeof cb === 'function') await cb();
+    });
+  }
+
+  function closeConfirm() {
+    const m = document.getElementById('confirm-modal');
+    if (m) m.remove();
+    state.confirmCallback = null;
   }
 
   window.catalogView = { render };
