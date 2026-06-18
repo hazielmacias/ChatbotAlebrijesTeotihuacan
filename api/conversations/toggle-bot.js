@@ -1,5 +1,7 @@
 const { requireAuth } = require('../../src/middleware/auth');
 const { supabaseAdmin } = require('../../src/lib/supabase');
+const { sendAndStore } = require('../../src/bot/sender');
+const menuFlow = require('../../src/bot/flows/menu.json');
 
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -59,12 +61,22 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    const isReactivation = newBotActive && !previousBotActive;
+
+    const updateData = {
+      bot_active: newBotActive,
+      updated_at: new Date().toISOString()
+    };
+
+    if (isReactivation) {
+      updateData.current_flow = 'menu';
+      updateData.current_step = 'start';
+      updateData.flow_data = {};
+    }
+
     const { data: updated, error: updateErr } = await supabaseAdmin
       .from('conversations')
-      .update({
-        bot_active: newBotActive,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', conversationId)
       .select('id, contact_id, phone, status, bot_active, current_flow, current_step, updated_at')
       .single();
@@ -74,11 +86,40 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: 'Error al actualizar bot_active.' });
     }
 
+    let reactivationSent = false;
+
+    if (isReactivation) {
+      try {
+        const menuMessage = menuFlow?.steps?.start?.message;
+        if (menuMessage) {
+          const sent = await sendAndStore({
+            phone: conv.phone,
+            conversationId: conversationId,
+            content: menuMessage,
+            type: 'text',
+            sentBy: 'bot',
+            metadata: { flow: 'menu', step: 'start', reactivation: true }
+          });
+          reactivationSent = sent.ok === true;
+          if (!sent.ok) {
+            console.error('[toggle-bot] Error enviando menu de reactivacion:', sent.error);
+          } else {
+            console.log(`[toggle-bot] Menu de reactivacion enviado a ${conv.phone}`);
+          }
+        } else {
+          console.error('[toggle-bot] menuFlow.steps.start.message no encontrado');
+        }
+      } catch (e) {
+        console.error('[toggle-bot] Excepcion enviando menu de reactivacion:', e.message);
+      }
+    }
+
     return res.status(200).json({
       conversation: updated,
       changed: true,
       previous_bot_active: previousBotActive,
-      new_bot_active: newBotActive
+      new_bot_active: newBotActive,
+      reactivation_sent: reactivationSent
     });
   } catch (e) {
     console.error('[toggle-bot] Excepcion:', e);

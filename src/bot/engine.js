@@ -499,19 +499,9 @@ async function processIncomingMessage(messageData) {
   const selectedOption = options[userInput] || options[userInputLower];
 
   if (!selectedOption) {
-    const debugMsg = '[DEBUG-V2026] input="' + userInput + '" options=[' + Object.keys(options).join(',') + '] currentStep.message includes 5: ' + (currentStep.message || '').includes('5️⃣');
-    console.log(debugMsg);
-    const sent = await sendAndStore({
-      phone: from,
-      conversationId: conversation.id,
-      content: debugMsg,
-      type: 'text',
-      sentBy: 'bot',
-      metadata: { debug: true }
-    });
-    console.log(`[bot-engine] Input no valido: "${userInput}" en ${currentFlowKey}/${currentStepKey}`);
+    console.log(`[bot-engine] Input no valido: "${userInput}" en ${currentFlowKey}/${currentStepKey}`, Object.keys(options));
     const helpMessage = buildHelpMessage(currentFlowKey, currentStepKey);
-    await sendAndStore({
+    const sent = await sendAndStore({
       phone: from,
       conversationId: conversation.id,
       content: helpMessage,
