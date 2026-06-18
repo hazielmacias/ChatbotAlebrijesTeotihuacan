@@ -4,13 +4,26 @@
   "description": "Punto de entrada. Muestra saludo y categorias disponibles.",
   "steps": {
     "start": {
-      "message": "¡Hola! Gracias por tu interes en *Alebrijes Teotihuacan* ⚽🔥. El inicio de tu carrera profesional comienza aqui.\n\nPara brindarte la informacion correcta y generar tu *Pase de Prueba de 1 Semana SIN COSTO*, por favor selecciona la categoria que te interesa escribiendo el numero:\n\n1️⃣ Centro de Iniciacion Deportiva (Escuela) - Ninos de 6 a 11 anos\n2️⃣ Tercera Division Profesional (Liga TDP) - Jovenes nacidos entre 2005 y 2012\n3️⃣ Equipo Piloto Liga de Expansion MX - Jovenes nacidos entre 2002 y 2004\n4️⃣ Preguntas frecuentes\n\n_Responde con el numero de la opcion._",
+      "message": "¡Hola! Gracias por tu interes en *Alebrijes Teotihuacan* ⚽🔥. El inicio de tu carrera profesional comienza aqui.\n\nPara brindarte la informacion correcta y generar tu *Pase de Prueba de 1 Semana SIN COSTO*, por favor selecciona la categoria que te interesa escribiendo el numero:\n\n1️⃣ Centro de Iniciacion Deportiva (Escuela) - Ninos de 6 a 11 anos\n2️⃣ Tercera Division Profesional (Liga TDP) - Jovenes nacidos entre 2005 y 2012\n3️⃣ Equipo Piloto Liga de Expansion MX - Jovenes nacidos entre 2002 y 2004\n4️⃣ Preguntas frecuentes\n5️⃣ Ver planes y precios\n\n_Responde con el numero de la opcion._",
       "options": {
         "1": { "next_flow": "escuela", "next_step": "info" },
         "2": { "next_flow": "tdp", "next_step": "info" },
         "3": { "next_flow": "piloto", "next_step": "info" },
         "4": { "next_flow": "faq", "next_step": "categories" },
+        "5": { "next_flow": "menu", "next_step": "show_planes" },
+        "planes": { "next_flow": "menu", "next_step": "show_planes" },
         "0": { "next_flow": "menu", "next_step": "start" }
+      }
+    },
+    "show_planes": {
+      "message": "{{planes_list}}",
+      "dynamic": "catalog_planes",
+      "options": {
+        "1": { "next_flow": "escuela", "next_step": "info" },
+        "2": { "next_flow": "tdp", "next_step": "info" },
+        "3": { "next_flow": "piloto", "next_step": "info" },
+        "0": { "next_flow": "menu", "next_step": "start" },
+        "menu": { "next_flow": "menu", "next_step": "start" }
       }
     },
     "human_takeover": {

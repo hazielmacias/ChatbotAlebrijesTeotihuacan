@@ -129,7 +129,46 @@ async function resolveDynamicContent(flowKey, stepKey, flowData) {
     return { contact_info: CONTACT_INFO[category] || CONTACT_INFO.escuela };
   }
 
+  if (step.dynamic === 'catalog_planes') {
+    return await buildCatalogPlanesMessage();
+  }
+
   return null;
+}
+
+async function buildCatalogPlanesMessage() {
+  try {
+    const { data: planes, error } = await supabaseAdmin
+      .from('catalog_plans')
+      .select('id, name, description, price, category, image_url')
+      .eq('is_active', true)
+      .order('price', { ascending: true });
+
+    if (error) {
+      console.error('[engine] Error cargando catalog_plans:', error.message);
+      return { planes_list: 'No pude cargar los planes en este momento. Intenta mas tarde.' };
+    }
+
+    if (!planes || planes.length === 0) {
+      return { planes_list: 'Por el momento no tenemos planes disponibles en el catalogo.\n\n_Escribe *menu* o *0* para volver al inicio._' };
+    }
+
+    const fmt = (n) => n == null ? 'Consultar' : '$' + new Intl.NumberFormat('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(n);
+    const lines = ['*Planes y precios disponibles*', ''];
+    for (const p of planes) {
+      lines.push('*' + p.name + '* - ' + fmt(p.price));
+      if (p.description) {
+        const desc = p.description.length > 120 ? p.description.substring(0, 117) + '...' : p.description;
+        lines.push('_' + desc + '_');
+      }
+      lines.push('');
+    }
+    lines.push('_Escribe *menu* o *0* para volver al inicio._');
+    return { planes_list: lines.join('\n') };
+  } catch (e) {
+    console.error('[engine] Excepcion en buildCatalogPlanesMessage:', e.message);
+    return { planes_list: 'No pude cargar los planes en este momento. Intenta mas tarde.' };
+  }
 }
 
 function buildHelpMessage(currentFlow, currentStep) {
