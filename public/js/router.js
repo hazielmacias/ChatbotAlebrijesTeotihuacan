@@ -138,13 +138,6 @@
     info: '<svg class="toast__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>'
   };
 
-  const TOAST_TITLES = {
-    success: 'Listo',
-    error: 'Error',
-    warning: 'Atencion',
-    info: 'Informacion'
-  };
-
   const MODAL_ICONS = {
     success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>',
     error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>',
@@ -172,14 +165,10 @@
       const dur = (duration != null) ? duration : (type === 'error' ? 6000 : 4000);
       el.innerHTML =
         (TOAST_ICONS[type] || TOAST_ICONS.info) +
-        '<div class="toast__body">' +
-          '<div class="toast__title"></div>' +
-          '<div class="toast__message"></div>' +
-        '</div>' +
+        '<span class="toast__message"></span>' +
         '<button type="button" class="toast__close" aria-label="Cerrar">' +
           '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>' +
         '</button>';
-      el.querySelector('.toast__title').textContent = TOAST_TITLES[type] || '';
       el.querySelector('.toast__message').textContent = String(message);
       this.container.appendChild(el);
 
