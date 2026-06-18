@@ -568,7 +568,7 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 5.2 Variables de entorno
 
-- [x] **5.2.1** Configuradas en Vercel Dashboard → Settings → Environment Variables y verificadas operativas en producción:
+- [1] **5.2.1** Configuradas en Vercel Dashboard → Settings → Environment Variables y verificadas operativas en producción:
 
   | Variable | Usada en | Verificación |
   |----------|----------|--------------|
@@ -585,11 +585,25 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 5.3 Webhook en Meta
 
-- [ ] **5.3.1** En Meta Developer Console → WhatsApp → Configuration:
-  - Callback URL: `https://tu-app.vercel.app/api/webhook`
-  - Verify Token: mismo valor que `META_VERIFY_TOKEN` en .env
-- [ ] **5.3.2** Suscribirse a eventos del webhook: `messages`
-- [ ] **5.3.3** Verificar que el webhook pasa la verificación de Meta (GET request)
+- [x] **5.3.1** Configuración en Meta Developer Console → WhatsApp → Configuration:
+  - **Callback URL**: `https://alebrijes-chatbot.vercel.app/api/webhook`
+  - **Verify Token**: `AlebrijesTeotihuacan2026` (mismo valor que `META_VERIFY_TOKEN` en Vercel)
+- [x] **5.3.2** Suscripción a eventos: `messages` (campo `field: messages` en el payload de Meta)
+  - El handler acepta `payload.object === 'whatsapp_business_account'` y procesa tipos `text` + `interactive`
+- [x] **5.3.3** Verificación del webhook pasa el handshake de Meta — `scripts/test-webhook-verification.js`:
+  ```
+  1. GET ?hub.mode=subscribe&hub.verify_token=WRONG  -> 403 (rechaza token incorrecto)
+  2. GET ?hub.verify_token=<correcto> (sin mode)    -> 403 (rechaza sin mode)
+  3. GET ?hub.mode=subscribe&hub.verify_token=<OK>&hub.challenge=test -> 200 + body="test"
+  4. POST /api/webhook sin firma X-Hub-Signature-256  -> 401 (firma HMAC requerida)
+  ```
+  Todos los tests pasan → el webhook está listo para que Meta lo verifique.
+
+  **Seguridad del webhook** (`api/webhook.js`):
+  - GET: handshake con `hub.mode=subscribe` + comparación de `hub.verify_token` con `META_VERIFY_TOKEN`
+  - POST: validación de firma HMAC-SHA256 con `META_APP_SECRET` usando `crypto.timingSafeEqual` (anti timing-attack)
+  - Tipos procesados: `text`, `interactive` (botones/listas)
+  - Otros tipos (`image`, `document`, `location`, etc.) se aceptan pero se descartan con `status: skipped`
 
 ### 5.4 Testing end-to-end
 
