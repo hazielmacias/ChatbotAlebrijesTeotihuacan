@@ -533,7 +533,7 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 5.1 Vercel Serverless Configuration
 
-- [x] **5.1.1** `vercel.json` configurado:
+- [1] **5.1.1** `vercel.json` configurado:
   ```json
   {
     "$schema": "https://openapi.vercel.sh/vercel.json",
@@ -552,7 +552,7 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
   - `/api/*` se resuelve a `api/*`; todo lo demás va a `public/`
   - **12/12 endpoints** verificados en producción (auth, conversations, messages, kpis, catalog CRUD completo)
   - **Static** verificado: dashboard.html, login.html, favicon.ico, css/variables.css, js/api.js → todos 200
-- [x] **5.1.2** Verificado: 12/12 serverless functions exportan `module.exports = async function handler(req, res) { ... }`:
+- [1] **5.1.2** Verificado: 12/12 serverless functions exportan `module.exports = async function handler(req, res) { ... }`:
   - `api/webhook.js`
   - `api/auth/login.js`
   - `api/auth/me.js`
@@ -568,15 +568,20 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 5.2 Variables de entorno
 
-- [ ] **5.2.1** Configurar TODAS las variables de entorno en Vercel Dashboard → Settings → Environment Variables:
-  - `SUPABASE_URL`
-  - `SUPABASE_SERVICE_KEY`
-  - `SUPABASE_ANON_KEY`
-  - `META_VERIFY_TOKEN`
-  - `META_ACCESS_TOKEN`
-  - `META_PHONE_NUMBER_ID`
-  - `META_WABA_ID`
-  - `META_APP_SECRET`
+- [x] **5.2.1** Configuradas en Vercel Dashboard → Settings → Environment Variables y verificadas operativas en producción:
+
+  | Variable | Usada en | Verificación |
+  |----------|----------|--------------|
+  | `SUPABASE_URL` | `src/lib/supabase.js`, `src/middleware/auth.js`, `api/auth/login.js` | ✅ Login funciona (200) |
+  | `SUPABASE_SERVICE_KEY` | `src/lib/supabase.js` (admin client) | ✅ /api/kpis (200), /api/conversations (200), /api/catalog (200) |
+  | `SUPABASE_ANON_KEY` | `src/middleware/auth.js`, `api/auth/login.js` | ✅ Login funciona (200) |
+  | `META_VERIFY_TOKEN` | `api/webhook.js` (GET hub.mode=subscribe) | ✅ Webhook GET responde 403 con token incorrecto (carga correcta) |
+  | `META_ACCESS_TOKEN` | `src/lib/meta-api.js` (enviar mensajes) | ✅ /api/messages/send (200) → WhatsApp real |
+  | `META_PHONE_NUMBER_ID` | `src/lib/meta-api.js` | ✅ Mismo /api/messages/send (200) |
+  | `META_APP_SECRET` | `api/webhook.js` (verificación firma), `src/lib/meta-api.js` | ✅ Webhook POST sin firma → 401 |
+  | `META_WABA_ID` | (reservado para uso futuro) | ⚠️ Definida en .env.example, no usada actualmente por código |
+
+  **Nota de seguridad**: ninguna variable está expuesta en `public/` o código del cliente. Las keys privadas (SERVICE_KEY, META_ACCESS_TOKEN, META_APP_SECRET) solo se usan en serverless functions (`api/**`). El anon key se publica en `public/js/config.js` (es público por diseño, RLS protege los datos).
 
 ### 5.3 Webhook en Meta
 
