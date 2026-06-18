@@ -538,9 +538,37 @@ async function processIncomingMessage(messageData) {
   }
 
   const options = currentStep.options || {};
-  console.log(`[bot-engine:LOOKUP] input="${userInput}" lower="${userInputLower}" currentStep.options keys:`, Object.keys(options));
   const selectedOption = options[userInput] || options[userInputLower];
-  console.log(`[bot-engine:LOOKUP] selectedOption:`, selectedOption ? 'FOUND' : 'NOT FOUND');
+
+  if (!selectedOption) {
+    const debugMsg = '[DEBUG-V2026] input="' + userInput + '" options=[' + Object.keys(options).join(',') + '] currentStep.message includes 5: ' + (currentStep.message || '').includes('5️⃣');
+    console.log(debugMsg);
+    const sent = await sendAndStore({
+      phone: from,
+      conversationId: conversation.id,
+      content: debugMsg,
+      type: 'text',
+      sentBy: 'bot',
+      metadata: { debug: true }
+    });
+    console.log(`[bot-engine] Input no valido: "${userInput}" en ${currentFlowKey}/${currentStepKey}`);
+    const helpMessage = buildHelpMessage(currentFlowKey, currentStepKey);
+    await sendAndStore({
+      phone: from,
+      conversationId: conversation.id,
+      content: helpMessage,
+      type: 'text',
+      sentBy: 'bot',
+      metadata: { flow: currentFlowKey, step: currentStepKey, help: true }
+    });
+    return {
+      handled: true,
+      bot_active: true,
+      response: 'help',
+      sent_ok: sent.ok,
+      conversation_id: conversation.id
+    };
+  }
 
   if (selectedOption) {
     let nextFlowData = flowData;
