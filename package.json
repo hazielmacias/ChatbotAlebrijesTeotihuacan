@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "alebrijes-teotihuacan-chatbot",
   "version": "1.0.0",
   "description": "Chatbot de WhatsApp para la Academia de Futbol Alebrijes de Oaxaca Teotihuacan",
@@ -41,3 +41,4 @@
     "sharp": "^0.35.1"
   }
 }
+
