@@ -1,24 +1,24 @@
 const { supabaseAdmin } = require('../lib/supabase');
 const { sendAndStore, sendImageAndStore } = require('./sender');
+const path = require('path');
+const fs = require('fs');
 
-const menuFlow = require('./flows/menu.json');
-const escuelaFlow = require('./flows/escuela.json');
-const tdpFlow = require('./flows/tdp.json');
-const pilotoFlow = require('./flows/piloto.json');
-const cierreFlow = require('./flows/cierre.json');
-const faqFlow = require('./flows/faq.json');
+function loadFlow(filename) {
+  const p = path.join(__dirname, 'flows', filename);
+  return JSON.parse(fs.readFileSync(p, 'utf8'));
+}
 
 const FLOWS = {
-  menu: menuFlow,
-  escuela: escuelaFlow,
-  tdp: tdpFlow,
-  piloto: pilotoFlow,
-  cierre: cierreFlow,
-  faq: faqFlow
+  menu: loadFlow('menu.json'),
+  escuela: loadFlow('escuela.json'),
+  tdp: loadFlow('tdp.json'),
+  piloto: loadFlow('piloto.json'),
+  cierre: loadFlow('cierre.json'),
+  faq: loadFlow('faq.json')
 };
 
-const MENU_VERSION = 'v2026-06-17-show_planes';
-console.log('[bot-engine:BOOT] ' + MENU_VERSION + ' | menu.steps:', Object.keys(menuFlow.steps || {}).join(','), '| menu.start.options:', Object.keys(menuFlow.steps?.start?.options || {}).join(','));
+const MENU_VERSION = 'v2026-06-17-show_planes-runtime';
+console.log('[bot-engine:BOOT] ' + MENU_VERSION + ' | menu.steps:', Object.keys(FLOWS.menu.steps || {}).join(','), '| menu.start.options:', Object.keys(FLOWS.menu.steps?.start?.options || {}).join(','));
 
 const RESET_TRIGGERS = ['0', 'menu', 'menú', 'inicio', 'empezar', 'cancelar', 'salir', 'cancel'];
 
