@@ -175,7 +175,9 @@
         <div class="wa-conversations-panel" id="wa-conv-panel">
           <div class="wa-conv-header">
             <div class="wa-conv-header__user">
-              <span class="wa-avatar wa-avatar--sm wa-avatar--primary">A</span>
+              <span class="wa-avatar wa-avatar--sm wa-avatar--header" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v2h20v-2c0-3.33-6.67-5-10-5z"/></svg>
+              </span>
               <span>${escapeHtml(window.auth.getUserDisplayName())}</span>
             </div>
             <div class="wa-conv-header__actions">
@@ -191,11 +193,18 @@
             </div>
           </div>
           <div class="wa-conv-filters" id="conv-filters">
-            <button class="wa-conv-filter wa-conv-filter--active" data-filter="all">Todos</button>
-            <button class="wa-conv-filter" data-filter="active">Activos</button>
-            <button class="wa-conv-filter" data-filter="closed">Cerrados</button>
-            <button class="wa-conv-filter" data-filter="bot">Bot</button>
-            <button class="wa-conv-filter" data-filter="human">Humano</button>
+            <button class="wa-conv-filter" data-filter="bot" type="button">
+              <span class="wa-conv-filter__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 2h-11A4.5 4.5 0 0 0 2 6.5v11A4.5 4.5 0 0 0 6.5 22h11a4.5 4.5 0 0 0 4.5-4.5v-11A4.5 4.5 0 0 0 17.5 2zM7 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm10 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm-5 7c-2.5 0-4.71-1.28-6-3.22.16-.1.33-.18.5-.25.6-.25 1.27-.4 2-.4h7c.73 0 1.4.15 2 .4.17.07.34.15.5.25C16.71 17.72 14.5 19 12 19z"/></svg>
+              </span>
+              <span class="wa-conv-filter__label">Bot</span>
+            </button>
+            <button class="wa-conv-filter" data-filter="human" type="button">
+              <span class="wa-conv-filter__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v2h20v-2c0-3.33-6.67-5-10-5z"/></svg>
+              </span>
+              <span class="wa-conv-filter__label">Humano</span>
+            </button>
           </div>
           <div class="wa-conv-list" id="conv-list"></div>
         </div>
@@ -231,9 +240,15 @@
     document.getElementById('conv-filters').addEventListener('click', (e) => {
       const btn = e.target.closest('.wa-conv-filter');
       if (!btn) return;
-      document.querySelectorAll('.wa-conv-filter').forEach(f => f.classList.remove('wa-conv-filter--active'));
-      btn.classList.add('wa-conv-filter--active');
-      state.filter = btn.dataset.filter;
+      const value = btn.dataset.filter;
+      if (state.filter === value) {
+        state.filter = 'all';
+        btn.classList.remove('wa-conv-filter--active');
+      } else {
+        document.querySelectorAll('.wa-conv-filter').forEach(f => f.classList.remove('wa-conv-filter--active'));
+        btn.classList.add('wa-conv-filter--active');
+        state.filter = value;
+      }
       applyFilters();
     });
   }
@@ -270,9 +285,7 @@
   function applyFilters() {
     let list = [...state.conversations];
 
-    if (state.filter === 'active') list = list.filter(c => c.status === 'active');
-    else if (state.filter === 'closed') list = list.filter(c => c.status === 'closed');
-    else if (state.filter === 'bot') list = list.filter(c => c.bot_active);
+    if (state.filter === 'bot') list = list.filter(c => c.bot_active);
     else if (state.filter === 'human') list = list.filter(c => !c.bot_active);
 
     if (state.search) {
