@@ -533,21 +533,38 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 5.1 Vercel Serverless Configuration
 
-- [ ] **5.1.1** Verificar que `vercel.json` mapea correctamente las rutas:
+- [x] **5.1.1** `vercel.json` configurado:
   ```json
   {
+    "$schema": "https://openapi.vercel.sh/vercel.json",
     "version": 2,
     "builds": [
-      { "src": "api/**/*.js", "use": "@vercel/node" },
-      { "src": "public/**", "use": "@vercel/static" }
+      { "src": "api/**/*.js", "use": "@vercel/node" }
     ],
-    "routes": [
-      { "src": "/api/(.*)", "dest": "/api/$1" },
-      { "src": "/(.*)", "dest": "/public/$1" }
-    ]
+    "functions": {
+      "api/webhook.js": { "maxDuration": 30 },
+      "api/**/*.js":     { "maxDuration": 30 }
+    }
   }
   ```
-- [ ] **5.1.2** Verificar que todas las serverless functions exportan un handler default compatible con Vercel
+  - `api/**/*.js` se compila con `@vercel/node` (serverless functions)
+  - `public/` se sirve automáticamente como static files (default de Vercel, no requiere `@vercel/static` legacy)
+  - `/api/*` se resuelve a `api/*`; todo lo demás va a `public/`
+  - **12/12 endpoints** verificados en producción (auth, conversations, messages, kpis, catalog CRUD completo)
+  - **Static** verificado: dashboard.html, login.html, favicon.ico, css/variables.css, js/api.js → todos 200
+- [x] **5.1.2** Verificado: 12/12 serverless functions exportan `module.exports = async function handler(req, res) { ... }`:
+  - `api/webhook.js`
+  - `api/auth/login.js`
+  - `api/auth/me.js`
+  - `api/catalog/delete.js`
+  - `api/catalog/get.js`
+  - `api/catalog/index.js`
+  - `api/catalog/update.js`
+  - `api/conversations/index.js`
+  - `api/conversations/toggle-bot.js`
+  - `api/kpis/index.js`
+  - `api/messages/index.js`
+  - `api/messages/send.js`
 
 ### 5.2 Variables de entorno
 
