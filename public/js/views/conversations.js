@@ -412,7 +412,7 @@
     const inputField = document.getElementById('msg-input');
     const form = document.getElementById('msg-form');
 
-    if (!isBot && sendBtn && inputField) {
+    if (sendBtn && inputField) {
       sendBtn.addEventListener('click', sendMessage);
       inputField.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
