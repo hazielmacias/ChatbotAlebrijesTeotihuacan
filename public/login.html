@@ -3,16 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#111111">
+  <meta name="theme-color" content="#ffffff">
   <meta name="description" content="Panel de administracion Alebrijes Teotihuacan">
   <title>Iniciar sesion - Alebrijes Teotihuacan</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/styles.css">
   <style>
@@ -22,7 +19,7 @@
       align-items: center;
       justify-content: center;
       padding: var(--space-4);
-      background: var(--color-bg);
+      background: var(--color-bg-elevated);
       position: relative;
       overflow: hidden;
     }
@@ -45,14 +42,14 @@
       right: -10%;
       width: 600px;
       height: 600px;
-      background: radial-gradient(circle, rgba(255, 94, 0, 0.08) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(255, 94, 0, 0.06) 0%, transparent 70%);
       pointer-events: none;
     }
 
     .login-card {
       width: 100%;
       max-width: 420px;
-      background: var(--color-bg-elevated);
+      background: var(--color-bg-card);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-xl);
       padding: var(--space-10) var(--space-8);
@@ -109,8 +106,8 @@
     }
 
     .login-error {
-      background: rgba(231, 76, 60, 0.1);
-      border: 1px solid rgba(231, 76, 60, 0.3);
+      background: rgba(231, 76, 60, 0.08);
+      border: 1px solid rgba(231, 76, 60, 0.24);
       border-radius: var(--radius-md);
       padding: var(--space-3) var(--space-4);
       color: var(--color-danger);
@@ -138,7 +135,7 @@
       display: flex;
       position: absolute;
       inset: 0;
-      background: rgba(17, 17, 17, 0.7);
+      background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(2px);
       align-items: center;
       justify-content: center;
@@ -174,7 +171,7 @@
       <div class="login-card__header">
         <img class="login-card__logo" src="/logo-alebrijes.png" alt="Alebrijes Teotihuacan">
         <h1 class="login-card__title">Alebrijes Teotihuacan</h1>
-        <p class="login-card__subtitle">Panel de administracion</p>
+        <p class="login-card__subtitle">Panel de administración</p>
       </div>
 
       <form class="login-form" id="login-form" novalidate>
@@ -182,7 +179,7 @@
 
         <div class="form-group">
           <label class="form-label" for="email">
-            Correo electronico<span class="form-label__required">*</span>
+            Correo electrónico<span class="form-label__required">*</span>
           </label>
           <input
             type="email"
@@ -197,22 +194,22 @@
 
         <div class="form-group">
           <label class="form-label" for="password">
-            Contrasena<span class="form-label__required">*</span>
+            Contraseña<span class="form-label__required">*</span>
           </label>
           <input
             type="password"
             id="password"
             name="password"
             class="form-input"
-            placeholder="Ingresa tu contrasena"
+            placeholder="Ingresa tu contraseña"
             autocomplete="current-password"
             required
           >
-          <a href="#" class="login-form__forgot" id="forgot-link">Olvide mi contrasena</a>
+          <a href="#" class="login-form__forgot" id="forgot-link">Olvidé mi contraseña</a>
         </div>
 
         <button type="submit" class="btn btn--primary btn--lg btn--block login-form__submit" id="login-submit">
-          Iniciar sesion
+          Iniciar sesión
         </button>
       </form>
 
@@ -262,7 +259,7 @@
           card.classList.remove('login-card--loading');
           loadingEl.classList.remove('login-loading--visible');
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Iniciar sesion';
+          submitBtn.textContent = 'Iniciar sesión';
         }
       }
 
@@ -297,7 +294,7 @@
         }
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          showError('El correo electronico no es valido');
+          showError('El correo electrónico no es válido');
           return;
         }
 
@@ -307,7 +304,7 @@
           const result = await window.auth.signIn(email, password);
 
           if (!result.ok) {
-            showError(result.error || 'Error al iniciar sesion');
+            showError(result.error || 'Error al iniciar sesión');
             setLoading(false);
             return;
           }
@@ -315,7 +312,7 @@
           window.location.replace('/dashboard.html');
         } catch (err) {
           console.error('Login error:', err);
-          showError('Error de conexion. Intenta de nuevo.');
+          showError('Error de conexión. Intenta de nuevo.');
           setLoading(false);
         }
       });
@@ -325,7 +322,7 @@
 
       forgotLink.addEventListener('click', function(e) {
         e.preventDefault();
-        window.toast.info('Contacta al administrador del sistema para restablecer tu contrasena.', 6000);
+        window.toast.info('Contacta al administrador del sistema para restablecer tu contraseña.', 6000);
       });
     })();
   </script>

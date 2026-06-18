@@ -66,16 +66,17 @@
 .stat-tile {
   position: relative;
   padding: var(--space-5);
-  background: var(--color-bg-elevated);
+  background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
 }
 
 .stat-tile:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  border-color: var(--color-border-strong);
 }
 
 .stat-tile::before {
@@ -148,7 +149,7 @@
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  background: var(--color-bg-card);
+  background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   font-size: var(--fs-xs);
@@ -179,7 +180,7 @@
 }
 
 .chart-card {
-  background: var(--color-bg-elevated);
+  background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-5);
@@ -218,7 +219,6 @@
     var(--color-info) 0% 0%,
     var(--color-bg-card) 0% 100%
   );
-  position: relative;
 }
 
 .pie-chart__center {
@@ -228,7 +228,7 @@
   transform: translate(-50%, -50%);
   width: 110px;
   height: 110px;
-  background: var(--color-bg-elevated);
+  background: var(--color-bg-card);
   border-radius: 50%;
   display: flex;
   flex-direction: column;
@@ -315,7 +315,7 @@
 
 /* === Recent messages list === */
 .dashboard-recent {
-  background: var(--color-bg-elevated);
+  background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -418,11 +418,11 @@
 }
 
 .recent-item__direction--in {
-  background: rgba(11, 97, 255, 0.12);
+  background: rgba(0, 80, 179, 0.08);
   color: var(--color-info);
 }
 
 .recent-item__direction--out {
-  background: rgba(255, 94, 0, 0.12);
+  background: rgba(255, 94, 0, 0.08);
   color: var(--color-primary);
 }

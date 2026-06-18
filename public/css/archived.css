@@ -25,10 +25,11 @@
   align-items: center;
   gap: 12px;
   margin: 0 0 8px 0;
-  font-family: 'Outfit', system-ui, sans-serif;
+  font-family: var(--font-display);
   font-size: 28px;
   font-weight: 700;
   color: var(--color-text, #111);
+  letter-spacing: -0.02em;
 }
 
 .archived-view__icon {

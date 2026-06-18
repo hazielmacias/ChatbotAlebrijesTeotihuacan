@@ -407,7 +407,7 @@
 }
 
 .app-nav__link--logout:hover {
-  background: rgba(231, 76, 60, 0.08);
+  background: rgba(231, 76, 60, 0.06);
   color: var(--color-danger);
 }
 
