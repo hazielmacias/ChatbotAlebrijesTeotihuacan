@@ -515,18 +515,24 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 4.8 Catálogo de Planes
 
-- [ ] **4.8.1** Crear `public/catalog.html`:
-  - Navbar consistente con el resto del dashboard
-  - Tabla/lista de planes existentes con: nombre, precio, categoría, estado (activo/inactivo)
-  - Botón "Agregar plan"
-  - Cada plan tiene botones: editar, desactivar/activar, eliminar
-- [ ] **4.8.2** Crear `public/js/catalog.js`:
-  - Fetch a `GET /api/catalog` al cargar
-  - Renderizar lista de planes
-  - Modal/formulario para crear plan (campos: nombre, descripción, precio, categoría, URL imagen)
-  - Modal/formulario para editar plan existente
-  - Confirmación antes de eliminar/desactivar
-  - `POST`, `PATCH`, `DELETE` a `/api/catalog`
+- [x] **4.8.1** Implementado como vista dentro de `dashboard.html` (ruta `#catalog`, vista `catalogView`):
+  - Navbar consistente con el resto del dashboard (sidebar + tiliche-bar)
+  - Tabla de planes existentes con: nombre (+ descripción truncada), categoría (badge), precio (MXN formateado), estado (badge activo/inactivo), fecha de creación
+  - Botón "Nuevo plan" (header, primary)
+  - Cada plan tiene botones: **Editar** + **Activar/Desactivar** (dinámico según estado)
+  - Filas inactivas con opacity 0.55 + checkbox "Mostrar inactivos" en header
+- [x] **4.8.2** Lógica en `public/js/views/catalog.js` (módulo equivalente a `catalog.js` en arquitectura SPA con router):
+  - Fetch a `GET /api/catalog` al cargar (con `include_inactive` y `search` params)
+  - Renderizar lista como tabla
+  - Modal crear/editar con campos: nombre*, categoría, precio (MXN), estado, URL imagen, descripción
+  - Validación inline (nombre requerido, precio >= 0, URL http(s))
+  - Search input con debounce 300ms (busca en name + description + category)
+  - Modal de confirmación custom (`openConfirm`) con colores danger/primary según acción
+  - **API refactorizada a estructura plana** (Vercel no rutaba `[id]/`):
+    - `POST /api/catalog` — crear
+    - `PATCH /api/catalog/update` con `{ id, ...data }` — actualizar
+    - `DELETE /api/catalog/delete` con `{ id }` — soft delete (is_active=false)
+    - `GET /api/catalog/get?id=xxx` — obtener uno
 
 ---
 
