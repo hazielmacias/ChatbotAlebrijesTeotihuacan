@@ -325,12 +325,7 @@
 
       forgotLink.addEventListener('click', function(e) {
         e.preventDefault();
-        window.modal.alert({
-          title: 'Contrasena olvidada',
-          message: 'Contacta al administrador del sistema para restablecer tu contrasena.',
-          type: 'info',
-          buttonText: 'Entendido'
-        });
+        window.toast.info('Contacta al administrador del sistema para restablecer tu contrasena.', 6000);
       });
     })();
   </script>
