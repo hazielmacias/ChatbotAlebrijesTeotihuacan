@@ -194,9 +194,6 @@
       state.filter = btn.dataset.filter;
       applyFilters();
     });
-
-    // Suscribirse a cambios en conversaciones (Realtime)
-    setupConversationsRealtime();
   }
 
   async function loadConversations() {
