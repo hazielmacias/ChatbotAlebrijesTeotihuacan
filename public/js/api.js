@@ -143,7 +143,7 @@
       return request('GET', '/api/kpis');
     },
 
-    // Catalog
+    // Catalog (consolidado en api/catalog/index.js con ?id=xxx, PATCH/DELETE con id en body)
     async listCatalog(params = {}) {
       const query = new URLSearchParams();
       if (params.category) query.set('category', params.category);
@@ -154,7 +154,7 @@
     },
 
     async getCatalogItem(id) {
-      return request('GET', '/api/catalog/get?id=' + encodeURIComponent(id));
+      return request('GET', '/api/catalog?id=' + encodeURIComponent(id));
     },
 
     async createCatalogItem(data) {
@@ -162,30 +162,28 @@
     },
 
     async updateCatalogItem(id, data) {
-      return request('PATCH', '/api/catalog/update', { id, ...data });
+      return request('PATCH', '/api/catalog', { id, ...data });
     },
 
     async deleteCatalogItem(id) {
-      return request('DELETE', '/api/catalog/delete', { id });
+      return request('DELETE', '/api/catalog', { id });
     },
 
-    // Dashboard stats
+    // Dashboard (consolidado: ?type=stats|notifications|templates)
     async getDashboardStats() {
-      return request('GET', '/api/stats/dashboard');
+      return request('GET', '/api/dashboard?type=stats');
     },
 
-    // Notifications
     async getNotifications() {
-      return request('GET', '/api/notifications');
+      return request('GET', '/api/dashboard?type=notifications');
     },
 
-    // Templates
     async getTemplates() {
-      return request('GET', '/api/templates');
+      return request('GET', '/api/dashboard?type=templates');
     },
 
     async saveTemplate(data) {
-      return request('POST', '/api/templates', data);
+      return request('POST', '/api/dashboard?type=templates', data);
     },
 
     // Generic request (exposed for custom endpoints)
