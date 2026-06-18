@@ -807,33 +807,42 @@
 }
 
 .brand-loader__logo {
-  width: 80px;
-  height: 80px;
+  width: 96px;
+  height: 96px;
   object-fit: contain;
   border-radius: var(--radius-lg);
-  animation: brand-loader-pulse 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: brand-loader-pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   will-change: transform, opacity;
 }
 
 .brand-loader--sm .brand-loader__logo {
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-md);
 }
 
 @keyframes brand-loader-pulse {
-  0%, 100% { opacity: 1;    transform: scale(1);   }
-  50%      { opacity: 0.92; transform: scale(1.03); }
+  0%, 100% { opacity: 1;    transform: scale(1)   translateY(0);  }
+  50%      { opacity: 0.88; transform: scale(1.07) translateY(-4px); }
 }
 
 .loading-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(17, 17, 17, 0.7);
+  background: rgba(17, 17, 17, 0.72);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
+  opacity: 0;
+  animation: loading-overlay-fade 360ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes loading-overlay-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .chart-bars {
