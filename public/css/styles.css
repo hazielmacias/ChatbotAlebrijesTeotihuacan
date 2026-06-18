@@ -785,6 +785,7 @@
 .modal__icon--error   { background: rgba(231, 76, 60, 0.14); color: var(--color-danger); }
 .modal__icon--warning { background: rgba(255, 193, 7, 0.14); color: var(--color-warning); }
 .modal__icon--info    { background: rgba(0, 80, 179, 0.14); color: var(--color-info); }
+.modal__icon--archive { background: rgba(0, 0, 0, 0.05); color: var(--color-text); }
 
 .modal__title {
   font-size: var(--fs-lg);
@@ -813,6 +814,60 @@
   padding: var(--space-6);
   overflow-y: auto;
   flex: 1;
+}
+
+.modal__context {
+  padding: var(--space-4) var(--space-6);
+  background: var(--color-bg-elevated);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal-context {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.modal-context__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-sm);
+  letter-spacing: -0.01em;
+}
+
+.modal-context__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modal-context__name {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-context__phone {
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
 }
 
 .modal__footer {

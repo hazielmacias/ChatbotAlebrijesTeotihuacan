@@ -802,11 +802,27 @@
     if (!state.activeConv) return;
     const conv = state.activeConv;
     const name = conv.contact?.name || formatPhone(conv.phone) || 'este contacto';
+    const phone = formatPhone(conv.phone) || '';
+    const initial = (name.trim().charAt(0) || '?').toUpperCase();
+    const contextEl = document.createElement('div');
+    contextEl.className = 'modal-context';
+    contextEl.innerHTML =
+      '<div class="modal-context__avatar"></div>' +
+      '<div class="modal-context__info">' +
+        '<div class="modal-context__name"></div>' +
+        (phone ? '<div class="modal-context__phone"></div>' : '') +
+      '</div>';
+    contextEl.querySelector('.modal-context__avatar').textContent = initial;
+    contextEl.querySelector('.modal-context__name').textContent = name;
+    if (phone) contextEl.querySelector('.modal-context__phone').textContent = phone;
+
     const ok = await window.modal.confirm({
       title: 'Archivar conversación',
-      message: 'Archivar la conversación con ' + name + '.\nDejará de aparecer en Conversaciones y podrás restaurarla desde Archivados.',
-      type: 'warning',
-      confirmText: 'Archivar'
+      message: 'La conversación dejará de aparecer en Conversaciones. Podrás restaurarla o eliminarla permanentemente desde Archivados.',
+      type: 'archive',
+      context: contextEl,
+      confirmText: 'Archivar',
+      cancelText: 'Cancelar'
     });
     if (!ok) return;
 
@@ -816,7 +832,7 @@
       return;
     }
 
-    window.toast.success('Conversacion archivada');
+    window.toast.success('Conversación archivada');
     state.conversations = state.conversations.filter(c => c.id !== conv.id);
     state.activeId = null;
     state.activeConv = null;
