@@ -63,11 +63,6 @@
         }
       }
 
-      // Show loading
-      if (mainEl) {
-        mainEl.innerHTML = '<div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>';
-      }
-
       try {
         await handler(mainEl);
       } catch (e) {
