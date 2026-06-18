@@ -326,20 +326,14 @@ async function executeStep(conversation, contact, flowKey, stepKey, flowData) {
   }
 
   if (step.send_document) {
-    const docCategory = flowData?.category;
-    const shouldSendDoc = !step.send_document_category_filter || step.send_document_category_filter.includes(docCategory);
-    if (shouldSendDoc) {
-      await sendDocumentAndStore({
-        phone: contact.phone,
-        conversationId: conversation.id,
-        documentKey: step.send_document,
-        caption: '',
-        sentBy: 'bot',
-        metadata: { flow: flowKey, step: stepKey, document_key: step.send_document }
-      });
-    } else {
-      console.log(`[bot-engine] Documento omitido por filtro de categoria: doc=${step.send_document} cat=${docCategory}`);
-    }
+    await sendDocumentAndStore({
+      phone: contact.phone,
+      conversationId: conversation.id,
+      documentKey: step.send_document,
+      caption: '',
+      sentBy: 'bot',
+      metadata: { flow: flowKey, step: stepKey, document_key: step.send_document }
+    });
   }
 
   console.log(`[bot-engine] Respuesta enviada: flow=${flowKey} step=${stepKey} sent_ok=${sent.ok} image=${step.send_image || 'none'} document=${step.send_document || 'none'} auto_advance=${!!step.auto_advance}`);
@@ -508,11 +502,15 @@ async function processIncomingMessage(messageData) {
     const nextStep = currentStep.next_step;
     const nextFlowData = { ...sideEffectUpdates, collected_data: parsed };
 
-    await updateConversationState(conversation.id, {
-      current_flow: nextFlow,
-      current_step: nextStep,
-      flow_data: nextFlowData
-    });
+    try {
+      await updateConversationState(conversation.id, {
+        current_flow: nextFlow,
+        current_step: nextStep,
+        flow_data: nextFlowData
+      });
+    } catch (stateErr) {
+      console.error('[bot-engine] Error actualizando estado (no bloqueante):', stateErr);
+    }
 
     console.log(`[bot-engine] free_text completado: ${currentFlowKey}/${currentStepKey} -> ${nextFlow}/${nextStep}`);
 
