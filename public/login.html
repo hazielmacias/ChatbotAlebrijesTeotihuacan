@@ -33,58 +33,88 @@
     }
 
     @media (max-width: 880px) {
-      .login-page { grid-template-columns: 1fr; }
-      .login-page__brand { display: none; }
-      .login-page::before { display: none; }
-
-      .login-page__form-wrap {
-        padding: 32px 20px;
-      }
-    }
-
-    @media (max-width: 480px) {
+      /* === Reset completo para mobile: solo el formulario === */
       .login-page {
-        min-height: 100vh;
-        min-height: 100dvh;
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-columns: none !important;
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+        width: 100% !important;
+        overflow: hidden !important;
       }
 
+      .login-page::before { display: none !important; }
+      .login-page__brand { display: none !important; }
+      .login-loading { display: none !important; }
+
       .login-page__form-wrap {
-        padding: 24px 20px;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+        padding: 24px 20px !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
       }
 
       .login-card {
-        max-width: 100%;
-        width: 100%;
+        width: 100% !important;
+        max-width: 400px !important;
+        margin: auto !important;
+        padding: 0 !important;
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
       }
 
       .login-card__header {
-        margin-bottom: 24px;
-        text-align: center;
+        margin-bottom: 32px !important;
+        text-align: center !important;
       }
 
       .login-card__title {
-        font-size: var(--fs-lg);
+        font-size: var(--fs-xl) !important;
+        margin-bottom: 8px !important;
+      }
+
+      .login-card__subtitle {
+        font-size: var(--fs-sm) !important;
       }
 
       .login-card .form-group {
-        margin-bottom: 16px;
+        margin-bottom: 20px !important;
+      }
+
+      .login-card .form-label {
+        font-size: 14px !important;
+        margin-bottom: 8px !important;
       }
 
       .login-card .form-input {
-        font-size: 16px;
-        min-height: 44px;
-        padding: 12px 14px;
-      }
-
-      .login-form__submit {
-        padding: 14px 20px;
-        font-size: 14px;
-        min-height: 44px;
-        margin-top: 20px;
+        width: 100% !important;
+        font-size: 16px !important;
+        min-height: 48px !important;
+        padding: 14px 16px !important;
+        border-radius: 10px !important;
       }
 
       .login-form__forgot {
-        font-size: 12px;
+        display: block !important;
+        margin-top: 12px !important;
+        font-size: 13px !important;
+        text-align: right !important;
+      }
+
+      .login-form__submit {
+        width: 100% !important;
+        min-height: 48px !important;
+        padding: 14px 20px !important;
+        font-size: 15px !important;
+        margin-top: 24px !important;
+        border-radius: 10px !important;
       }
     }
 
