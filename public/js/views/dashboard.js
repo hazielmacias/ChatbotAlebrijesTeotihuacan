@@ -55,7 +55,7 @@
   async function render(container) {
     container.innerHTML = `
       <div class="dashboard-view" id="dashboard-view">
-        <div class="loading-overlay"><div class="spinner spinner--lg"></div></div>
+        <div class="loading-overlay" role="status" aria-label="Cargando"><div class="spinner spinner--logo"><img class="spinner--logo__img" src="/logo-alebrijes.png" alt=""></div></div>
       </div>
     `;
 

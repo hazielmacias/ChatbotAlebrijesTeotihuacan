@@ -23,7 +23,7 @@
             <p class="view-header__subtitle">Edita las plantillas de mensajes del bot</p>
           </div>
         </div>
-        <div class="loading-overlay"><div class="spinner spinner--lg"></div></div>
+        <div class="loading-overlay" role="status" aria-label="Cargando"><div class="spinner spinner--logo"><img class="spinner--logo__img" src="/logo-alebrijes.png" alt=""></div></div>
       </div>
     `;
 

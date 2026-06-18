@@ -111,7 +111,7 @@
         </header>
 
         <div class="archived-view__list" id="archived-list">
-          <div class="loading-overlay"><div class="spinner spinner--lg"></div></div>
+          <div class="loading-overlay" role="status" aria-label="Cargando"><div class="spinner spinner--logo"><img class="spinner--logo__img" src="/logo-alebrijes.png" alt=""></div></div>
         </div>
       </div>
     `;
@@ -133,7 +133,7 @@
     state.loading = true;
     const listEl = document.getElementById('archived-list');
     if (listEl) {
-      listEl.innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
+      listEl.innerHTML = '<div class="loading-overlay" role="status" aria-label="Cargando"><div class="spinner spinner--logo spinner--logo--sm"><img class="spinner--logo__img" src="/logo-alebrijes.png" alt=""></div></div>';
     }
 
     const result = await window.api.listArchivedConversations({ limit: 100 });
