@@ -802,100 +802,28 @@
 
 .brand-loader {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-5);
-  color: var(--color-text-muted);
-}
-
-.brand-loader__wrap {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.brand-loader__halo {
-  position: absolute;
-  inset: 0;
-  border-radius: var(--radius-lg);
-  background: radial-gradient(circle, rgba(255, 94, 0, 0.22) 0%, rgba(255, 94, 0, 0.05) 45%, transparent 70%);
-  animation: brand-loader-halo 2.6s ease-in-out infinite;
-  pointer-events: none;
-}
-
 .brand-loader__logo {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
   border-radius: var(--radius-lg);
-  background: var(--color-bg-card);
-  padding: 12%;
-  box-shadow: 0 0 0 1px rgba(255, 94, 0, 0.10), var(--shadow-md);
-  animation: brand-loader-breathe 2.6s ease-in-out infinite;
-  z-index: 1;
-}
-
-.brand-loader__label {
-  font-family: var(--font-display);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-medium);
-  color: var(--color-text-muted);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  display: inline-flex;
-  align-items: baseline;
-}
-
-.brand-loader__dots {
-  display: inline-block;
-  width: 1.4em;
-  margin-left: 0.2em;
-  text-align: left;
-}
-
-.brand-loader__dots::after {
-  content: '';
-  animation: brand-loader-dots 1.5s steps(4) infinite;
-}
-
-.brand-loader--sm {
-  gap: 0;
-}
-
-.brand-loader--sm .brand-loader__wrap {
-  width: 36px;
-  height: 36px;
+  animation: brand-loader-pulse 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform, opacity;
 }
 
 .brand-loader--sm .brand-loader__logo {
-  padding: 8%;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-md);
-  box-shadow: 0 0 0 1px rgba(255, 94, 0, 0.10);
 }
 
-.brand-loader--sm .brand-loader__label {
-  display: none;
-}
-
-@keyframes brand-loader-breathe {
-  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 1px rgba(255, 94, 0, 0.10), var(--shadow-md); }
-  50%      { transform: scale(1.04); box-shadow: 0 0 0 1px rgba(255, 94, 0, 0.22), 0 8px 24px rgba(255, 94, 0, 0.18); }
-}
-
-@keyframes brand-loader-halo {
-  0%, 100% { opacity: 0.35; transform: scale(1);   }
-  50%      { opacity: 0.95; transform: scale(1.3); }
-}
-
-@keyframes brand-loader-dots {
-  0%   { content: '';   }
-  25%  { content: '.';  }
-  50%  { content: '..'; }
-  75%  { content: '...'; }
+@keyframes brand-loader-pulse {
+  0%, 100% { opacity: 1;    transform: scale(1);   }
+  50%      { opacity: 0.92; transform: scale(1.03); }
 }
 
 .loading-overlay {

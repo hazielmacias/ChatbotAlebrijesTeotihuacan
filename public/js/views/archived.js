@@ -111,7 +111,7 @@
         </header>
 
         <div class="archived-view__list" id="archived-list">
-          <div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader"><div class="brand-loader__wrap"><div class="brand-loader__halo" aria-hidden="true"></div><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div><p class="brand-loader__label" aria-hidden="true">Cargando<span class="brand-loader__dots"></span></p></div></div>
+          <div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>
         </div>
       </div>
     `;
@@ -133,7 +133,7 @@
     state.loading = true;
     const listEl = document.getElementById('archived-list');
     if (listEl) {
-      listEl.innerHTML = '<div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader brand-loader--sm"><div class="brand-loader__wrap"><div class="brand-loader__halo" aria-hidden="true"></div><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div></div>';
+      listEl.innerHTML = '<div class="loading-overlay" role="status" aria-label="Cargando"><div class="brand-loader brand-loader--sm"><img class="brand-loader__logo" src="/logo-alebrijes.png" alt=""></div></div>';
     }
 
     const result = await window.api.listArchivedConversations({ limit: 100 });
