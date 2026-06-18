@@ -4,14 +4,13 @@
   "description": "Lista de preguntas frecuentes con respuestas predefinidas.",
   "steps": {
     "categories": {
-      "message": "❓ *Preguntas Frecuentes*\n\n1️⃣ Horarios y ubicación\n2️⃣ Requisitos para inscribirte\n3️⃣ Edades y categorías\n4️⃣ Métodos de pago\n5️⃣ Qué necesitas traer\n6️⃣ Hablar con una persona\n\n_Responde con el número de tu pregunta._\n_Escribe 0 para volver al menú principal._",
+      "message": "❓ *Preguntas Frecuentes*\n\n1️⃣ Horarios y ubicación\n2️⃣ Requisitos para inscribirte\n3️⃣ Edades y categorías\n4️⃣ Qué necesitas traer\n5️⃣ Hablar con una persona\n\n_Responde con el número de tu pregunta._\n_Escribe 0 para volver al menú principal._",
       "options": {
         "1": { "next_flow": "faq", "next_step": "horarios" },
         "2": { "next_flow": "faq", "next_step": "requisitos" },
         "3": { "next_flow": "faq", "next_step": "edades" },
-        "4": { "next_flow": "faq", "next_step": "pagos" },
-        "5": { "next_flow": "faq", "next_step": "que_traer" },
-        "6": { "next_flow": "menu", "next_step": "human_takeover" },
+        "4": { "next_flow": "faq", "next_step": "que_traer" },
+        "5": { "next_flow": "menu", "next_step": "human_takeover" },
         "0": { "next_flow": "menu", "next_step": "start" },
         "menu": { "next_flow": "menu", "next_step": "start" }
       }
@@ -19,7 +18,7 @@
     "horarios": {
       "message": "🕐 *Horarios y ubicación*\n\n📍 Estamos en el *Centro Recreativo Pascual Boing*, Teotihuacán, Estado de México.\n\n🗓️ Horarios de entrenamiento según tu categoría:\n• *Escuela - Turno Matutino:* Lunes a Viernes de 08:00 a 10:30 hrs.\n• *Escuela - Turno Vespertino:* Martes, Miércoles y Jueves de 16:00 a 18:30 hrs.\n• *Fuerzas Básicas / TDP / Piloto:* La fecha la da el asesor.\n\n📲 Ubicación: https://maps.app.goo.gl/nXnXtADvzofWVusk9",
       "options": {
-        "6": { "next_flow": "menu", "next_step": "human_takeover" },
+        "5": { "next_flow": "menu", "next_step": "human_takeover" },
         "0": { "next_flow": "menu", "next_step": "start" },
         "9": { "next_flow": "faq", "next_step": "categories" },
         "menu": { "next_flow": "menu", "next_step": "start" }
@@ -36,15 +35,6 @@
     },
     "edades": {
       "message": "👦 *Edades y categorías*\n\nContamos con 3 categorías según tu edad:\n\n🏫 *Centro de Iniciación Deportiva (Escuela):* Niños de 6 a 11 años\n⚽ *Fuerzas Básicas y Tercera División Profesional (Liga TDP):* Jóvenes de 12 a 18 años\n🏆 *Equipo Piloto (Liga de Expansión MX):* Jóvenes nacidos entre 2002 y 2004\n\nLos grupos se asignan según la edad y nivel del jugador.",
-      "options": {
-        "1": { "next_flow": "menu", "next_step": "human_takeover" },
-        "9": { "next_flow": "faq", "next_step": "categories" },
-        "0": { "next_flow": "menu", "next_step": "start" },
-        "menu": { "next_flow": "menu", "next_step": "start" }
-      }
-    },
-    "pagos": {
-      "message": "💳 *Métodos de pago*\n\n*Escuela:*\n✅ Costo de Inscripción: $0\n✅ Mensualidad fija: $550 MXN (Sin letras chiquitas)\n\n*Fuerzas Básicas / TDP / Piloto:*\nLa semana de pruebas incluye seguro, uniforme, zapatería, hidratación, fisioterapia y más sin costo inicial.\n\nAceptamos:\n• Efectivo\n• Transferencia bancaria\n• Depósito en OXXO\n\nPara más detalle de costos, contactanos directamente.",
       "options": {
         "1": { "next_flow": "menu", "next_step": "human_takeover" },
         "9": { "next_flow": "faq", "next_step": "categories" },
