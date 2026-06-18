@@ -70,6 +70,18 @@
         box-shadow: none !important;
       }
 
+      .login-card__logo {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin-bottom: 24px !important;
+      }
+
+      .login-card__logo img {
+        width: 72px !important;
+        height: 72px !important;
+      }
+
       .login-card__header {
         margin-bottom: 32px !important;
         text-align: center !important;
@@ -269,6 +281,17 @@
 
     .login-card__header {
       margin-bottom: 36px;
+    }
+
+    .login-card__logo {
+      display: none;
+    }
+
+    .login-card__logo img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      border-radius: var(--radius-lg);
     }
 
     .login-card__title {
@@ -505,6 +528,9 @@
 
     <section class="login-page__form-wrap">
       <div class="login-card" id="login-card">
+        <div class="login-card__logo" id="login-mobile-logo">
+          <img src="/logo-alebrijes.png" alt="Alebrijes Teotihuacan">
+        </div>
         <div class="login-card__header">
           <h1 class="login-card__title">Iniciar sesión</h1>
           <p class="login-card__subtitle">Ingresa tus credenciales para continuar</p>
