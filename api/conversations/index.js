@@ -43,9 +43,7 @@ module.exports = async function handler(req, res) {
     const archivedFilter = parseBool(archived);
     const showArchived = archivedFilter === true;
 
-    let query = supabaseAdmin
-      .from('conversations')
-      .select(`
+    const baseSelect = `
         id,
         contact_id,
         phone,
@@ -57,7 +55,11 @@ module.exports = async function handler(req, res) {
         created_at,
         updated_at,
         contacts ( id, phone, name, created_at )
-      `, { count: 'exact' })
+      `;
+
+    let query = supabaseAdmin
+      .from('conversations')
+      .select(baseSelect, { count: 'exact' })
       .order('updated_at', { ascending: false })
       .range(offset, offset + limitNum - 1);
 
@@ -65,13 +67,44 @@ module.exports = async function handler(req, res) {
       query = query.eq('status', status);
     }
 
+    let hasArchivedColumn = true;
     if (showArchived) {
       query = query.not('archived_at', 'is', null);
     } else {
       query = query.is('archived_at', null);
     }
 
-    const { data: conversations, error, count } = await query;
+    let result = await query;
+    let { data: conversations, error, count } = result;
+
+    if (error && /archived_at|column.*does not exist/i.test(error.message || '')) {
+      hasArchivedColumn = false;
+      console.warn('[conversations:list] archived_at no existe, fallback sin filtro. Ejecutar scripts/setup-archive-column.sql');
+      const fallback = supabaseAdmin
+        .from('conversations')
+        .select(`
+          id,
+          contact_id,
+          phone,
+          status,
+          bot_active,
+          current_flow,
+          current_step,
+          created_at,
+          updated_at,
+          contacts ( id, phone, name, created_at )
+        `, { count: 'exact' })
+        .order('updated_at', { ascending: false })
+        .range(offset, offset + limitNum - 1);
+
+      if (status && ['active', 'closed'].includes(status)) {
+        fallback.eq('status', status);
+      }
+      const fb = await fallback;
+      conversations = fb.data;
+      error = fb.error;
+      count = fb.count;
+    }
 
     if (error) {
       console.error('[conversations:list] Error:', error);
@@ -122,7 +155,7 @@ module.exports = async function handler(req, res) {
         bot_active: c.bot_active,
         current_flow: c.current_flow,
         current_step: c.current_step,
-        archived_at: c.archived_at,
+        archived_at: c.archived_at || null,
         created_at: c.created_at,
         updated_at: c.updated_at,
         contact: c.contacts ? {
@@ -169,6 +202,10 @@ module.exports = async function handler(req, res) {
         status: status || 'all',
         search: search || null,
         archived: showArchived
+      },
+      _meta: {
+        archived_column_available: hasArchivedColumn,
+        hint: hasArchivedColumn ? null : 'Ejecuta scripts/setup-archive-column.sql en Supabase para activar archivados'
       }
     });
   } catch (e) {

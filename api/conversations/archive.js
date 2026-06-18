@@ -51,6 +51,14 @@ module.exports = async function handler(req, res) {
       .single();
 
     if (updateError) {
+      const msg = updateError.message || '';
+      if (/archived_at|column.*does not exist/i.test(msg)) {
+        console.error('[conversations:archive] archived_at no existe. Ejecutar scripts/setup-archive-column.sql');
+        return res.status(503).json({
+          error: 'La columna archived_at no existe. Ejecuta scripts/setup-archive-column.sql en Supabase.',
+          setup_required: true
+        });
+      }
       console.error('[conversations:archive] Error actualizando:', updateError);
       return res.status(500).json({ error: 'Error al archivar la conversacion' });
     }

@@ -147,6 +147,20 @@
 
     state.conversations = result.data.conversations || [];
     state.loading = false;
+
+    if (result.data._meta && result.data._meta.archived_column_available === false) {
+      listEl.innerHTML = `
+        <div class="empty-state">
+          <svg class="empty-state__icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+          <h3 class="empty-state__title">Falta configurar Archivados</h3>
+          <p class="empty-state__message">${result.data._meta.hint || 'Ejecuta el script SQL en Supabase.'}</p>
+        </div>
+      `;
+      return;
+    }
+
     renderList();
   }
 
