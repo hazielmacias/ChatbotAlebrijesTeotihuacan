@@ -484,24 +484,23 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 4.6 Dashboard — Chat estilo WhatsApp Web
 
-- [ ] **4.6.1** Crear `public/chat.html` (o como sección dentro de dashboard):
+- [x] **4.6.1** Implementado como sección dentro de `dashboard.html` (ruta `#conversations`, vista `conversationsView`) según permitía la spec:
   - Layout idéntico a WhatsApp Web:
-    - **Panel izquierdo** (300px): lista de conversaciones con búsqueda
+    - **Panel izquierdo** (360px via `--conv-list-width`): lista de conversaciones con búsqueda y filtros
     - **Panel derecho** (flex-grow): chat activo
   - Panel derecho tiene 3 zonas:
-    - **Header**: nombre/teléfono del contacto, badge "🤖 Bot activo" / "👤 Control manual", toggle switch para bot
-    - **Body** (scrollable): mensajes con estilo de burbujas, timestamps, indicador de enviado por bot/humano
-    - **Footer**: input de texto + botón enviar
-- [ ] **4.6.2** Crear `public/js/chat.js`:
-  - Cargar historial de mensajes: `GET /api/messages?conversation_id=xxx`
+    - **Header**: nombre/teléfono del contacto, badge "Bot activo" (naranja) / "Humano" (azul), toggle switch iOS-style (`wa-switch`) con label dinámico
+    - **Body** (scrollable): mensajes como burbujas con timestamps, indicador de autor (Bot / display_name humano), day separators, agrupamiento, esquinas con flecha tipo WhatsApp, fondo con patrón sutil
+    - **Footer**: textarea auto-resize + botón enviar (cuadrado 40x40, color `--wa-header`); Enter envía, Shift+Enter nueva línea
+- [x] **4.6.2** Lógica en `public/js/views/conversations.js` (módulo equivalente a `chat.js` en arquitectura SPA con router):
+  - Cargar historial: `GET /api/messages?conversation_id=xxx` (`loadMessages`)
   - Renderizar mensajes como burbujas:
-    - Mensajes inbound: burbuja gris, alineados a la izquierda
-    - Mensajes outbound bot: burbuja verde, alineados a la derecha, etiqueta "🤖 Bot"
-    - Mensajes outbound humano: burbuja verde, alineados a la derecha, etiqueta "👤 Tú"
-  - Función de envío: `POST /api/messages/send`
-  - Al enviar mensaje: agregar burbuja optimista, confirmar con respuesta de API
-  - Scroll automático al último mensaje
-  - Enter para enviar, Shift+Enter para nueva línea
+    - **Inbound**: burbuja blanca `--wa-bubble-in`, alineada a la izquierda, etiqueta con nombre del contacto
+    - **Outbound bot**: burbuja verde `--wa-bubble-out` (#d9fdd3), alineada a la derecha, etiqueta "Bot" en color primary
+    - **Outbound humano**: burbuja verde, etiqueta con `display_name` del respondedor (Areli / Athziri / Juan / Lalo)
+  - Envío: `POST /api/messages/send` con `sendMessage()` + burbuja optimista (tempId) + replace con respuesta del servidor
+  - Scroll automático: `body.scrollTop = body.scrollHeight` en cada render
+  - Enter sin Shift envía; Shift+Enter inserta nueva línea
 
 ### 4.7 Toggle Bot On/Off
 
