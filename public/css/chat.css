@@ -348,6 +348,31 @@
   word-break: break-word;
 }
 
+.wa-msg__text strong { font-weight: 700; }
+.wa-msg__text em { font-style: italic; }
+.wa-msg__text del { text-decoration: line-through; }
+
+.wa-msg__text .wa-msg__code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(127, 127, 127, 0.18);
+  word-break: break-all;
+}
+
+.wa-msg__text .wa-msg__code-block {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  background: rgba(127, 127, 127, 0.18);
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin: 4px 0;
+  overflow-x: auto;
+  white-space: pre;
+  word-break: normal;
+}
+
 .wa-msg__text--image {
   padding: 0;
   margin: -6px -7px -8px -9px;

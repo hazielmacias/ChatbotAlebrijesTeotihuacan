@@ -131,6 +131,41 @@
     return div.innerHTML;
   }
 
+  function formatWhatsAppText(text) {
+    if (text == null) return '';
+    let s = escapeHtml(String(text));
+
+    const stash = [];
+    const placeholder = (i) => `\u0001WAFMT${i}\u0001`;
+
+    // Bloques de codigo (```...```) — pueden cruzar lineas
+    s = s.replace(/```([\s\S]+?)```/g, (m, code) => {
+      const clean = code.replace(/^\n+|\n+$/g, '');
+      stash.push(`<pre class="wa-msg__code-block"><code>${clean}</code></pre>`);
+      return placeholder(stash.length - 1);
+    });
+
+    // Codigo en linea (`...`) — una sola linea
+    s = s.replace(/`([^`\n]+)`/g, (m, code) => {
+      stash.push(`<code class="wa-msg__code">${code}</code>`);
+      return placeholder(stash.length - 1);
+    });
+
+    // Cursiva (_..._) — antes que bold/strike para soportar anidamiento
+    s = s.replace(/(?<![_\s])_(?=\S)([^_\n]+?)(?<=\S)_(?![_\s])/g, '<em>$1</em>');
+
+    // Negrita (*...*)
+    s = s.replace(/(?<![*\s])\*(?=\S)([^*\n]+?)(?<=\S)\*(?![*\s])/g, '<strong>$1</strong>');
+
+    // Tachado (~...~)
+    s = s.replace(/(?<![~\s])~(?=\S)([^~\n]+?)(?<=\S)~(?![~\s])/g, '<del>$1</del>');
+
+    // Restaurar placeholders de codigo
+    s = s.replace(/\u0001WAFMT(\d+)\u0001/g, (m, i) => stash[Number(i)]);
+
+    return s;
+  }
+
   function renderShell(container) {
     container.innerHTML = `
       <div class="wa-app" id="wa-app">
@@ -530,7 +565,7 @@
       if (msg.type === 'image' && msg.metadata?.image_url) {
         content = `<div class="wa-msg__text wa-msg__text--image"><img class="wa-msg__image" src="${escapeHtml(msg.metadata.image_url)}" alt="Imagen" data-image="${escapeHtml(msg.metadata.image_url)}"></div>`;
       } else {
-        content = `<div class="wa-msg__text">${escapeHtml(msg.content || '')}</div>`;
+        content = `<div class="wa-msg__text">${formatWhatsAppText(msg.content || '')}</div>`;
       }
 
       const statusIcon = isOut
