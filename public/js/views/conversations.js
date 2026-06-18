@@ -368,17 +368,17 @@
         <div class="loading-overlay"><div class="spinner"></div></div>
       </div>
 
-      <div class="wa-chat-input ${!isBot ? 'wa-chat-input--disabled' : ''}" id="wa-chat-input">
+      <div class="wa-chat-input ${isBot ? 'wa-chat-input--disabled' : ''}" id="wa-chat-input">
         <form class="wa-chat-input__form" id="msg-form">
           <textarea
             class="wa-chat-input__field"
             id="msg-input"
-            placeholder="${!isBot ? 'Activa el bot para enviar mensajes' : 'Escribe un mensaje'}"
+            placeholder="${isBot ? 'Activa el bot para enviar mensajes' : 'Escribe un mensaje'}"
             rows="1"
-            ${!isBot ? 'disabled' : ''}
+            ${isBot ? 'disabled' : ''}
           ></textarea>
         </form>
-        <button class="wa-chat-input__send" id="msg-send" type="button" ${!isBot ? 'disabled' : ''} aria-label="Enviar mensaje">
+        <button class="wa-chat-input__send" id="msg-send" type="button" ${isBot ? 'disabled' : ''} aria-label="Enviar mensaje">
           <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
         </button>
       </div>
@@ -400,7 +400,7 @@
     const inputField = document.getElementById('msg-input');
     const form = document.getElementById('msg-form');
 
-    if (isBot && sendBtn && inputField) {
+    if (!isBot && sendBtn && inputField) {
       sendBtn.addEventListener('click', sendMessage);
       inputField.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {

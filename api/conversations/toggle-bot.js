@@ -1,8 +1,5 @@
 const { requireAuth } = require('../../src/middleware/auth');
 const { supabaseAdmin } = require('../../src/lib/supabase');
-const { sendAndStore } = require('../../src/bot/sender');
-
-const REACTIVATION_MESSAGE = '*El bot ha sido reactivado en esta conversacion.*\n\nA partir de este momento retomare el control. Escribe *menu* o *0* para ver las opciones disponibles.';
 
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -58,8 +55,7 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({
         conversation: conv,
         changed: false,
-        message: 'El valor de bot_active ya era el solicitado.',
-        reactivation_sent: false
+        message: 'El valor de bot_active ya era el solicitado.'
       });
     }
 
@@ -78,42 +74,11 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: 'Error al actualizar bot_active.' });
     }
 
-    let reactivationSent = false;
-    let reactivationError = null;
-
-    if (!previousBotActive && newBotActive) {
-      console.log(`[toggle-bot] Reactivando bot para conv ${conversationId} (${conv.phone})`);
-      try {
-        const result = await sendAndStore({
-          phone: conv.phone,
-          conversationId: conversationId,
-          content: REACTIVATION_MESSAGE,
-          type: 'text',
-          sentBy: 'bot',
-          metadata: {
-            event: 'bot_reactivated',
-            triggered_by: auth.user.id,
-            previous_bot_active: previousBotActive
-          }
-        });
-        reactivationSent = result.ok;
-        if (!result.ok) {
-          reactivationError = result.error;
-          console.warn(`[toggle-bot] Mensaje de reactivacion fallo: ${result.error}`);
-        }
-      } catch (e) {
-        reactivationError = e.message;
-        console.error('[toggle-bot] Excepcion enviando reactivacion:', e.message);
-      }
-    }
-
     return res.status(200).json({
       conversation: updated,
       changed: true,
       previous_bot_active: previousBotActive,
-      new_bot_active: newBotActive,
-      reactivation_sent: reactivationSent,
-      reactivation_error: reactivationError
+      new_bot_active: newBotActive
     });
   } catch (e) {
     console.error('[toggle-bot] Excepcion:', e);
