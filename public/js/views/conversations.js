@@ -211,14 +211,20 @@
 
         <div class="wa-chat-panel" id="wa-chat-panel">
           <div class="wa-chat-empty" id="wa-chat-empty">
-            <svg class="wa-chat-empty__icon" viewBox="0 0 303 172" fill="none">
-              <path d="M229.6 96.4c0 14.4-2.8 28.4-8.2 41.3-5 12-12 22.6-20.7 31.5-8.2 8.4-18 15-29 19.5-11.6 4.8-24 7.2-36.9 7.2-12.7 0-24.8-2.3-36.1-6.9-10.7-4.3-20.4-10.4-28.9-18.2-8.4-7.8-15.1-17-19.9-27.3-5-10.7-7.6-22.3-7.6-34.4 0-13.2 2.7-26 7.9-37.8 4.9-11.3 12-21.3 20.9-29.7 8.7-8.2 18.9-14.5 30.1-18.9 11.5-4.5 23.7-6.8 36.3-6.8 12.9 0 25.3 2.4 36.9 7.2 11 4.5 20.8 11.1 29 19.5 8.7 8.9 15.7 19.5 20.7 31.5 5.4 12.9 8.2 27 8.2 41.3z" fill="#daecdc"/>
-              <path d="M134.4 27.6c-50.4 0-91.3 33.5-91.3 74.8 0 41.3 40.9 74.8 91.3 74.8 50.4 0 91.3-33.5 91.3-74.8 0-41.3-40.9-74.8-91.3-74.8z" fill="#daecdc"/>
-              <path d="M5 25.4c-2.7 0-4.9 2.2-4.9 4.9v94.6c0 2.7 2.2 4.9 4.9 4.9s4.9-2.2 4.9-4.9V30.3c0-2.7-2.2-4.9-4.9-4.9z" fill="#009688"/>
-              <path d="M297.1 70.9L274.5 48.3c-2-2-5.1-2-7.1 0-2 2-2 5.1 0 7.1l17.7 17.7-17.7 17.7c-2 2-2 5.1 0 7.1 1 1 2.3 1.5 3.5 1.5s2.6-.5 3.5-1.5l22.6-22.6c2-2 2-5.1.1-7.1l-.1-.1z" fill="#009688"/>
-            </svg>
+            <div class="wa-chat-empty__art" aria-hidden="true">
+              <span class="wa-chat-empty__bubble wa-chat-empty__bubble--in">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </span>
+              <span class="wa-chat-empty__bubble wa-chat-empty__bubble--out">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </span>
+            </div>
             <h2 class="wa-chat-empty__title">Selecciona una conversacion</h2>
             <p class="wa-chat-empty__message">Elige una conversacion de la lista para ver los mensajes, responder como humano o desactivar el bot.</p>
+            <div class="wa-chat-empty__hint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              <span>Tambien puedes buscar con el campo de busqueda</span>
+            </div>
           </div>
         </div>
       </div>
