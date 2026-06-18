@@ -471,68 +471,61 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 4.5 Dashboard — Conversaciones
 
-- [x] **4.5.1** Integrar vista de conversaciones en `dashboard.html` o crear página dedicada:
+- [1] **4.5.1** Integrar vista de conversaciones en `dashboard.html` o crear página dedicada:
   - Panel izquierdo: lista de conversaciones (scrollable) — `wa-conversations-panel` + `wa-conv-list`
   - Cada item muestra: nombre/teléfono, último mensaje, timestamp, badge con mensajes nuevos — `wa-conv-item` con avatares, preview, time, badge Bot/Humano + unread
   - Barra de búsqueda arriba de la lista — `wa-search` con input `conv-search` (busca por nombre, teléfono o contenido)
   - Filtro por status (todas, activas, cerradas) — `wa-conv-filters` con Todos/Activos/Cerrados/Bot/Humano
   - Click en conversación → abrir vista de chat — `selectConversation()` + responsive mobile toggle
-- [x] **4.5.2** Suscripción Realtime:
+- [1] **4.5.2** Suscripción Realtime:
   - Al abrir una conversación, suscribirse a nuevos mensajes en `messages` donde `conversation_id = id` — `subscribeToActiveConversation()` con `subscribeToMessages()`
   - Al recibir mensaje nuevo, agregar burbuja al chat en tiempo real — push a `state.messages` + `renderMessages()` con dedup
   - Actualizar lista de conversaciones cuando cambia `updated_at` — `subscribeToConversations()` + `subscribeToAllMessages()` con updates incrementales (last_message, unread_count)
 
 ### 4.6 Dashboard — Chat estilo WhatsApp Web
 
-- [x] **4.6.1** Implementado como sección dentro de `dashboard.html` (ruta `#conversations`, vista `conversationsView`) según permitía la spec:
+- [1] **4.6.1** Crear `public/chat.html` (o como sección dentro de dashboard):
   - Layout idéntico a WhatsApp Web:
-    - **Panel izquierdo** (360px via `--conv-list-width`): lista de conversaciones con búsqueda y filtros
+    - **Panel izquierdo** (300px): lista de conversaciones con búsqueda
     - **Panel derecho** (flex-grow): chat activo
   - Panel derecho tiene 3 zonas:
-    - **Header**: nombre/teléfono del contacto, badge "Bot activo" (naranja) / "Humano" (azul), toggle switch iOS-style (`wa-switch`) con label dinámico
-    - **Body** (scrollable): mensajes como burbujas con timestamps, indicador de autor (Bot / display_name humano), day separators, agrupamiento, esquinas con flecha tipo WhatsApp, fondo con patrón sutil
-    - **Footer**: textarea auto-resize + botón enviar (cuadrado 40x40, color `--wa-header`); Enter envía, Shift+Enter nueva línea
-- [x] **4.6.2** Lógica en `public/js/views/conversations.js` (módulo equivalente a `chat.js` en arquitectura SPA con router):
-  - Cargar historial: `GET /api/messages?conversation_id=xxx` (`loadMessages`)
+    - **Header**: nombre/teléfono del contacto, badge "🤖 Bot activo" / "👤 Control manual", toggle switch para bot
+    - **Body** (scrollable): mensajes con estilo de burbujas, timestamps, indicador de enviado por bot/humano
+    - **Footer**: input de texto + botón enviar
+- [1] **4.6.2** Crear `public/js/chat.js`:
+  - Cargar historial de mensajes: `GET /api/messages?conversation_id=xxx`
   - Renderizar mensajes como burbujas:
-    - **Inbound**: burbuja blanca `--wa-bubble-in`, alineada a la izquierda, etiqueta con nombre del contacto
-    - **Outbound bot**: burbuja verde `--wa-bubble-out` (#d9fdd3), alineada a la derecha, etiqueta "Bot" en color primary
-    - **Outbound humano**: burbuja verde, etiqueta con `display_name` del respondedor (Areli / Athziri / Juan / Lalo)
-  - Envío: `POST /api/messages/send` con `sendMessage()` + burbuja optimista (tempId) + replace con respuesta del servidor
-  - Scroll automático: `body.scrollTop = body.scrollHeight` en cada render
-  - Enter sin Shift envía; Shift+Enter inserta nueva línea
+    - Mensajes inbound: burbuja gris, alineados a la izquierda
+    - Mensajes outbound bot: burbuja verde, alineados a la derecha, etiqueta "🤖 Bot"
+    - Mensajes outbound humano: burbuja verde, alineados a la derecha, etiqueta "👤 Tú"
+  - Función de envío: `POST /api/messages/send`
+  - Al enviar mensaje: agregar burbuja optimista, confirmar con respuesta de API
+  - Scroll automático al último mensaje
+  - Enter para enviar, Shift+Enter para nueva línea
 
 ### 4.7 Toggle Bot On/Off
 
-- [x] **4.7.1** En el header del chat, toggle switch con feedback visual:
-  - Estado ON (verde switch #21c063, label verde oscuro `rgba(7,94,50,0.85)`): "Bot activo" → el bot responde automáticamente
-  - Estado OFF (rojo label `rgba(220,38,38,0.85)`): "Control manual" → el operador responde manualmente
-  - Al hacer toggle: `POST /api/conversations/toggle-bot` con `{ conversation_id, bot_active: true/false }` (refactor a estructura plana por Vercel routing)
-  - Feedback visual inmediato: `updateToggleVisuals()` pinta colores/labels/aria/title antes del await (optimistic UI)
-  - Si API falla: revierte a `previousVal` + toast error
-  - Confirmación con toast: "Bot reactivado - ahora el bot responde" / "Control manual activado - tu respondes al contacto"
-  - Banner rojo aparece bajo header cuando está en control manual
+- [1] **4.7.1** En el header del chat, agregar un toggle switch:
+  - Estado ON (verde): "Bot activo" → el bot responde automáticamente
+  - Estado OFF (rojo): "Control manual" → el operador responde manualmente
+  - Al hacer toggle: `POST /api/conversations/:id/toggle-bot` con `{ bot_active: true/false }`
+  - Feedback visual inmediato (cambio de color del badge y el switch)
+  - Confirmación con toast/snackbar
 
 ### 4.8 Catálogo de Planes
 
-- [x] **4.8.1** Implementado como vista dentro de `dashboard.html` (ruta `#catalog`, vista `catalogView`):
-  - Navbar consistente con el resto del dashboard (sidebar + tiliche-bar)
-  - Tabla de planes existentes con: nombre (+ descripción truncada), categoría (badge), precio (MXN formateado), estado (badge activo/inactivo), fecha de creación
-  - Botón "Nuevo plan" (header, primary)
-  - Cada plan tiene botones: **Editar** + **Activar/Desactivar** (dinámico según estado)
-  - Filas inactivas con opacity 0.55 + checkbox "Mostrar inactivos" en header
-- [x] **4.8.2** Lógica en `public/js/views/catalog.js` (módulo equivalente a `catalog.js` en arquitectura SPA con router):
-  - Fetch a `GET /api/catalog` al cargar (con `include_inactive` y `search` params)
-  - Renderizar lista como tabla
-  - Modal crear/editar con campos: nombre*, categoría, precio (MXN), estado, URL imagen, descripción
-  - Validación inline (nombre requerido, precio >= 0, URL http(s))
-  - Search input con debounce 300ms (busca en name + description + category)
-  - Modal de confirmación custom (`openConfirm`) con colores danger/primary según acción
-  - **API refactorizada a estructura plana** (Vercel no rutaba `[id]/`):
-    - `POST /api/catalog` — crear
-    - `PATCH /api/catalog/update` con `{ id, ...data }` — actualizar
-    - `DELETE /api/catalog/delete` con `{ id }` — soft delete (is_active=false)
-    - `GET /api/catalog/get?id=xxx` — obtener uno
+- [1] **4.8.1** Crear `public/catalog.html`:
+  - Navbar consistente con el resto del dashboard
+  - Tabla/lista de planes existentes con: nombre, precio, categoría, estado (activo/inactivo)
+  - Botón "Agregar plan"
+  - Cada plan tiene botones: editar, desactivar/activar, eliminar
+- [1] **4.8.2** Crear `public/js/catalog.js`:
+  - Fetch a `GET /api/catalog` al cargar
+  - Renderizar lista de planes
+  - Modal/formulario para crear plan (campos: nombre, descripción, precio, categoría, URL imagen)
+  - Modal/formulario para editar plan existente
+  - Confirmación antes de eliminar/desactivar
+  - `POST`, `PATCH`, `DELETE` a `/api/catalog`
 
 ---
 
