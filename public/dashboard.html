@@ -62,31 +62,44 @@
 
     <div class="app-body">
       <aside class="app-sidebar">
-        <nav class="app-nav">
+        <nav class="app-nav" id="app-nav">
+          <a href="#dashboard" class="app-nav__link" data-route="dashboard">
+            <svg class="app-nav__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+            </svg>
+            <span>Dashboard</span>
+          </a>
           <a href="#conversations" class="app-nav__link" data-route="conversations">
-            <svg class="app-nav__icon" viewBox="0 0 24 24">
-              <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+            <svg class="app-nav__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
             </svg>
             <span>Conversaciones</span>
           </a>
-          <a href="#kpis" class="app-nav__link" data-route="kpis">
-            <svg class="app-nav__icon" viewBox="0 0 24 24">
-              <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+          <a href="#notifications" class="app-nav__link" data-route="notifications">
+            <svg class="app-nav__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
             </svg>
-            <span>KPIs</span>
+            <span>Notificaciones</span>
+            <span class="app-nav__badge" id="notif-badge" hidden>0</span>
           </a>
           <a href="#catalog" class="app-nav__link" data-route="catalog">
-            <svg class="app-nav__icon" viewBox="0 0 24 24">
+            <svg class="app-nav__icon" viewBox="0 0 24 24" fill="currentColor">
               <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z"/>
             </svg>
             <span>Catalogo</span>
           </a>
           <a href="#settings" class="app-nav__link" data-route="settings">
-            <svg class="app-nav__icon" viewBox="0 0 24 24">
+            <svg class="app-nav__icon" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
             </svg>
-            <span>Configuracion</span>
+            <span>Ajustes</span>
           </a>
+          <button type="button" class="app-nav__link app-nav__link--logout" id="btn-logout">
+            <svg class="app-nav__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+            </svg>
+            <span>Cerrar sesion</span>
+          </button>
         </nav>
         <div class="app-nav__footer">
           Alebrijes Teotihuacan &copy; 2026
@@ -101,13 +114,17 @@
     </div>
   </div>
 
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/notifications.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
   <script src="/js/config.js"></script>
   <script src="/js/supabase-client.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/auth.js"></script>
   <script src="/js/router.js"></script>
+  <script src="/js/views/dashboard.js"></script>
   <script src="/js/views/conversations.js"></script>
+  <script src="/js/views/notifications.js"></script>
   <script src="/js/views/kpis.js"></script>
   <script src="/js/views/catalog.js"></script>
   <script src="/js/views/settings.js"></script>
@@ -143,12 +160,25 @@
         }
       });
 
-      // Logout
-      document.getElementById('logout-btn').addEventListener('click', () => {
-        if (confirm('Cerrar sesion?')) {
-          window.auth.logout();
-        }
-      });
+      // Logout button in user menu (legacy)
+      const legacyLogout = document.getElementById('logout-btn');
+      if (legacyLogout) {
+        legacyLogout.addEventListener('click', () => {
+          if (confirm('Cerrar sesion?')) {
+            window.auth.logout();
+          }
+        });
+      }
+
+      // Logout button in sidebar
+      const sidebarLogout = document.getElementById('btn-logout');
+      if (sidebarLogout) {
+        sidebarLogout.addEventListener('click', () => {
+          if (confirm('Cerrar sesion?')) {
+            window.auth.logout();
+          }
+        });
+      }
 
       // Settings menu link (close menu after click)
       document.querySelectorAll('.user-menu__item[data-route]').forEach(item => {
@@ -158,13 +188,15 @@
       });
 
       // Register routes
+      window.router.register('dashboard', window.dashboardView.render);
       window.router.register('conversations', window.conversationsView.render);
+      window.router.register('notifications', window.notificationsView.render);
       window.router.register('kpis', window.kpisView.render);
       window.router.register('catalog', window.catalogView.render);
       window.router.register('settings', window.settingsView.render);
 
-      // Init
-      window.router.init('conversations');
+      // Init en Dashboard
+      window.router.init('dashboard');
     })();
   </script>
 </body>

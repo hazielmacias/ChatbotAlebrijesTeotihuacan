@@ -167,7 +167,29 @@
 
     async deleteCatalogItem(id) {
       return request('DELETE', '/api/catalog/delete', { id });
-    }
+    },
+
+    // Dashboard stats
+    async getDashboardStats() {
+      return request('GET', '/api/stats/dashboard');
+    },
+
+    // Notifications
+    async getNotifications() {
+      return request('GET', '/api/notifications');
+    },
+
+    // Templates
+    async getTemplates() {
+      return request('GET', '/api/templates');
+    },
+
+    async saveTemplate(data) {
+      return request('POST', '/api/templates', data);
+    },
+
+    // Generic request (exposed for custom endpoints)
+    request
   };
 
   window.api = api;

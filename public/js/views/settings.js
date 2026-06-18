@@ -1,6 +1,12 @@
 (function() {
   'use strict';
 
+  let state = {
+    templates: [],
+    loading: false,
+    editing: null
+  };
+
   function escapeHtml(text) {
     if (text == null) return '';
     const div = document.createElement('div');
@@ -9,105 +15,182 @@
   }
 
   async function render(container) {
-    const user = window.auth.getUser();
-    const name = window.auth.getUserDisplayName();
-    const email = window.auth.getUserEmail();
-
     container.innerHTML = `
       <div class="app-view">
         <div class="view-header">
           <div>
-            <h1 class="view-header__title">Configuracion</h1>
-            <p class="view-header__subtitle">Informacion de tu cuenta</p>
+            <h1 class="view-header__title">Ajustes</h1>
+            <p class="view-header__subtitle">Edita las plantillas de mensajes del bot</p>
+          </div>
+        </div>
+        <div class="loading-overlay"><div class="spinner spinner--lg"></div></div>
+      </div>
+    `;
+
+    state.loading = true;
+    const result = await window.api.getTemplates();
+    state.loading = false;
+
+    if (!result.ok) {
+      container.innerHTML = `
+        <div class="app-view">
+          <div class="empty-state">
+            <h3 class="empty-state__title">Error al cargar plantillas</h3>
+            <p class="empty-state__message">${escapeHtml(result.error || 'desconocido')}</p>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    state.templates = result.data.templates || [];
+    paint(container);
+  }
+
+  function paint(container) {
+    container.innerHTML = `
+      <div class="app-view">
+        <div class="view-header">
+          <div>
+            <h1 class="view-header__title">Ajustes</h1>
+            <p class="view-header__subtitle">Edita las plantillas de mensajes del bot</p>
           </div>
         </div>
 
-        <div style="max-width: 640px;">
-          <div class="card" style="margin-bottom: var(--space-6);">
-            <div class="card__header">
-              <div>
-                <h2 class="card__title">Perfil</h2>
-                <p class="card__subtitle">Datos de tu cuenta en el dashboard</p>
-              </div>
-            </div>
+        <div class="settings-grid">
+          <aside class="settings-sidebar">
+            <h3 class="settings-sidebar__title">Plantillas</h3>
+            <ul class="settings-list">
+              ${state.templates.map(t => `
+                <li class="settings-list__item ${state.editing && state.editing.key === t.key ? 'settings-list__item--active' : ''}" data-key="${escapeHtml(t.key)}">
+                  <div class="settings-list__name">${escapeHtml(formatKey(t.key))}</div>
+                  <div class="settings-list__desc">${escapeHtml(t.description || '')}</div>
+                  ${t.is_default ? '<span class="settings-list__badge">default</span>' : ''}
+                </li>
+              `).join('')}
+            </ul>
+          </aside>
 
-            <div style="display: flex; align-items: center; gap: var(--space-5); margin-bottom: var(--space-6); padding: var(--space-5); background: var(--color-bg-elevated); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
-              <div class="wa-avatar wa-avatar--primary" style="width:64px; height:64px; font-size: var(--fs-2xl);">${escapeHtml(window.auth.getUserInitials())}</div>
-              <div>
-                <div style="font-family: var(--font-display); font-size: var(--fs-xl); font-weight: var(--fw-semibold);">${escapeHtml(name)}</div>
-                <div style="font-size: var(--fs-sm); color: var(--color-text-muted); margin-top: var(--space-1);">${escapeHtml(email)}</div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Nombre mostrado</label>
-              <div class="form-input" style="background: var(--color-bg-elevated); cursor: not-allowed;">${escapeHtml(name)}</div>
-              <p class="form-help">Para cambiar el nombre mostrado, contacta al administrador del sistema.</p>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Correo electronico</label>
-              <div class="form-input" style="background: var(--color-bg-elevated); cursor: not-allowed; font-family: monospace;">${escapeHtml(email)}</div>
-              <p class="form-help">El correo electronico es tu identificador unico de inicio de sesion.</p>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">ID de usuario</label>
-              <div class="form-input" style="background: var(--color-bg-elevated); cursor: not-allowed; font-family: monospace; font-size: var(--fs-xs);">${escapeHtml(user?.id || '-')}</div>
-            </div>
-          </div>
-
-          <div class="card" style="margin-bottom: var(--space-6);">
-            <div class="card__header">
-              <div>
-                <h2 class="card__title">Sesion</h2>
-                <p class="card__subtitle">Cerrar sesion en este dispositivo</p>
-              </div>
-            </div>
-            <p style="color: var(--color-text-muted); font-size: var(--fs-sm); margin-bottom: var(--space-4);">
-              Al cerrar sesion, seras redirigido a la pantalla de inicio de sesion. Tus credenciales no se eliminan.
-            </p>
-            <button class="btn btn--danger" id="btn-logout">
-              <svg class="btn__icon" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-              Cerrar sesion
-            </button>
-          </div>
-
-          <div class="card">
-            <div class="card__header">
-              <div>
-                <h2 class="card__title">Sistema</h2>
-                <p class="card__subtitle">Informacion tecnica del dashboard</p>
-              </div>
-            </div>
-            <div style="display: grid; gap: var(--space-3);">
-              <div style="display: flex; justify-content: space-between; padding: var(--space-3) 0; border-bottom: 1px solid var(--color-border);">
-                <span style="color: var(--color-text-muted); font-size: var(--fs-sm);">Version del dashboard</span>
-                <span style="font-family: monospace; font-size: var(--fs-sm);">1.0.0</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: var(--space-3) 0; border-bottom: 1px solid var(--color-border);">
-                <span style="color: var(--color-text-muted); font-size: var(--fs-sm);">Backend</span>
-                <span style="font-family: monospace; font-size: var(--fs-sm);">alebrijes-chatbot.vercel.app</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: var(--space-3) 0; border-bottom: 1px solid var(--color-border);">
-                <span style="color: var(--color-text-muted); font-size: var(--fs-sm);">Usuario actual</span>
-                <span style="font-family: monospace; font-size: var(--fs-sm);">${escapeHtml(email)}</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: var(--space-3) 0;">
-                <span style="color: var(--color-text-muted); font-size: var(--fs-sm);">Navegador</span>
-                <span style="font-family: monospace; font-size: var(--fs-sm);">${escapeHtml((navigator.userAgent || '').split(' ').slice(-1)[0] || '-')}</span>
-              </div>
+          <div class="settings-content" id="settings-content">
+            <div class="empty-state" style="padding: var(--space-8);">
+              <p class="empty-state__message">Selecciona una plantilla para editar</p>
             </div>
           </div>
         </div>
       </div>
     `;
 
-    document.getElementById('btn-logout').addEventListener('click', () => {
-      if (confirm('Cerrar sesion en este dispositivo?')) {
-        window.auth.logout();
+    container.querySelectorAll('.settings-list__item').forEach(li => {
+      li.addEventListener('click', () => {
+        const key = li.dataset.key;
+        const tpl = state.templates.find(t => t.key === key);
+        if (tpl) {
+          state.editing = { ...tpl };
+          paint(container);
+          renderEditor(container);
+        }
+      });
+    });
+
+    if (state.editing) {
+      renderEditor(container);
+    }
+  }
+
+  function renderEditor(container) {
+    const content = container.querySelector('#settings-content');
+    if (!content || !state.editing) return;
+
+    const t = state.editing;
+    const vars = (t.variables || []).map(v => `<code>${escapeHtml(v)}</code>`).join(', ');
+
+    content.innerHTML = `
+      <div class="template-editor">
+        <div class="template-editor__head">
+          <div>
+            <h3 class="template-editor__title">${escapeHtml(formatKey(t.key))}</h3>
+            <p class="template-editor__desc">${escapeHtml(t.description || '')}</p>
+          </div>
+          <div class="template-editor__actions">
+            <button class="btn btn--secondary btn--sm" id="btn-revert">Revertir</button>
+            <button class="btn btn--primary btn--sm" id="btn-save">Guardar cambios</button>
+          </div>
+        </div>
+
+        <div class="template-editor__vars">
+          <strong>Variables:</strong> ${vars || '<em>ninguna</em>'}
+        </div>
+
+        <textarea id="template-content" class="template-editor__textarea" rows="14" spellcheck="false">${escapeHtml(t.content)}</textarea>
+
+        <div class="template-editor__preview" id="template-preview">
+          <div class="template-editor__preview-label">Vista previa (como lo ve el contacto)</div>
+          <div class="template-editor__preview-bubble" id="template-preview-bubble"></div>
+        </div>
+      </div>
+    `;
+
+    const textarea = content.querySelector('#template-content');
+    const preview = content.querySelector('#template-preview-bubble');
+
+    function updatePreview() {
+      let text = textarea.value;
+      // Reemplazar variables con valores de ejemplo
+      text = text.replace(/\{\{(\w+)\}\}/g, (m, name) => {
+        const samples = {
+          name: 'Juan Pérez',
+          category: 'escuela',
+          phone: '+52 55 1234 5678',
+          date: '15 de junio'
+        };
+        return samples[name] || m;
+      });
+      preview.innerHTML = text.replace(/\n/g, '<br>').replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+    }
+    updatePreview();
+    textarea.addEventListener('input', updatePreview);
+
+    content.querySelector('#btn-revert').addEventListener('click', () => {
+      const original = state.templates.find(t => t.key === t.key);
+      if (original) {
+        state.editing.content = original.content;
+        renderEditor(container);
       }
     });
+
+    content.querySelector('#btn-save').addEventListener('click', async () => {
+      const saveBtn = content.querySelector('#btn-save');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Guardando...';
+
+      const result = await window.api.saveTemplate({
+        key: t.key,
+        description: t.description,
+        content: textarea.value,
+        variables: t.variables || []
+      });
+
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Guardar cambios';
+
+      if (!result.ok) {
+        window.toast.error('Error: ' + (result.error || 'desconocido'));
+        return;
+      }
+
+      // Actualizar el template en state
+      const idx = state.templates.findIndex(x => x.key === t.key);
+      if (idx >= 0) {
+        state.templates[idx] = result.data.template;
+        state.editing = { ...result.data.template };
+      }
+      window.toast.success('Plantilla guardada');
+      paint(container);
+    });
+  }
+
+  function formatKey(key) {
+    return key.split('.').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' / ');
   }
 
   window.settingsView = { render };

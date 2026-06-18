@@ -892,8 +892,41 @@
     state.messages = [];
   }
 
+  function selectById(id) {
+    if (!id) return;
+    const conv = state.conversations.find(c => c.id === id);
+    if (!conv) {
+      // Si no esta en cache, cargar y luego seleccionar
+      window.api.listConversations({ limit: 100 }).then(r => {
+        if (r.ok) {
+          state.conversations = r.data.conversations || [];
+          applyFilters();
+          doSelect(id);
+        }
+      });
+    } else {
+      doSelect(id);
+    }
+  }
+
+  function doSelect(id) {
+    // Si la vista aun no esta renderizada, esperar
+    if (!document.getElementById('wa-app')) {
+      const checkInterval = setInterval(() => {
+        if (document.getElementById('wa-app')) {
+          clearInterval(checkInterval);
+          doSelect(id);
+        }
+      }, 100);
+      setTimeout(() => clearInterval(checkInterval), 3000);
+      return;
+    }
+    selectConversation(id);
+  }
+
   window.conversationsView = {
     render: renderShell,
-    cleanup
+    cleanup,
+    selectById
   };
 })();
