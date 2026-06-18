@@ -411,8 +411,14 @@
 
       ${!isBot ? `
         <div class="wa-chat-banner">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-          Control manual: el bot no respondera hasta que se reactive.
+          <span class="wa-chat-banner__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="4" y="7" width="16" height="11" rx="2.5"/>
+              <path d="M12 2v3M8 14h.01M16 14h.01M9 18l-1 2M15 18l1 2"/>
+              <line x1="3" y1="3" x2="21" y2="21"/>
+            </svg>
+          </span>
+          <span class="wa-chat-banner__text">El Bot no respondera hasta que se reactive.</span>
         </div>
       ` : ''}
 
@@ -759,8 +765,14 @@
     const banner = document.createElement('div');
     banner.className = 'wa-chat-banner';
     banner.innerHTML = `
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-      Control manual: el bot no respondera hasta que se reactive.
+      <span class="wa-chat-banner__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="4" y="7" width="16" height="11" rx="2.5"/>
+          <path d="M12 2v3M8 14h.01M16 14h.01M9 18l-1 2M15 18l1 2"/>
+          <line x1="3" y1="3" x2="21" y2="21"/>
+        </svg>
+      </span>
+      <span class="wa-chat-banner__text">El Bot no respondera hasta que se reactive.</span>
     `;
     header.insertAdjacentElement('afterend', banner);
   }
