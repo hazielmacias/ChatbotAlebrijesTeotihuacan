@@ -356,7 +356,6 @@
             <svg viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
           </button>
           <label class="wa-chat-bot-control ${isBot ? 'wa-chat-bot-control--on' : 'wa-chat-bot-control--off'}" id="bot-control-wrap" title="Click para ${isBot ? 'desactivar el bot y responder manualmente' : 'reactivar el bot'}">
-            <span class="wa-chat-bot-control__label" id="bot-control-label">${isBot ? 'Bot activo' : 'Control manual'}</span>
             <span class="wa-switch">
               <input type="checkbox" class="wa-switch__input" id="btn-toggle-bot" data-id="${conv.id}" ${isBot ? 'checked' : ''} aria-label="${isBot ? 'Desactivar bot' : 'Activar bot'}">
               <span class="wa-switch__slider"></span>
@@ -641,12 +640,16 @@
     const newVal = !previousVal;
 
     updateToggleVisuals(conversationId, newVal);
+    updateChatInputForBot(newVal);
+    updateManualBanner(newVal);
     conv.bot_active = newVal;
 
     const result = await window.api.toggleBot(conversationId, newVal);
 
     if (!result.ok) {
       updateToggleVisuals(conversationId, previousVal);
+      updateChatInputForBot(previousVal);
+      updateManualBanner(previousVal);
       conv.bot_active = previousVal;
       window.toast.error('Error al cambiar el bot: ' + (result.error || 'desconocido'));
       return;
@@ -663,12 +666,10 @@
     }
 
     applyFilters();
-    renderChatPanel();
   }
 
   function updateToggleVisuals(conversationId, isBot) {
     const wrap = document.getElementById('bot-control-wrap');
-    const label = document.getElementById('bot-control-label');
     const checkbox = document.getElementById('btn-toggle-bot');
     if (wrap) {
       wrap.classList.toggle('wa-chat-bot-control--on', isBot);
@@ -677,13 +678,46 @@
         ? 'Click para desactivar el bot y responder manualmente'
         : 'Click para reactivar el bot';
     }
-    if (label) {
-      label.textContent = isBot ? 'Bot activo' : 'Control manual';
-    }
     if (checkbox) {
       checkbox.checked = isBot;
       checkbox.setAttribute('aria-label', isBot ? 'Desactivar bot' : 'Activar bot');
     }
+  }
+
+  function updateChatInputForBot(isBot) {
+    const inputWrap = document.getElementById('wa-chat-input');
+    const inputField = document.getElementById('msg-input');
+    const sendBtn = document.getElementById('msg-send');
+    if (inputWrap) {
+      inputWrap.classList.toggle('wa-chat-input--disabled', isBot);
+    }
+    if (inputField) {
+      inputField.disabled = isBot;
+      inputField.placeholder = isBot ? 'Activa el bot para enviar mensajes' : 'Escribe un mensaje';
+    }
+    if (sendBtn) {
+      sendBtn.disabled = isBot;
+    }
+  }
+
+  function updateManualBanner(isBot) {
+    const panel = document.getElementById('wa-chat-panel');
+    if (!panel) return;
+    const existing = panel.querySelector('.wa-chat-banner');
+    if (isBot) {
+      if (existing) existing.remove();
+      return;
+    }
+    if (existing) return;
+    const header = panel.querySelector('.wa-chat-header');
+    if (!header) return;
+    const banner = document.createElement('div');
+    banner.className = 'wa-chat-banner';
+    banner.innerHTML = `
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+      Control manual: el bot no respondera hasta que se reactive.
+    `;
+    header.insertAdjacentElement('afterend', banner);
   }
 
   async function archiveCurrentConversation() {
