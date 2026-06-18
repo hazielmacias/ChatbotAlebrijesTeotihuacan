@@ -93,6 +93,31 @@
     });
   }
 
+  function showBotTyping() {
+    const body = document.getElementById('wa-chat-body');
+    if (!body) return;
+    if (document.getElementById('wa-typing-indicator')) return;
+    const el = document.createElement('div');
+    el.id = 'wa-typing-indicator';
+    el.className = 'wa-typing';
+    el.setAttribute('aria-live', 'polite');
+    el.innerHTML = `
+      <span class="wa-typing__label">Bot esta escribiendo</span>
+      <div class="wa-typing__dots">
+        <span class="wa-typing__dot"></span>
+        <span class="wa-typing__dot"></span>
+        <span class="wa-typing__dot"></span>
+      </div>
+    `;
+    body.appendChild(el);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function hideBotTyping() {
+    const el = document.getElementById('wa-typing-indicator');
+    if (el) el.remove();
+  }
+
   function escapeHtml(text) {
     if (text == null) return '';
     const div = document.createElement('div');
@@ -387,6 +412,33 @@
         }
       });
       inputField.addEventListener('input', autoResize);
+
+      let userTypingTimer = null;
+      const userTypingEl = document.createElement('div');
+      userTypingEl.className = 'wa-typing wa-typing--self';
+      userTypingEl.style.display = 'none';
+      userTypingEl.innerHTML = `
+        <div class="wa-typing__dots">
+          <span class="wa-typing__dot"></span>
+          <span class="wa-typing__dot"></span>
+          <span class="wa-typing__dot"></span>
+        </div>
+        <span class="wa-typing__label">Escribiendo...</span>
+      `;
+      const header = panel.querySelector('.wa-chat-header__status');
+      if (header) header.appendChild(userTypingEl);
+
+      inputField.addEventListener('input', () => {
+        if (inputField.value.trim().length > 0) {
+          userTypingEl.style.display = 'inline-flex';
+        } else {
+          userTypingEl.style.display = 'none';
+        }
+        if (userTypingTimer) clearTimeout(userTypingTimer);
+        userTypingTimer = setTimeout(() => {
+          userTypingEl.style.display = 'none';
+        }, 2000);
+      });
     }
   }
 
@@ -791,16 +843,31 @@
 
     try {
       messagesChannel = window.supabaseClient.subscribeToMessages(state.activeId, (newMsg) => {
-        // Evitar duplicados si llega por polling y realtime
         const exists = state.messages.find(m => m.id === newMsg.id);
-        if (!exists) {
-          state.messages.push(newMsg);
-          renderMessages();
-          // Auto-scroll al fondo
-          const body = document.getElementById('wa-chat-body');
-          if (body) body.scrollTop = body.scrollHeight;
+        if (exists) return;
+
+        if (newMsg.direction === 'inbound' && state.activeConv && state.activeConv.bot_active) {
+          showBotTyping();
+        }
+
+        state.messages.push(newMsg);
+        renderMessages();
+        const body = document.getElementById('wa-chat-body');
+        if (body) body.scrollTop = body.scrollHeight;
+
+        if (newMsg.direction === 'outbound' && newMsg.sent_by === 'bot') {
+          hideBotTyping();
         }
       });
+
+      // Safety: si el bot no responde en 30s, ocultar el typing
+      setTimeout(() => {
+        if (!document.getElementById('wa-typing-indicator')) return;
+        const lastMsg = state.messages[state.messages.length - 1];
+        if (lastMsg && lastMsg.direction === 'inbound') {
+          hideBotTyping();
+        }
+      }, 30000);
     } catch (e) {
       console.error('[conversations] Error subscribiendo a messages:', e);
     }

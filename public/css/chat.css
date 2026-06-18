@@ -58,6 +58,27 @@
   gap: var(--space-1);
 }
 
+.wa-chat-header__status .wa-typing--self {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  align-self: auto;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--fs-xs);
+}
+
+.wa-chat-header__status .wa-typing--self .wa-typing__dot {
+  background: rgba(255, 255, 255, 0.7);
+  width: 4px;
+  height: 4px;
+}
+
+.wa-chat-header__status .wa-typing--self .wa-typing__label {
+  font-style: italic;
+  opacity: 0.85;
+}
+
 .wa-chat-header__actions {
   display: flex;
   align-items: center;

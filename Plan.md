@@ -585,57 +585,25 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 5.3 Webhook en Meta
 
-- [x] **5.3.1** Configuración en Meta Developer Console → WhatsApp → Configuration:
-  - **Callback URL**: `https://alebrijes-chatbot.vercel.app/api/webhook`
-  - **Verify Token**: `AlebrijesTeotihuacan2026` (mismo valor que `META_VERIFY_TOKEN` en Vercel)
-- [x] **5.3.2** Suscripción a eventos: `messages` (campo `field: messages` en el payload de Meta)
-  - El handler acepta `payload.object === 'whatsapp_business_account'` y procesa tipos `text` + `interactive`
-- [x] **5.3.3** Verificación del webhook pasa el handshake de Meta — `scripts/test-webhook-verification.js`:
-  ```
-  1. GET ?hub.mode=subscribe&hub.verify_token=WRONG  -> 403 (rechaza token incorrecto)
-  2. GET ?hub.verify_token=<correcto> (sin mode)    -> 403 (rechaza sin mode)
-  3. GET ?hub.mode=subscribe&hub.verify_token=<OK>&hub.challenge=test -> 200 + body="test"
-  4. POST /api/webhook sin firma X-Hub-Signature-256  -> 401 (firma HMAC requerida)
-  ```
-  Todos los tests pasan → el webhook está listo para que Meta lo verifique.
-
-  **Seguridad del webhook** (`api/webhook.js`):
-  - GET: handshake con `hub.mode=subscribe` + comparación de `hub.verify_token` con `META_VERIFY_TOKEN`
-  - POST: validación de firma HMAC-SHA256 con `META_APP_SECRET` usando `crypto.timingSafeEqual` (anti timing-attack)
-  - Tipos procesados: `text`, `interactive` (botones/listas)
-  - Otros tipos (`image`, `document`, `location`, etc.) se aceptan pero se descartan con `status: skipped`
+- [1] **5.3.1** En Meta Developer Console → WhatsApp → Configuration:
+  - Callback URL: `https://tu-app.vercel.app/api/webhook`
+  - Verify Token: mismo valor que `META_VERIFY_TOKEN` en .env
+- [1] **5.3.2** Suscribirse a eventos del webhook: `messages`
+- [1] **5.3.3** Verificar que el webhook pasa la verificación de Meta (GET request)
 
 ### 5.4 Testing end-to-end
 
-- [x] **5.4.1** Enviar mensaje de prueba al número de WhatsApp Business
-- [x] **5.4.2** Verificar que el webhook recibe el mensaje y guarda en Supabase
-- [x] **5.4.3** Verificar que el bot responde con el menú principal
-- [x] **5.4.4** Navegar por todas las opciones del bot (planes, FAQ, hablar con persona)
-- [x] **5.4.5** Abrir el dashboard y verificar que la conversación aparece en la lista
-- [x] **5.4.6** Abrir el chat y verificar que los mensajes se ven como en WhatsApp Web
-- [x] **5.4.7** Enviar un mensaje manual desde el dashboard y verificar que llega al WhatsApp
-- [x] **5.4.8** Apagar el bot en una conversación y verificar que no responde automáticamente
-- [x] **5.4.9** Encender el bot y verificar que envía mensaje de reactivación
-- [x] **5.4.10** Verificar que los KPIs se actualizan en el dashboard en tiempo real
-- [x] **5.4.11** Crear un plan desde el dashboard y verificar que aparece (en el dashboard)
-
-> **Nota sobre 5.4.11**: El bot usa planes hardcoded en `escuela.json`/`tdp.json`/`piloto.json` ($0 inscripcion + $550 MXN escuela, etc.). El catálogo es una entidad separada gestionada desde el dashboard. La integración catálogo↔bot (resolver dinámico `catalog_planes`) se intentó pero Vercel tuvo problemas de cache de bundle al desplegar nuevos archivos `api/*` (incluso con `builds` quitado y `fs.readFileSync` runtime). Se documentó y revirtió: el bot mantiene su contenido de planes por categoría, y el catálogo es solo para dashboard.
-
-**Suite E2E**: `scripts/test-e2e-flow.js` — 19/19 tests OK:
-- Login dashboard ✓
-- Webhook recibe y procesa mensaje (firma HMAC válida) ✓
-- Contacto + conversación creados automáticamente ✓
-- Bot responde con menú principal ✓
-- Bot navega por opciones (planes, FAQ, persona) ✓
-- Conversación aparece en lista del dashboard ✓
-- Chat muestra 8 mensajes con metadata (autor, timestamp) ✓
-- Mensaje manual desde dashboard llega a WhatsApp real ✓
-- Metadata guarda `sent_by_user_name` (solo dashboard) ✓
-- Bot desactivado no responde a nuevos mensajes ✓
-- Bot reactivado envía `reactivation_sent: true` ✓
-- KPIs en tiempo real (totals, today, direction, 7d chart) ✓
-- Plan creado aparece en lista del dashboard ✓
-- Plan se desactiva correctamente (soft delete) ✓
+- [1] **5.4.1** Enviar mensaje de prueba al número de WhatsApp Business
+- [1] **5.4.2** Verificar que el webhook recibe el mensaje y guarda en Supabase
+- [1] **5.4.3** Verificar que el bot responde con el menú principal
+- [1] **5.4.4** Navegar por todas las opciones del bot (planes, FAQ, hablar con persona)
+- [1] **5.4.5** Abrir el dashboard y verificar que la conversación aparece en la lista
+- [1] **5.4.6** Abrir el chat y verificar que los mensajes se ven como en WhatsApp Web
+- [1] **5.4.7** Enviar un mensaje manual desde el dashboard y verificar que llega al WhatsApp
+- [1] **5.4.8** Apagar el bot en una conversación y verificar que no responde automáticamente
+- [1] **5.4.9** Encender el bot y verificar que envía mensaje de reactivación
+- [1] **5.4.10** Verificar que los KPIs se actualizan en el dashboard en tiempo real
+- [1] **5.4.11** Crear un plan desde el dashboard y verificar que aparece en el bot
 
 ---
 
