@@ -538,7 +538,9 @@ async function processIncomingMessage(messageData) {
   }
 
   const options = currentStep.options || {};
+  console.log(`[bot-engine:LOOKUP] input="${userInput}" lower="${userInputLower}" currentStep.options keys:`, Object.keys(options));
   const selectedOption = options[userInput] || options[userInputLower];
+  console.log(`[bot-engine:LOOKUP] selectedOption:`, selectedOption ? 'FOUND' : 'NOT FOUND');
 
   if (selectedOption) {
     let nextFlowData = flowData;
