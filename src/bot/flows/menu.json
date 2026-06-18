@@ -4,7 +4,7 @@
   "description": "Punto de entrada. Muestra saludo y categorias disponibles.",
   "steps": {
     "start": {
-      "message": "¡Hola! Gracias por tu interés en *Alebrijes Teotihuacán* ⚽🔥. El inicio de tu carrera profesional comienza aquí.\n\nPara brindarte la información correcta y generar tu *Pase de Prueba de 1 Semana SIN COSTO*, por favor selecciona la categoría que te interesa escribiendo el número:\n\n1️⃣ Centro de Iniciación Deportiva (Escuela) - Niños de 6 a 11 años\n2️⃣ Fuerzas Básicas y Tercera División Profesional (Liga TDP) - Jóvenes de 12 a 18 años\n3️⃣ Equipo Piloto Liga de Expansión MX - Jóvenes nacidos entre 2002 y 2004\n4️⃣ Preguntas frecuentes\n\n_Responde con el número de la opción._",
+      "message": "¡Hola! Gracias por tu interés en *Alebrijes Teotihuacán* ⚽🔥. El inicio de tu carrera profesional comienza aquí.\n\nPor favor selecciona la categoría que te interesa escribiendo el número:\n\n1️⃣ Centro de Iniciación Deportiva (Escuela) - Niños de 6 a 11 años\n2️⃣ Fuerzas Básicas y Tercera División Profesional (Liga TDP) - Jóvenes de 12 a 18 años\n3️⃣ Equipo Piloto Liga de Expansión MX - Jóvenes nacidos entre 2002 y 2004\n4️⃣ Preguntas frecuentes\n\n_Responde con el número de la opción._",
       "options": {
         "1": { "next_flow": "escuela", "next_step": "info" },
         "2": { "next_flow": "tdp", "next_step": "info", "flow_data_update": { "category": "tdp" } },
