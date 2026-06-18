@@ -11,6 +11,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/styles.css">
   <style>
     * { box-sizing: border-box; }
 
@@ -203,27 +204,76 @@
       margin: 0;
     }
 
+    /* === Form fields (Apple-style) === */
+    .login-card .form-group {
+      margin-bottom: 20px;
+    }
+
+    .login-card .form-label {
+      font-size: 13px;
+      font-weight: var(--fw-bold);
+      color: var(--color-text);
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .login-card .form-label__required {
+      color: var(--color-primary);
+      margin-left: 2px;
+    }
+
+    .login-card .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: var(--fw-medium);
+      color: var(--color-text);
+      background: var(--color-bg-elevated);
+      border: 1.5px solid transparent;
+      border-radius: 12px;
+      transition: background 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+      letter-spacing: -0.01em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .login-card .form-input::placeholder {
+      color: var(--color-text-dim);
+      font-weight: var(--fw-medium);
+    }
+
+    .login-card .form-input:hover {
+      background: var(--color-bg-card);
+      border-color: var(--color-border);
+    }
+
+    .login-card .form-input:focus {
+      outline: none;
+      background: var(--color-bg-card);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px rgba(255, 94, 0, 0.12);
+    }
+
     .password-input-wrap {
       position: relative;
     }
 
     .password-input-wrap .form-input {
-      padding-right: 44px;
+      padding-right: 48px;
     }
 
     .password-toggle {
       position: absolute;
-      right: 4px;
+      right: 6px;
       top: 50%;
       transform: translateY(-50%);
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: transparent;
       border: none;
-      border-radius: var(--radius-md);
+      border-radius: 8px;
       color: var(--color-text-dim);
       cursor: pointer;
       padding: 0;
@@ -233,6 +283,11 @@
     .password-toggle:hover {
       color: var(--color-text);
       background: var(--color-bg-hover);
+    }
+
+    .password-toggle:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 1px;
     }
 
     .password-toggle svg {
@@ -248,23 +303,59 @@
     .password-toggle[data-state="hidden"] .eye-on { display: block; }
     .password-toggle[data-state="visible"] .eye-off { display: block; }
 
+    /* === Forgot link (Apple-style) === */
     .login-form__forgot {
       display: block;
       text-align: right;
-      font-size: var(--fs-sm);
+      font-size: 13px;
       color: var(--color-primary);
-      margin-top: var(--space-2);
+      margin-top: 8px;
       text-decoration: none;
       font-weight: var(--fw-semibold);
       letter-spacing: -0.005em;
+      transition: color 150ms ease;
     }
 
     .login-form__forgot:hover {
       color: var(--color-primary-hover);
     }
 
+    /* === Submit button (gradient) === */
     .login-form__submit {
-      margin-top: var(--space-6);
+      width: 100%;
+      margin-top: 28px;
+      padding: 16px 24px;
+      font-size: 15px;
+      font-weight: var(--fw-bold);
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 150ms ease, box-shadow 200ms ease, filter 150ms ease;
+      box-shadow: 0 4px 14px rgba(255, 94, 0, 0.25);
+    }
+
+    .login-form__submit:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(255, 94, 0, 0.32);
+      filter: brightness(1.05);
+    }
+
+    .login-form__submit:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(255, 94, 0, 0.2);
+    }
+
+    .login-form__submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .login-form__submit:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
     }
 
     .login-error {
@@ -375,7 +466,7 @@
             <a href="#" class="login-form__forgot" id="forgot-link">Olvidé mi contraseña</a>
           </div>
 
-          <button type="submit" class="btn btn--primary btn--lg btn--block login-form__submit" id="login-submit">
+          <button type="submit" class="login-form__submit" id="login-submit">
             Iniciar sesión
           </button>
         </form>
