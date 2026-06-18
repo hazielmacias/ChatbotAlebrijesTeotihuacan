@@ -140,7 +140,7 @@
       }
     }
 
-    const result = await window.api.listArchivedConversations({ limit: 100 });
+    const result = await window.api.listConversations({ archived: true, limit: 100 });
     if (loader) loader.hide();
     if (!result.ok) {
       if (listEl) {
