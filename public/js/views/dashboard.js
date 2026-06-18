@@ -136,7 +136,7 @@
           <div class="stat-tile stat-tile--success">
             <div class="stat-tile__head">
               <svg class="stat-tile__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Pases de Entrenamiento
+              Escalados
             </div>
             <div class="stat-tile__value">${formatNumber(t.passes)}</div>
             <div class="stat-tile__delta">
@@ -147,7 +147,7 @@
           <div class="stat-tile stat-tile--warning">
             <div class="stat-tile__head">
               <svg class="stat-tile__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-              Top palabras
+              Palabras Frecuentes
             </div>
             <div class="keywords-row">
               ${kw.length === 0 ? '<span class="keyword-pill">Sin datos</span>' :

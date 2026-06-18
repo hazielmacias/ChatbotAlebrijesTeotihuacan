@@ -64,7 +64,7 @@
     if (diffDays < 7) {
       return d.toLocaleDateString('es-MX', { weekday: 'short' });
     }
-    return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
   }
 
   function timeFull(date) {
@@ -93,19 +93,16 @@
               </svg>
               Archivados
             </h1>
-            <p class="archived-view__subtitle">Conversaciones que no necesitas ver todos los dias. Puedes restaurarlas cuando quieras.</p>
+            <p class="archived-view__subtitle">Conversaciones que archivaste. Puedes restaurarlas o eliminarlas permanentemente.</p>
           </div>
 
           <div class="archived-view__actions">
-            <div class="wa-search archived-view__search">
-              <div class="wa-search__input-wrap">
-                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                <input type="text" class="wa-search__input" id="archived-search" placeholder="Buscar en archivados" autocomplete="off">
-              </div>
+            <div class="archived-view__search">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <input type="text" id="archived-search" placeholder="Buscar en archivados" autocomplete="off">
             </div>
-            <button class="btn btn--secondary" id="btn-refresh-archived" type="button">
+            <button class="btn btn--secondary" id="btn-refresh-archived" type="button" title="Actualizar">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-              Actualizar
             </button>
           </div>
         </header>
@@ -195,7 +192,7 @@
             <path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/>
           </svg>
           <h3 class="empty-state__title">Sin conversaciones archivadas</h3>
-          <p class="empty-state__message">${state.search ? 'No se encontraron coincidencias.' : 'Cuando archives una conversación aparecerá aquí. Puedes restaurarla en cualquier momento.'}</p>
+          <p class="empty-state__message">${state.search ? 'No se encontraron coincidencias.' : 'Cuando archives una conversación aparecerá aquí. Puedes restaurarla o eliminarla permanentemente.'}</p>
         </div>
       `;
       return;
@@ -218,26 +215,22 @@
               <h3 class="archived-item__name">${escapeHtml(name)}</h3>
               <span class="archived-item__time">${escapeHtml(time)}</span>
             </div>
-            <div class="archived-item__phone">${escapeHtml(phone)}</div>
             <p class="archived-item__preview">${escapeHtml(preview)}</p>
             <div class="archived-item__meta">
-              <span class="archived-item__meta-item">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
-                Archivado: ${escapeHtml(archivedAt)}
-              </span>
-              ${conv.message_count
-                ? `<span class="archived-item__meta-item">${conv.message_count} mensaje${conv.message_count === 1 ? '' : 's'}</span>`
-                : ''}
+              <span>${escapeHtml(phone)}</span>
+              <span>Archivado: ${escapeHtml(archivedAt)}</span>
+              ${conv.message_count ? `<span>${conv.message_count} mensaje${conv.message_count === 1 ? '' : 's'}</span>` : ''}
             </div>
           </div>
           <div class="archived-item__actions">
-            <button class="btn btn--secondary btn--sm" data-action="view" data-id="${conv.id}" type="button">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-              Ver
+            <button class="archived-item__btn archived-item__btn--view" data-action="view" data-id="${conv.id}" type="button" title="Ver conversación" aria-label="Ver conversación">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             </button>
-            <button class="btn btn--primary btn--sm" data-action="restore" data-id="${conv.id}" type="button">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-              Restaurar
+            <button class="archived-item__btn archived-item__btn--restore" data-action="restore" data-id="${conv.id}" type="button" title="Restaurar" aria-label="Restaurar">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            </button>
+            <button class="archived-item__btn archived-item__btn--delete" data-action="delete" data-id="${conv.id}" type="button" title="Borrar permanentemente" aria-label="Borrar permanentemente">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
             </button>
           </div>
         </article>
@@ -249,11 +242,9 @@
         e.stopPropagation();
         const id = btn.dataset.id;
         const action = btn.dataset.action;
-        if (action === 'view') {
-          viewConversation(id);
-        } else if (action === 'restore') {
-          restoreConversation(id);
-        }
+        if (action === 'view') viewConversation(id);
+        else if (action === 'restore') restoreConversation(id);
+        else if (action === 'delete') deleteConversation(id);
       });
     });
   }
@@ -279,7 +270,30 @@
       return;
     }
 
-    window.toast.success('Conversacion restaurada');
+    window.toast.success('Conversación restaurada');
+    state.conversations = state.conversations.filter(c => c.id !== id);
+    renderList();
+  }
+
+  async function deleteConversation(id) {
+    const conv = state.conversations.find(c => c.id === id);
+    const name = conv?.contact?.name || formatPhone(conv?.phone) || 'esta conversación';
+    const ok = await window.modal.confirm({
+      title: 'Borrar permanentemente',
+      message: 'Vas a eliminar la conversación con ' + name + ' de forma permanente.\n\nEsta acción no se puede deshacer y se borrarán también todos los mensajes asociados.',
+      type: 'warning',
+      confirmText: 'Borrar permanentemente',
+      cancelText: 'Cancelar'
+    });
+    if (!ok) return;
+
+    const result = await window.api.deleteConversation(id);
+    if (!result.ok) {
+      window.toast.error('Error al eliminar: ' + (result.error || 'desconocido'));
+      return;
+    }
+
+    window.toast.success('Conversación eliminada permanentemente');
     state.conversations = state.conversations.filter(c => c.id !== id);
     renderList();
   }

@@ -187,12 +187,12 @@
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
-  color: var(--color-text-muted);
-  font-size: var(--fs-base);
-  font-weight: var(--fw-medium);
+  color: var(--color-text);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.01em;
   transition: all var(--transition-fast);
   position: relative;
-  letter-spacing: -0.005em;
 }
 
 .app-nav__link:hover {
@@ -203,7 +203,7 @@
 .app-nav__link--active {
   background: var(--color-primary-soft);
   color: var(--color-primary);
-  font-weight: var(--fw-semibold);
+  font-weight: var(--fw-bold);
 }
 
 .app-nav__link--active::before {
@@ -276,15 +276,18 @@
 .view-header__title {
   font-family: var(--font-display);
   font-size: var(--fs-3xl);
-  font-weight: var(--fw-semibold);
+  font-weight: var(--fw-bold);
   color: var(--color-text);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
 }
 
 .view-header__subtitle {
   margin-top: var(--space-2);
   color: var(--color-text-muted);
-  font-size: var(--fs-base);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  letter-spacing: -0.005em;
 }
 
 .view-header__actions {
@@ -424,14 +427,16 @@
 
 .card__title {
   font-size: var(--fs-md);
-  font-weight: var(--fw-semibold);
+  font-weight: var(--fw-bold);
   color: var(--color-text);
+  letter-spacing: -0.015em;
 }
 
 .card__subtitle {
   font-size: var(--fs-sm);
   color: var(--color-text-muted);
   margin-top: var(--space-1);
+  font-weight: var(--fw-medium);
 }
 
 .stats-grid {
@@ -467,20 +472,20 @@
 
 .stat-card__label {
   font-size: var(--fs-xs);
-  font-weight: var(--fw-medium);
+  font-weight: var(--fw-bold);
   color: var(--color-text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   margin-bottom: var(--space-2);
 }
 
 .stat-card__value {
   font-family: var(--font-display);
   font-size: var(--fs-3xl);
-  font-weight: var(--fw-semibold);
+  font-weight: var(--fw-bold);
   color: var(--color-text);
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 .stat-card__delta {

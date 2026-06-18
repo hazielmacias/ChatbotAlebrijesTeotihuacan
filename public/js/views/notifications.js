@@ -26,6 +26,27 @@
     return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
   }
 
+  function getFlatItems() {
+    const d = state.data;
+    if (!d) return [];
+    const items = [];
+    (d.high_interaction || []).forEach(i => items.push({ ...i, _type: 'high' }));
+    (d.new_conversations || []).forEach(i => items.push({ ...i, _type: 'new' }));
+    (d.escalated || []).forEach(i => items.push({ ...i, _type: 'escalated' }));
+    items.sort((a, b) => {
+      const da = new Date(a.created_at || a.updated_at || 0).getTime();
+      const db = new Date(b.created_at || b.updated_at || 0).getTime();
+      return db - da;
+    });
+    return items;
+  }
+
+  function getFilteredItems() {
+    const all = getFlatItems();
+    if (state.activeTab === 'all') return all;
+    return all.filter(i => i._type === state.activeTab);
+  }
+
   async function render(container) {
     container.innerHTML = `
       <div class="app-view" id="notifications-view">
@@ -75,21 +96,25 @@
           </div>
         </div>
 
-        <div class="notifications-tabs" id="notif-tabs">
+        <div class="notif-tabs" id="notif-tabs">
           <button class="notif-tab ${state.activeTab === 'all' ? 'notif-tab--active' : ''}" data-tab="all">
+            <svg class="notif-tab__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z"/></svg>
             Todas
             ${total > 0 ? `<span class="notif-tab__count">${total}</span>` : ''}
           </button>
           <button class="notif-tab ${state.activeTab === 'high' ? 'notif-tab--active' : ''}" data-tab="high">
-            Alta interaccion
+            <svg class="notif-tab__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
+            Alta actividad
             ${counts.high_interaction > 0 ? `<span class="notif-tab__count">${counts.high_interaction}</span>` : ''}
           </button>
           <button class="notif-tab ${state.activeTab === 'new' ? 'notif-tab--active' : ''}" data-tab="new">
+            <svg class="notif-tab__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             Nuevas
             ${counts.new_conversations > 0 ? `<span class="notif-tab__count">${counts.new_conversations}</span>` : ''}
           </button>
           <button class="notif-tab ${state.activeTab === 'escalated' ? 'notif-tab--active' : ''}" data-tab="escalated">
-            Pases de entrada
+            <svg class="notif-tab__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            Escalados
             ${counts.escalated > 0 ? `<span class="notif-tab__count">${counts.escalated}</span>` : ''}
           </button>
         </div>
@@ -98,7 +123,6 @@
       </div>
     `;
 
-    // Tabs
     container.querySelectorAll('.notif-tab').forEach(btn => {
       btn.addEventListener('click', () => {
         state.activeTab = btn.dataset.tab;
@@ -106,7 +130,6 @@
       });
     });
 
-    // Lista
     renderList(container);
   }
 
@@ -114,61 +137,22 @@
     const list = container.querySelector('#notif-list');
     if (!list) return;
 
-    const d = state.data;
-    const sections = [];
+    const items = getFilteredItems();
 
-    if (state.activeTab === 'all' || state.activeTab === 'high') {
-      sections.push({
-        title: 'Alta interaccion (24h)',
-        icon: 'fire',
-        items: d.high_interaction || [],
-        emptyText: 'Sin chats con alta interaccion'
-      });
-    }
-    if (state.activeTab === 'all' || state.activeTab === 'new') {
-      sections.push({
-        title: 'Nuevas conversaciones (24h)',
-        icon: 'plus',
-        items: d.new_conversations || [],
-        emptyText: 'Sin conversaciones nuevas'
-      });
-    }
-    if (state.activeTab === 'all' || state.activeTab === 'escalated') {
-      sections.push({
-        title: 'Pases de entrada (escalados)',
-        icon: 'check',
-        items: d.escalated || [],
-        emptyText: 'Sin pases de entrada generados'
-      });
-    }
-
-    if (sections.length === 0 || sections.every(s => s.items.length === 0)) {
+    if (items.length === 0) {
       list.innerHTML = `<div class="empty-state"><p class="empty-state__message">No hay notificaciones</p></div>`;
       return;
     }
 
-    list.innerHTML = sections.map(s => `
-      <div class="notif-section">
-        <div class="notif-section__head">
-          <span class="notif-section__icon notif-section__icon--${s.icon}">
-            ${s.icon === 'fire' ? '🔥' : s.icon === 'plus' ? '✨' : '✓'}
-          </span>
-          <h3 class="notif-section__title">${s.title}</h3>
-          <span class="notif-section__count">${s.items.length}</span>
-        </div>
-        ${s.items.length === 0 ? `
-          <div class="notif-section__empty">${s.emptyText}</div>
-        ` : `
-          <div class="notif-section__list">
-            ${s.items.map(item => renderItem(item, s.icon)).join('')}
-          </div>
-        `}
+    list.innerHTML = `
+      <div class="notif-list">
+        ${items.map(item => renderItem(item)).join('')}
       </div>
-    `).join('');
+    `;
 
-    // Click -> ir a la conversacion
     list.querySelectorAll('.notif-item').forEach(el => {
-      el.addEventListener('click', () => {
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('.notif-item__delete')) return;
         const convId = el.dataset.id;
         if (convId) {
           window.location.hash = '#conversations';
@@ -180,19 +164,69 @@
         }
       });
     });
+
+    list.querySelectorAll('.notif-item__delete').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        const name = btn.dataset.name || 'esta conversación';
+        await deleteConversation(id, name, container);
+      });
+    });
   }
 
-  function renderItem(item, type) {
+  async function deleteConversation(id, name, container) {
+    const ok = await window.modal.confirm({
+      title: 'Borrar permanentemente',
+      message: 'Vas a eliminar la conversación con ' + name + ' de forma permanente.\n\nEsta acción no se puede deshacer y se borrarán también todos los mensajes asociados.',
+      type: 'warning',
+      confirmText: 'Borrar permanentemente',
+      cancelText: 'Cancelar'
+    });
+    if (!ok) return;
+
+    const result = await window.api.deleteConversation(id);
+    if (!result.ok) {
+      window.toast.error('Error al eliminar: ' + (result.error || 'desconocido'));
+      return;
+    }
+
+    window.toast.success('Conversación eliminada permanentemente');
+
+    if (state.data) {
+      ['high_interaction', 'new_conversations', 'escalated'].forEach(key => {
+        if (state.data[key]) {
+          state.data[key] = state.data[key].filter(c => c.conversation_id !== id);
+        }
+      });
+      if (state.data.counts) {
+        const c = state.data.counts;
+        const totalBefore = (c.high_interaction || 0) + (c.new_conversations || 0) + (c.escalated || 0);
+        const totalAfter = (state.data.high_interaction || []).length
+                         + (state.data.new_conversations || []).length
+                         + (state.data.escalated || []).length;
+        const diff = Math.max(0, totalBefore - totalAfter);
+        if (diff > 0) {
+          c.high_interaction = (state.data.high_interaction || []).length;
+          c.new_conversations = (state.data.new_conversations || []).length;
+          c.escalated = (state.data.escalated || []).length;
+        }
+      }
+    }
+    paint(container);
+  }
+
+  function renderItem(item) {
     const name = item.contact_name || item.phone || 'Sin nombre';
     const time = formatTimeAgo(item.created_at || item.updated_at);
 
     let badge = '';
-    if (type === 'fire') {
+    if (item._type === 'high') {
       badge = `<span class="notif-item__badge notif-item__badge--fire">${item.message_count_24h} mensajes</span>`;
-    } else if (type === 'plus') {
-      badge = `<span class="notif-item__badge notif-item__badge--new">${item.current_flow || 'inicio'}</span>`;
+    } else if (item._type === 'new') {
+      badge = `<span class="notif-item__badge notif-item__badge--new">${escapeHtml(item.current_flow || 'inicio')}</span>`;
     } else {
-      badge = `<span class="notif-item__badge notif-item__badge--escalated">${item.current_step || item.current_flow}</span>`;
+      badge = `<span class="notif-item__badge notif-item__badge--escalated">${escapeHtml(item.current_step || item.current_flow || '')}</span>`;
     }
 
     return `
@@ -204,6 +238,9 @@
         </div>
         ${badge}
         <span class="notif-item__time">${time}</span>
+        <button class="notif-item__delete" data-id="${item.conversation_id}" data-name="${escapeHtml(name)}" title="Borrar permanentemente" aria-label="Borrar permanentemente">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        </button>
         <svg class="notif-item__chevron" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
           <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
         </svg>

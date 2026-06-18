@@ -130,6 +130,12 @@
       });
     },
 
+    async deleteConversation(conversationId) {
+      return request('POST', '/api/conversations/delete', {
+        conversation_id: conversationId
+      });
+    },
+
     // Messages
     async listMessages(conversationId, params = {}) {
       const query = new URLSearchParams();
