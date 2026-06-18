@@ -426,3 +426,60 @@
 .app-nav__link--logout .app-nav__icon {
   fill: currentColor;
 }
+
+/* === Responsive: Mobile (max-width: 768px) === */
+@media (max-width: 768px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .settings-content {
+    min-height: 0;
+    padding: var(--space-4);
+  }
+
+  .notif-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+  }
+
+  .notif-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .notif-tab {
+    flex-shrink: 0;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--fs-xs);
+  }
+
+  .notif-item {
+    padding: var(--space-3) var(--space-3);
+    gap: var(--space-2);
+  }
+
+  .notif-item__name {
+    font-size: var(--fs-xs);
+  }
+
+  .notif-item__phone {
+    font-size: 10px;
+  }
+
+  .notif-item__badge {
+    display: none;
+  }
+
+  .notif-item:hover .notif-item__delete,
+  .notif-item__delete {
+    opacity: 1;
+  }
+
+  .template-editor__head {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+}

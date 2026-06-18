@@ -34,6 +34,41 @@
       .login-page__brand { display: none; }
     }
 
+    @media (max-width: 480px) {
+      .login-page {
+        padding: 0;
+      }
+
+      .login-page__form-wrap {
+        padding: 32px 20px;
+        align-items: center;
+      }
+
+      .login-card {
+        max-width: 100%;
+        padding: var(--space-5);
+      }
+
+      .login-card__title {
+        font-size: var(--fs-xl);
+      }
+
+      .login-card .form-input {
+        font-size: 16px;
+        min-height: 44px;
+      }
+
+      .login-form__submit {
+        padding: 14px 20px;
+        font-size: 14px;
+        min-height: 44px;
+      }
+
+      .login-form__forgot {
+        font-size: 12px;
+      }
+    }
+
     /* === Tiliche bar (top) === */
     .login-page::before {
       content: '';

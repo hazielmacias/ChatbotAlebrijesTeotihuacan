@@ -595,7 +595,7 @@
 }
 
 .wa-chat-banner__text {
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .wa-chat-image-modal {
@@ -646,4 +646,54 @@
 
 .wa-msg-group .wa-msg:not(:last-child) {
   margin-bottom: 0;
+}
+
+/* === Responsive: Mobile (max-width: 768px) === */
+@media (max-width: 768px) {
+  .wa-chat-header {
+    height: 52px;
+    padding: 0 var(--space-3);
+    gap: var(--space-2);
+  }
+
+  .wa-chat-header__back {
+    display: flex;
+  }
+
+  .wa-chat-body {
+    padding: var(--space-3) var(--space-3) var(--space-3);
+  }
+
+  .wa-msg {
+    max-width: 88%;
+  }
+
+  .wa-msg__bubble {
+    font-size: 14px;
+  }
+
+  .wa-msg__image {
+    max-width: 260px;
+  }
+
+  .wa-chat-input {
+    padding: var(--space-2) var(--space-3);
+    min-height: 56px;
+  }
+
+  .wa-chat-input__field {
+    font-size: 15px;
+  }
+
+  .wa-chat-banner {
+    padding: 10px var(--space-3);
+    font-size: var(--fs-xs);
+    gap: 8px;
+  }
+
+  .wa-chat-bot-control {
+    height: 32px;
+    font-size: 11px;
+    padding: 0 8px;
+  }
 }

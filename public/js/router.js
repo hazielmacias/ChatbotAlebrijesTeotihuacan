@@ -47,12 +47,12 @@
       this.currentRoute = name;
 
       // Update nav active state
-      document.querySelectorAll('.app-nav__link').forEach(link => {
+      document.querySelectorAll('.app-nav__link, .app-bottom-nav__link').forEach(link => {
         const route = link.getAttribute('data-route');
         if (route === name) {
-          link.classList.add('app-nav__link--active');
+          link.classList.add('app-nav__link--active', 'app-bottom-nav__link--active');
         } else {
-          link.classList.remove('app-nav__link--active');
+          link.classList.remove('app-nav__link--active', 'app-bottom-nav__link--active');
         }
       });
 

@@ -98,6 +98,8 @@
   --header-height: 60px;
   --tiliche-bar-height: 4px;
   --sidebar-width: 240px;
+  --sidebar-width-compact: 64px;
+  --bottom-nav-height: 0px;
   --conv-list-width: 360px;
 
   --transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
