@@ -1,17 +1,24 @@
 {
   "flow_key": "cierre",
   "name": "Cierre y Pase de Prueba",
-  "description": "Mensaje final con envío de la imagen del Pase. Los requisitos y contacto ya se mostraron antes del registro.",
+  "description": "Mensaje final con envío de la imagen del Pase y CTA con requisitos y contacto (solo para Escuela, ya que TDP y Piloto los muestran antes del registro).",
   "steps": {
     "success": {
-      "message": "¡Registro exitoso! 🎉\n\nA continuación te envío la imagen de tu *Pase de Semana de Prueba Sin Costo*.\n\nSi tienes alguna duda, recuerda los requisitos y la información de contacto que te compartimos anteriormente. ¡Te esperamos en la cancha! ⚽",
+      "message": "¡Registro exitoso! 🎉\n\nTe generamos tu *Pase de Semana de Prueba Sin Costo*.\n\nA continuación te envío la imagen con tus datos.",
       "send_image": "pase",
+      "auto_advance": true,
+      "next_flow": "cierre",
+      "next_step": "post"
+    },
+    "post": {
+      "message": "{{message}}",
+      "dynamic": "post_registration",
       "auto_advance": true,
       "next_flow": "cierre",
       "next_step": "farewell"
     },
     "farewell": {
-      "message": "📲 Si necesitas más información, escríbenos al *menu* o *0* para volver a las opciones.",
+      "message": "📲 Si necesitas más información, escribe *menu* o *0* para volver a las opciones.",
       "options": {
         "0": { "next_flow": "menu", "next_step": "start" },
         "menu": { "next_flow": "menu", "next_step": "start" }

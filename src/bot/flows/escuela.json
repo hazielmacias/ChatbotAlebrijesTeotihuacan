@@ -14,7 +14,7 @@
       }
     },
     "collect_data": {
-      "message": "Para generar tu *Pase de Semana de Prueba sin costo*, por favor compárteme los siguientes datos en un solo mensaje:\n\n📋 *Nombre completo del jugador:*\n📋 *Edad exacta:*\n📋 *Posición en la que juega:*\n📋 *Nombre del tutor o responsable:*\n\n🚨 *REQUISITOS OBLIGATORIOS PARA TU PRIMER DÍA:*\nPara que te hagamos válido este pase, el día de tu entrenamiento debes presentarte puntualmente en el Centro Recreativo Pascual Boing con:\n\n1️⃣ Esta imagen de tu pase de prueba (en tu celular o impresa).\n2️⃣ Ropa completamente blanca.\n3️⃣ Zapatos de fútbol (tacos).\n4️⃣ Tu propia hidratación.\n\n📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Lic. Areli Janette:* 55 1008 7435\n📌 *Centro de Formación Académica*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽",
+      "message": "Para generar tu *Pase de Semana de Prueba sin costo*, por favor compárteme los siguientes datos en un solo mensaje:\n\n📋 *Nombre completo del jugador:*\n📋 *Edad:*\n📋 *Posición en la que juega:*\n📋 *Nombre del tutor o responsable:*",
       "input_type": "free_text",
       "validation": {
         "type": "age_range",
