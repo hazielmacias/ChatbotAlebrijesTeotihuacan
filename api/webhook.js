@@ -11,9 +11,22 @@ if (process.env.NODE_ENV !== 'production' || !process.env.META_APP_SECRET) {
 
 const metaApi = require('../src/lib/meta-api');
 const { processIncomingMessage } = require('../src/bot/engine');
+const path = require('path');
+const fs = require('fs');
 
 const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN;
 const APP_SECRET = process.env.META_APP_SECRET;
+
+// DEBUG: read menu.json and report options
+try {
+  const menuPath = path.join(__dirname, '..', 'src', 'bot', 'flows', 'menu.json');
+  const menu = JSON.parse(fs.readFileSync(menuPath, 'utf8'));
+  console.log('[webhook:BOOT] menu.start.options:', Object.keys(menu.steps?.start?.options || {}).join(','));
+  console.log('[webhook:BOOT] menu.steps:', Object.keys(menu.steps || {}).join(','));
+  console.log('[webhook:BOOT] menu.start.message has 5:', (menu.steps?.start?.message || '').includes('5️⃣'));
+} catch (e) {
+  console.log('[webhook:BOOT] Error reading menu:', e.message);
+}
 
 console.log('[webhook:BOOT] v=2026-06-17-fix-1 APP_SECRET present:', !!APP_SECRET, '| length:', APP_SECRET?.length, '| first8:', APP_SECRET?.substring(0, 8));
 console.log('[webhook:BOOT] VERIFY_TOKEN present:', !!VERIFY_TOKEN, '| length:', VERIFY_TOKEN?.length);
