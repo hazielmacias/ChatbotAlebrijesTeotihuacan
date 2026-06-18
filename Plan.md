@@ -504,12 +504,14 @@ Chatbot de WhatsApp para la Academia de Fútbol **Alebrijes de Oaxaca Teotihuaca
 
 ### 4.7 Toggle Bot On/Off
 
-- [ ] **4.7.1** En el header del chat, agregar un toggle switch:
-  - Estado ON (verde): "Bot activo" → el bot responde automáticamente
-  - Estado OFF (rojo): "Control manual" → el operador responde manualmente
-  - Al hacer toggle: `POST /api/conversations/:id/toggle-bot` con `{ bot_active: true/false }`
-  - Feedback visual inmediato (cambio de color del badge y el switch)
-  - Confirmación con toast/snackbar
+- [x] **4.7.1** En el header del chat, toggle switch con feedback visual:
+  - Estado ON (verde switch #21c063, label verde oscuro `rgba(7,94,50,0.85)`): "Bot activo" → el bot responde automáticamente
+  - Estado OFF (rojo label `rgba(220,38,38,0.85)`): "Control manual" → el operador responde manualmente
+  - Al hacer toggle: `POST /api/conversations/toggle-bot` con `{ conversation_id, bot_active: true/false }` (refactor a estructura plana por Vercel routing)
+  - Feedback visual inmediato: `updateToggleVisuals()` pinta colores/labels/aria/title antes del await (optimistic UI)
+  - Si API falla: revierte a `previousVal` + toast error
+  - Confirmación con toast: "Bot reactivado - ahora el bot responde" / "Control manual activado - tu respondes al contacto"
+  - Banner rojo aparece bajo header cuando está en control manual
 
 ### 4.8 Catálogo de Planes
 
