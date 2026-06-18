@@ -219,8 +219,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               </span>
             </div>
-            <h2 class="wa-chat-empty__title">Selecciona una conversacion</h2>
-            <p class="wa-chat-empty__message">Elige una conversacion de la lista para ver los mensajes, responder como humano o desactivar el bot.</p>
+            <h2 class="wa-chat-empty__title">Selecciona una conversación</h2>
+            <p class="wa-chat-empty__message">Elige una conversación de la lista para ver los mensajes, responder como humano o desactivar el bot.</p>
             <div class="wa-chat-empty__hint">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
               <span>Tambien puedes buscar con el campo de busqueda</span>
@@ -416,7 +416,7 @@
           <div class="wa-chat-header__status">${escapeHtml(phone)}</div>
         </div>
         <div class="wa-chat-header__actions">
-          <button class="wa-icon-btn wa-chat-header__archive" id="btn-archive-conv" title="Archivar conversacion" aria-label="Archivar conversacion">
+          <button class="wa-icon-btn wa-chat-header__archive" id="btn-archive-conv" title="Archivar conversación" aria-label="Archivar conversación">
             <svg viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
           </button>
           <label class="wa-chat-bot-control ${isBot ? 'wa-chat-bot-control--on' : 'wa-chat-bot-control--off'}" id="bot-control-wrap" title="Click para ${isBot ? 'desactivar el bot y responder manualmente' : 'reactivar el bot'}">
@@ -546,7 +546,7 @@
     if (!body) return;
 
     if (state.messages.length === 0) {
-      body.innerHTML = '<div class="empty-state" style="margin-top:80px"><h3 class="empty-state__title">Sin mensajes</h3><p class="empty-state__message">Aun no hay mensajes en esta conversacion.</p></div>';
+      body.innerHTML = '<div class="empty-state" style="margin-top:80px"><h3 class="empty-state__title">Sin mensajes</h3><p class="empty-state__message">Aún no hay mensajes en esta conversación.</p></div>';
       return;
     }
 
@@ -801,8 +801,8 @@
     const conv = state.activeConv;
     const name = conv.contact?.name || formatPhone(conv.phone) || 'este contacto';
     const ok = await window.modal.confirm({
-      title: 'Archivar conversacion',
-      message: 'Archivar la conversacion con ' + name + '.\nDejara de aparecer en Conversaciones y podras restaurarla desde Archivados.',
+      title: 'Archivar conversación',
+      message: 'Archivar la conversación con ' + name + '.\nDejará de aparecer en Conversaciones y podrás restaurarla desde Archivados.',
       type: 'warning',
       confirmText: 'Archivar'
     });

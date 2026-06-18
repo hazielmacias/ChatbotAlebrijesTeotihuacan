@@ -195,7 +195,7 @@
             <path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/>
           </svg>
           <h3 class="empty-state__title">Sin conversaciones archivadas</h3>
-          <p class="empty-state__message">${state.search ? 'No se encontraron coincidencias.' : 'Cuando archives una conversacion aparecera aqui. Puedes restaurarla en cualquier momento.'}</p>
+          <p class="empty-state__message">${state.search ? 'No se encontraron coincidencias.' : 'Cuando archives una conversación aparecerá aquí. Puedes restaurarla en cualquier momento.'}</p>
         </div>
       `;
       return;
@@ -264,10 +264,10 @@
 
   async function restoreConversation(id) {
     const conv = state.conversations.find(c => c.id === id);
-    const name = conv?.contact?.name || formatPhone(conv?.phone) || 'esta conversacion';
+    const name = conv?.contact?.name || formatPhone(conv?.phone) || 'esta conversación';
     const ok = await window.modal.confirm({
-      title: 'Restaurar conversacion',
-      message: 'Restaurar la conversacion con ' + name + '. Volvera a aparecer en Conversaciones.',
+      title: 'Restaurar conversación',
+      message: 'Restaurar la conversación con ' + name + '. Volverá a aparecer en Conversaciones.',
       type: 'info',
       confirmText: 'Restaurar'
     });
