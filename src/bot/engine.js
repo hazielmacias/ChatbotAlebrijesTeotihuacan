@@ -25,6 +25,10 @@ const CONTACT_INFO = {
   piloto: '👉 *Lic. Athziri Velazquez:* 56 2128 9945\n📌 *Equipo Piloto Liga de Expansión MX*'
 };
 
+const TDP_WARNING_TEXT = '*⚠️ ANTES DE CONTINUAR*\n\n' +
+  'Solicita una semana de pruebas para entrenar y jugar durante este periodo con el equipo de tercera división profesional. Solamente cubres tu seguro contra accidentes y lesiones deportivas. Sin este no podras tener actividad deportiva.\n\n' +
+  'Todo lo relacionado a costos y así tienes que consultarlo con la asesora. Athziri';
+
 const POST_REGISTRATION_MESSAGES = {
   escuela: '🚨 *REQUISITOS OBLIGATORIOS PARA TU PRIMER DÍA:*\nPara que te hagamos válido este pase, el día de tu entrenamiento debes presentarte puntualmente en el Centro Recreativo Pascual Boing con:\n\n1️⃣ Esta imagen de tu pase de prueba (en tu celular o impresa).\n2️⃣ Ropa completamente blanca.\n3️⃣ Zapatos de fútbol (tacos).\n4️⃣ Tu propia hidratación.\n\n📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Lic. Areli Janette:* 55 1008 7435\n📌 *Centro de Formación Académica*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
   tdp: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Lic. Athziri Velazquez:* 56 2128 9945\n📌 *Fuerzas Básicas y Tercera División Profesional*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
@@ -139,6 +143,12 @@ async function resolveDynamicContent(flowKey, stepKey, flowData) {
     const category = flowData?.category || 'escuela';
     const message = POST_REGISTRATION_MESSAGES[category] || POST_REGISTRATION_MESSAGES.escuela;
     return { message };
+  }
+
+  if (step.dynamic === 'tdp_warning') {
+    const category = flowData?.category;
+    const warning = category === 'tdp' ? TDP_WARNING_TEXT : '';
+    return { warning };
   }
 
   return null;

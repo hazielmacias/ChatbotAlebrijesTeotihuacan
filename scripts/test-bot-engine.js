@@ -72,6 +72,29 @@ async function runScenario(name, steps, options = {}) {
     }
   }
 
+  if (options.verifyMessage) {
+    const { data: conv } = await supabaseAdmin
+      .from('conversations')
+      .select('id')
+      .eq('phone', phone)
+      .maybeSingle();
+    const { data: msgs } = await supabaseAdmin
+      .from('messages')
+      .select('content, sent_by, type')
+      .eq('conversation_id', conv.id)
+      .eq('direction', 'outbound')
+      .eq('sent_by', 'bot')
+      .order('created_at', { ascending: true });
+    const allText = (msgs || []).map(m => m.content || '').join('\n--SEPARATOR--\n');
+    for (const [assertion, expected] of Object.entries(options.verifyMessage)) {
+      if (assertion === 'contains') {
+        assert(allText.includes(expected), 'mensaje contiene ' + JSON.stringify(expected));
+      } else if (assertion === 'notContains') {
+        assert(!allText.includes(expected), 'mensaje NO contiene ' + JSON.stringify(expected));
+      }
+    }
+  }
+
   // Limpiar
   const { data: convs } = await supabaseAdmin.from('conversations').select('id').eq('phone', phone);
   if (convs) {
@@ -179,6 +202,29 @@ async function runScenario(name, steps, options = {}) {
       }
     ], {
       verifyRegistration: { category: 'escuela', position: 'Delantero' }
+    });
+
+    // ====== ESCENARIO REGRESION WARNING TDP: solo visible en opcion 2 ======
+    await runScenario('11) WARNING TDP: opcion 2 (TDP) muestra el bloque ⚠️ ANTES DE CONTINUAR (REGRESION)', [
+      { input: 'menu' },
+      { input: '2', expect: { response_flow: 'tdp', response_step: 'info' } }
+    ], {
+      verifyMessage: {
+        contains: '*⚠️ ANTES DE CONTINUAR*',
+        contains: 'Solamente cubres tu seguro contra accidentes y lesiones deportivas',
+        contains: 'Todo lo relacionado a costos y así tienes que consultarlo con la asesora. Athziri'
+      }
+    });
+
+    await runScenario('12) WARNING TDP: opcion 3 (Piloto) NO muestra el bloque (REGRESION)', [
+      { input: 'menu' },
+      { input: '3', expect: { response_flow: 'tdp', response_step: 'info' } }
+    ], {
+      verifyMessage: {
+        notContains: '*⚠️ ANTES DE CONTINUAR*',
+        notContains: 'Solamente cubres tu seguro',
+        contains: 'FUERZAS BÁSICAS Y TERCERA DIVISIÓN PROFESIONAL'
+      }
     });
 
     console.log('\n=== RESUMEN ===');
