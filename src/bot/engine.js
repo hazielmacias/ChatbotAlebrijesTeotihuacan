@@ -193,8 +193,36 @@ function extractField(text, fieldLabels) {
   return null;
 }
 
+function normalizePositionValue(value) {
+  if (!value) return value;
+  const norm = value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  const map = {
+    'portero': 'Portero', 'guardameta': 'Portero', 'arquero': 'Portero',
+    'defensa': 'Defensa', 'defensor': 'Defensa',
+    'mediocampista': 'Mediocampista', 'medio': 'Mediocampista', 'medio centro': 'Mediocampista', 'centrocampista': 'Mediocampista', 'volante': 'Mediocampista',
+    'delantero': 'Delantero', 'atacante': 'Delantero', 'extremo': 'Delantero'
+  };
+  return map[norm] || value.trim();
+}
+
 function extractPosition(text) {
-  return extractField(text, ['posicion principal', 'posicion', 'posición principal']);
+  const explicit = extractField(text, ['posicion principal', 'posicion', 'posici\u00f3n principal', 'posici\u00f3n']);
+  if (explicit) return normalizePositionValue(explicit);
+
+  if (!extractBirthYearFromText(text)) return null;
+
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const yearRe = /^(19|20)\d{2}$/;
+  const nameLine = (extractNameFromText(text) || '').split('\n')[0].trim();
+  for (const line of lines) {
+    if (yearRe.test(line)) continue;
+    if (line === nameLine) continue;
+    const labelRe = /(?:nombre|posici[o\u00f3]n|edad|a[ñn]o|tutor|responsable|perfil|diestro|zurdo|diestra|zurda)\s*[:\-]/i;
+    if (labelRe.test(line)) continue;
+    if (/^\d{1,3}$/.test(line)) continue;
+    return normalizePositionValue(line);
+  }
+  return null;
 }
 
 function extractTutor(text) {
@@ -462,9 +490,26 @@ async function processIncomingMessage(messageData) {
     if (!validationResult.valid) {
       console.log(`[bot-engine] Validacion fallo: reason=${validationResult.reason} value=${validationResult.value}`);
 
-      const failMessage = validation?.fail_message || '⚠️ Los datos proporcionados no son validos.';
-      const failFlow = validation?.fail_flow || 'menu';
-      const failStep = validation?.fail_step || 'start';
+      const keepOnSameStep = validationResult.reason === 'no_year_found' && validation?.type === 'birth_year_range';
+      const noAgeFound = validationResult.reason === 'no_age_found' && validation?.type === 'age_range';
+
+      let helpMessage;
+      if (keepOnSameStep) {
+        helpMessage = '🤔 No detecte un *año de nacimiento* valido en tu mensaje (debe tener 4 digitos, ej. 2009).\n\n' +
+          'Para generar tu *Pase de Semana de Prueba sin costo*, mándame en un solo mensaje:\n\n' +
+          '📋 *Nombre completo:*\n📋 *Año de nacimiento (4 dígitos):*\n📋 *Posición principal:*\n\n' +
+          '_Ejemplo:_\nJuan Pérez García\n2009\nMediocampista';
+      } else if (noAgeFound) {
+        helpMessage = '🤔 No detecte la *edad* en tu mensaje.\n\n' +
+          'Para generar tu *Pase de Semana de Prueba sin costo*, mándame en un solo mensaje:\n\n' +
+          '📋 *Nombre completo del jugador:*\n📋 *Edad (6 a 11 años):*\n📋 *Posición en la que juega:*\n📋 *Nombre del tutor o responsable:*\n\n' +
+          '_Ejemplo:_\nJuan Pérez García\n9\nMediocampista\nMaría Pérez';
+      } else {
+        helpMessage = validation?.fail_message || '⚠️ Los datos proporcionados no son validos.';
+      }
+
+      const failFlow = (keepOnSameStep || noAgeFound) ? currentFlowKey : (validation?.fail_flow || 'menu');
+      const failStep = (keepOnSameStep || noAgeFound) ? currentStepKey : (validation?.fail_step || 'start');
 
       await updateConversationState(conversation.id, {
         current_flow: failFlow,
@@ -475,13 +520,18 @@ async function processIncomingMessage(messageData) {
       const sent = await sendAndStore({
         phone: from,
         conversationId: conversation.id,
-        content: failMessage,
+        content: helpMessage,
         type: 'text',
         sentBy: 'bot',
-        metadata: { flow: currentFlowKey, step: currentStepKey, validation_failed: true }
+        metadata: {
+          flow: currentFlowKey,
+          step: currentStepKey,
+          validation_failed: true,
+          help_retry: keepOnSameStep || noAgeFound
+        }
       });
 
-      if (failFlow && failStep) {
+      if (failFlow && failStep && !keepOnSameStep && !noAgeFound) {
         return await executeStep(conversation, contact, failFlow, failStep, { ...flowData, last_validation_error: validationResult.reason });
       }
 
@@ -489,6 +539,7 @@ async function processIncomingMessage(messageData) {
         handled: true,
         bot_active: true,
         validation_failed: true,
+        help_retry: keepOnSameStep || noAgeFound,
         sent_ok: sent.ok,
         conversation_id: conversation.id
       };

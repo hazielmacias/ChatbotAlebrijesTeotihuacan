@@ -33,16 +33,19 @@ console.log('[webhook:BOOT] VERIFY_TOKEN present:', !!VERIFY_TOKEN, '| length:',
 
 function readRawBody(req) {
   return new Promise((resolve, reject) => {
-    if (req.rawBody) {
-      if (Buffer.isBuffer(req.rawBody)) return resolve(req.rawBody.toString('utf8'));
-      return resolve(req.rawBody);
+    // Prioridad 1: buffer crudo. Siempre decodificar como UTF-8 explicito
+    // para evitar que Vercel entregue req.body con encoding latin1, que
+    // corrompe caracteres multibyte (ej. 'í' -> '?').
+    if (Buffer.isBuffer(req.rawBody)) {
+      return resolve(req.rawBody.toString('utf8'));
     }
-    if (typeof req.body === 'string') return resolve(req.body);
-    if (req.body && Object.keys(req.body).length > 0) {
-      return resolve(JSON.stringify(req.body));
-    }
+    // Prioridad 2: stream crudo. Leer chunks como Buffer y concatenar,
+    // luego decodificar como UTF-8. Esto evita que el body string que
+    // Vercel entrega pre-parseado contenga caracteres ya corrompidos.
     const chunks = [];
-    req.on('data', chunk => chunks.push(chunk));
+    req.on('data', chunk => {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    });
     req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
     req.on('error', reject);
   });
