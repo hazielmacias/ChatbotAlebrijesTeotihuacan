@@ -212,7 +212,7 @@ async function runScenario(name, steps, options = {}) {
       verifyMessage: {
         contains: '*⚠️ ANTES DE CONTINUAR*',
         contains: 'Solamente cubres tu seguro contra accidentes y lesiones deportivas',
-        contains: 'Todo lo relacionado a costos y así tienes que consultarlo con la asesora. Athziri'
+        notContains: 'Todo lo relacionado a costos y así tienes que consultarlo con la asesora. Athziri'
       }
     });
 
