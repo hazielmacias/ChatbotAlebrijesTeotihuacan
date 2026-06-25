@@ -20,18 +20,18 @@ const FLOWS = {
 const RESET_TRIGGERS = ['0', 'menu', 'menú', 'inicio', 'empezar', 'cancelar', 'salir', 'cancel'];
 
 const CONTACT_INFO = {
-  escuela: '👉 *Lic. Areli Janette:* 55 1008 7435\n📌 *Centro de Formación Académica*',
-  tdp: '👉 *Lic. Athziri Velazquez:* 56 2128 9945\n📌 *Fuerzas Básicas y Tercera División Profesional*',
-  piloto: '👉 *Lic. Athziri Velazquez:* 56 2128 9945\n📌 *Equipo Piloto Liga de Expansión MX*'
+  escuela: '👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*',
+  tdp: '👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*',
+  piloto: '👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*'
 };
 
 const TDP_WARNING_TEXT = '*⚠️ ANTES DE CONTINUAR*\n\n' +
   'Solicita una semana de pruebas para entrenar y jugar durante este periodo con el equipo de tercera división profesional. Solamente cubres tu seguro contra accidentes y lesiones deportivas. Sin este no podras tener actividad deportiva.';
 
 const POST_REGISTRATION_MESSAGES = {
-  escuela: '🚨 *REQUISITOS OBLIGATORIOS PARA TU PRIMER DÍA:*\nPara que te hagamos válido este pase, el día de tu entrenamiento debes presentarte puntualmente en el Centro Recreativo Pascual Boing con:\n\n1️⃣ Esta imagen de tu pase de prueba (en tu celular o impresa).\n2️⃣ Ropa completamente blanca.\n3️⃣ Zapatos de fútbol (tacos).\n4️⃣ Tu propia hidratación.\n\n📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Lic. Areli Janette:* 55 1008 7435\n📌 *Centro de Formación Académica*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
-  tdp: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Lic. Athziri Velazquez:* 56 2128 9945\n📌 *Fuerzas Básicas y Tercera División Profesional*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
-  piloto: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Lic. Athziri Velazquez:* 56 2128 9945\n📌 *Fuerzas Básicas y Tercera División Profesional*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽'
+  escuela: '🚨 *REQUISITOS OBLIGATORIOS PARA TU PRIMER DÍA:*\nPara que te hagamos válido este pase, el día de tu entrenamiento debes presentarte puntualmente en el Centro Recreativo Pascual Boing con:\n\n1️⃣ Esta imagen de tu pase de prueba (en tu celular o impresa).\n2️⃣ Ropa completamente blanca.\n3️⃣ Zapatos de fútbol (tacos).\n4️⃣ Tu propia hidratación.\n\n📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
+  tdp: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
+  piloto: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽'
 };
 
 async function getOrCreateContact(phone, name) {
@@ -363,14 +363,15 @@ async function executeStep(conversation, contact, flowKey, stepKey, flowData) {
     metadata: { flow: flowKey, step: stepKey }
   });
 
-  if (step.send_image) {
+  const imageKeys = step.send_images || (step.send_image ? [step.send_image] : []);
+  for (const imageKey of imageKeys) {
     await sendImageAndStore({
       phone: contact.phone,
       conversationId: conversation.id,
-      imageKey: step.send_image,
+      imageKey,
       caption: '',
       sentBy: 'bot',
-      metadata: { flow: flowKey, step: stepKey, image_key: step.send_image }
+      metadata: { flow: flowKey, step: stepKey, image_key: imageKey }
     });
   }
 
@@ -385,7 +386,7 @@ async function executeStep(conversation, contact, flowKey, stepKey, flowData) {
     });
   }
 
-  console.log(`[bot-engine] Respuesta enviada: flow=${flowKey} step=${stepKey} sent_ok=${sent.ok} image=${step.send_image || 'none'} document=${step.send_document || 'none'} auto_advance=${!!step.auto_advance}`);
+  console.log(`[bot-engine] Respuesta enviada: flow=${flowKey} step=${stepKey} sent_ok=${sent.ok} image=${(step.send_images || (step.send_image ? [step.send_image] : [])).join(',') || 'none'} document=${step.send_document || 'none'} auto_advance=${!!step.auto_advance}`);
 
   if (step.auto_advance && step.next_flow && step.next_step) {
     return await executeStep(

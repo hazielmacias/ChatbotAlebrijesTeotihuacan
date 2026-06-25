@@ -3,7 +3,9 @@ const { supabaseAdmin } = require('../lib/supabase');
 
 const IMAGE_URLS = {
   pase: process.env.PASE_IMAGE_URL || 'https://alebrijes-chatbot.vercel.app/pase.jpeg',
-  filtro: process.env.FILTRO_IMAGE_URL || 'https://alebrijes-chatbot.vercel.app/filtro.jpeg'
+  filtro: process.env.FILTRO_IMAGE_URL || 'https://alebrijes-chatbot.vercel.app/filtro.jpeg',
+  pase_tdp: process.env.PASE_TDP_IMAGE_URL || 'https://alebrijes-chatbot.vercel.app/PaseDeEntrenamientoTDP-FuerzasBasicas.jpeg',
+  pase_escuela: process.env.PASE_ESCUELA_IMAGE_URL || 'https://alebrijes-chatbot.vercel.app/InformaciónPaseDeUnaSemana_CentroDeFormacion.jpeg'
 };
 
 const DOCUMENT_URLS = {

@@ -16,7 +16,7 @@
       }
     },
     "horarios": {
-      "message": "🕐 *Horarios y ubicación*\n\n📍 Estamos en el *Centro Recreativo Pascual Boing*, Teotihuacán, Estado de México.\n\n🗓️ Horarios de entrenamiento según tu categoría:\n• *Escuela - Turno Matutino:* Lunes a Viernes de 08:00 a 10:30 hrs.\n• *Escuela - Turno Vespertino:* Martes, Miércoles y Jueves de 16:00 a 18:30 hrs.\n• *Fuerzas Básicas / TDP / Piloto:* La fecha la da el asesor.\n\n📲 Ubicación: https://maps.app.goo.gl/nXnXtADvzofWVusk9",
+      "message": "🕐 *Horarios y ubicación*\n\n📍 Estamos en el *Centro Recreativo Pascual Boing*, Teotihuacán, Estado de México.\n\n🗓️ Horarios de entrenamiento según tu categoría:\n• *Escuela - Turno Matutino:* Lunes a Viernes de 08:00 a 10:30 hrs.\n• *Escuela - Turno Vespertino:* Lunes a Viernes de 4:00 pm a 6:00 pm.\n• *Fuerzas Básicas / TDP / Piloto:* La fecha la da el asesor.\n\n📲 Ubicación: https://maps.app.goo.gl/nXnXtADvzofWVusk9",
       "options": {
         "5": { "next_flow": "menu", "next_step": "human_takeover" },
         "0": { "next_flow": "menu", "next_step": "start" },

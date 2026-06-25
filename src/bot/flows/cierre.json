@@ -5,7 +5,7 @@
   "steps": {
     "success": {
       "message": "¡Registro exitoso! 🎉\n\nTe generamos tu *Pase de Semana de Prueba Sin Costo*.\n\nA continuación te envío la imagen con tus datos.",
-      "send_image": "pase",
+      "send_images": ["pase", "pase_escuela"],
       "auto_advance": true,
       "next_flow": "cierre",
       "next_step": "post"
