@@ -320,6 +320,21 @@ function validateFreeText(parsed, validation) {
   return { valid: true, value: null };
 }
 
+function resolveImageKeys(step, flowData) {
+  if (!step) return [];
+  if (Array.isArray(step.send_images)) return step.send_images.filter(Boolean);
+  if (Array.isArray(step.send_image)) return step.send_image.filter(Boolean);
+  if (step.send_image && typeof step.send_image === 'object') {
+    const category = (flowData && flowData.category) || 'escuela';
+    const value = step.send_image[category];
+    if (value) return [value];
+    const firstKey = Object.keys(step.send_image)[0];
+    return firstKey ? [step.send_image[firstKey]] : [];
+  }
+  if (typeof step.send_image === 'string') return [step.send_image];
+  return [];
+}
+
 async function executeStep(conversation, contact, flowKey, stepKey, flowData) {
   const flow = FLOWS[flowKey];
   if (!flow) {
@@ -363,7 +378,7 @@ async function executeStep(conversation, contact, flowKey, stepKey, flowData) {
     metadata: { flow: flowKey, step: stepKey }
   });
 
-  const imageKeys = step.send_images || (step.send_image ? [step.send_image] : []);
+  const imageKeys = resolveImageKeys(step, flowData);
   for (const imageKey of imageKeys) {
     await sendImageAndStore({
       phone: contact.phone,
@@ -386,7 +401,7 @@ async function executeStep(conversation, contact, flowKey, stepKey, flowData) {
     });
   }
 
-  console.log(`[bot-engine] Respuesta enviada: flow=${flowKey} step=${stepKey} sent_ok=${sent.ok} image=${(step.send_images || (step.send_image ? [step.send_image] : [])).join(',') || 'none'} document=${step.send_document || 'none'} auto_advance=${!!step.auto_advance}`);
+  console.log(`[bot-engine] Respuesta enviada: flow=${flowKey} step=${stepKey} sent_ok=${sent.ok} image=${resolveImageKeys(step, flowData).join(',') || 'none'} document=${step.send_document || 'none'} auto_advance=${!!step.auto_advance}`);
 
   if (step.auto_advance && step.next_flow && step.next_step) {
     return await executeStep(

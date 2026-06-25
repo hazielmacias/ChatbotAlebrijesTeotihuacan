@@ -6,6 +6,7 @@
     "info": {
       "message": "¡Excelente elección! Nuestra Escuela es el lugar ideal para los fundamentos y la pasión por el fútbol.\n\n*Información General*:\n✅ Costo de Inscripción: *$0*\n✅ Mensualidad fija: *$550 MXN*\n\n📄 Te adjuntamos nuestro PDF informativo con todos los detalles del programa.\n\n*Elige tu horario de entrenamiento:*\n\n*A* — Turno Matutino (Alto Rendimiento)\nLunes a Viernes de 08:00 a 10:30 hrs.\n\n*B* — Turno Vespertino (Iniciación y Desarrollo)\nLunes a Viernes de 4:00 pm a 6:00 pm\n\n👉 *Para continuar, responde con la letra de tu horario (A o B).*\n\n📲 *WhatsApp Business:* 55 2529 5501",
       "send_document": "escuela_pdf",
+      "send_images": ["pase_escuela"],
       "options": {
         "a": { "next_flow": "escuela", "next_step": "collect_data", "flow_data_update": { "category": "escuela", "schedule": "A" } },
         "b": { "next_flow": "escuela", "next_step": "collect_data", "flow_data_update": { "category": "escuela", "schedule": "B" } },

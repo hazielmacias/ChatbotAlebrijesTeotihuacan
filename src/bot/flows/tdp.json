@@ -5,7 +5,7 @@
   "steps": {
     "info": {
       "message": "¡Excelente elección! A continuación te presento los detalles de nuestra categoría:\n\n*FUERZAS BÁSICAS Y TERCERA DIVISIÓN PROFESIONAL* ⚽🔥\n\nSolicita una *semana de pruebas sin costo* para entrenar y jugar durante este periodo con el equipo de Tercera División Profesional. De igual manera le generamos su pase con su nombre.\n\n*✅ DETALLES DE LA SEMANA DE PRUEBAS*\n📅 Fecha: La fecha la da el asesor\n⏱️ Duración: 1 semana\n🔍 Evaluación: Staff de visores + inteligencia deportiva\n🏆 Resultado: Se entrega al finalizar tu semana. Si eres seleccionado, te incorporas de inmediato.\n📍 Sede: Centro Recreativo Pascual Boing, Teotihuacán, EdoMex\n📲 Ubicación: https://maps.app.goo.gl/nXnXtADvzofWVusk9\n\n*Qué incluye tu participación*\n✔️ (Opcional) Seguro contra accidentes y lesiones deportivas con vigencia de un mes.\n✔️ Hidratación todas las sesiones\n✔️ Fisioterapeutas en cancha\n✔️ Canchas empastadas y demás\n✔️ Partidos vs equipos TDP y Fuerzas Básicas\n✔️ Evaluación técnica de inteligencia deportiva\n✔️ Seguridad privada\n\n📌 *Presenta este pase en cancha.*\n\n{{warning}}\n\nPara generar tu *Pase de Semana de Prueba sin costo*, compárteme en un solo mensaje:\n\n📋 *Nombre completo:*\n📋 *Año de nacimiento:*\n📋 *Posición principal:*",
-      "send_images": ["filtro", "pase_tdp"],
+      "send_images": ["filtro"],
       "dynamic": "tdp_warning",
       "input_type": "free_text",
       "validation": {
