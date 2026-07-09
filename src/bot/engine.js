@@ -5,6 +5,7 @@ const menuFlow = require('./flows/menu.json');
 const escuelaFlow = require('./flows/escuela.json');
 const tdpFlow = require('./flows/tdp.json');
 const pilotoFlow = require('./flows/piloto.json');
+const veranoFlow = require('./flows/verano.json');
 const cierreFlow = require('./flows/cierre.json');
 const faqFlow = require('./flows/faq.json');
 
@@ -13,6 +14,7 @@ const FLOWS = {
   escuela: escuelaFlow,
   tdp: tdpFlow,
   piloto: pilotoFlow,
+  verano: veranoFlow,
   cierre: cierreFlow,
   faq: faqFlow
 };
@@ -22,7 +24,8 @@ const RESET_TRIGGERS = ['0', 'menu', 'menú', 'inicio', 'empezar', 'cancelar', '
 const CONTACT_INFO = {
   escuela: '👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*',
   tdp: '👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*',
-  piloto: '👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*'
+  piloto: '👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*',
+  verano: '👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*'
 };
 
 const TDP_WARNING_TEXT = '*⚠️ ANTES DE CONTINUAR*\n\n' +
@@ -31,7 +34,8 @@ const TDP_WARNING_TEXT = '*⚠️ ANTES DE CONTINUAR*\n\n' +
 const POST_REGISTRATION_MESSAGES = {
   escuela: '🚨 *REQUISITOS OBLIGATORIOS PARA TU PRIMER DÍA:*\nPara que te hagamos válido este pase, el día de tu entrenamiento debes presentarte puntualmente en el Centro Recreativo Pascual Boing con:\n\n1️⃣ Esta imagen de tu pase de prueba (en tu celular o impresa).\n2️⃣ Ropa completamente blanca.\n3️⃣ Zapatos de fútbol (tacos).\n4️⃣ Tu propia hidratación.\n\n📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
   tdp: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
-  piloto: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽'
+  piloto: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
+  verano: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu inscripción al Curso de Verano, resolver cualquier duda final y recibir las instrucciones exactas, comunícate ahora mismo con el profesor enviando un mensaje de WhatsApp:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha este verano! ☀️⚽'
 };
 
 async function getOrCreateContact(phone, name) {
@@ -250,6 +254,9 @@ function parseFreeTextData(text, category) {
   data.position = extractPosition(text);
 
   if (category === 'escuela') {
+    data.age = extractAgeFromText(text);
+    data.tutor = extractTutor(text);
+  } else if (category === 'verano') {
     data.age = extractAgeFromText(text);
     data.tutor = extractTutor(text);
   } else {

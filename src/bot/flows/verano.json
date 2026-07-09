@@ -1,0 +1,20 @@
+{
+  "flow_key": "verano",
+  "name": "Curso de Verano",
+  "description": "Informacion del Curso de Verano. Muestra detalles, pide datos sin validacion ni persistencia (solo para continuar en el flujo) y remite al Prof. Haziel Alejandro al final.",
+  "steps": {
+    "info": {
+      "message": "¡Excelente elección! ☀️ Aquí tienes los detalles de nuestro *Curso de Verano* de Alebrijes Teotihuacán:\n\n*💰 COSTO*\n✅ Inscripción: *$0* (Gratis)\n✅ Mensualidad: *$850 MXN*\n\n*📋 QUÉ INCLUYE*\n✔️ Seguro contra accidentes y lesiones deportivas\n✔️ Hidratación en cancha\n✔️ Uniforme de entrenamiento\n✔️ Atención en cancha con fisioterapeuta\n✔️ Canchas totalmente empastadas\n✔️ Entrenadores certificados\n\n*🕐 HORARIO*\n🗓️ Lunes a Viernes de *08:30 a 10:30 hrs.*\n⚽ Sábado: juego\n\nPara apartar tu lugar, compárteme en un solo mensaje:\n\n📋 *Nombre completo:*\n📋 *Edad:*\n📋 *Posición en la que juega:*\n📋 *Nombre del tutor o responsable:*",
+      "input_type": "free_text",
+      "next_flow": "verano",
+      "next_step": "post"
+    },
+    "post": {
+      "message": "📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu inscripción al Curso de Verano, resolver cualquier duda final y recibir las instrucciones exactas, comunícate ahora mismo con el profesor enviando un mensaje de WhatsApp:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha este verano! ☀️⚽",
+      "options": {
+        "0": { "next_flow": "menu", "next_step": "start" },
+        "menu": { "next_flow": "menu", "next_step": "start" }
+      }
+    }
+  }
+}
