@@ -1,5 +1,6 @@
 const { supabaseAdmin } = require('../lib/supabase');
 const { sendAndStore, sendImageAndStore, sendDocumentAndStore } = require('./sender');
+const { callAI, isAIEnabled } = require('../lib/ai');
 
 const menuFlow = require('./flows/menu.json');
 const escuelaFlow = require('./flows/escuela.json');
@@ -32,10 +33,10 @@ const TDP_WARNING_TEXT = '*⚠️ ANTES DE CONTINUAR*\n\n' +
   'Solicita una semana de pruebas para entrenar y jugar durante este periodo con el equipo de tercera división profesional. Solamente cubres tu seguro contra accidentes y lesiones deportivas. Sin este no podras tener actividad deportiva.';
 
 const POST_REGISTRATION_MESSAGES = {
-  escuela: '🚨 *REQUISITOS OBLIGATORIOS PARA TU PRIMER DÍA:*\nPara que te hagamos válido este pase, el día de tu entrenamiento debes presentarte puntualmente en el Centro Recreativo Pascual Boing con:\n\n1️⃣ Esta imagen de tu pase de prueba (en tu celular o impresa).\n2️⃣ Ropa completamente blanca.\n3️⃣ Zapatos de fútbol (tacos).\n4️⃣ Tu propia hidratación.\n\n📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
-  tdp: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
-  piloto: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu asistencia, resolver cualquier duda final y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora mismo con nuestra coordinadora enviándole un mensaje de WhatsApp:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽',
-  verano: '📲 *SIGUIENTE PASO (MUY IMPORTANTE):*\nPara confirmar tu inscripción al Curso de Verano, resolver cualquier duda final y recibir las instrucciones exactas, comunícate ahora mismo con el profesor enviando un mensaje de WhatsApp:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha este verano! ☀️⚽'
+  escuela: '🚨 *REQUISITOS PARA TU PRIMER DÍA*\n\nPara que te hagamos válido este pase, preséntate puntualmente en el Centro Recreativo Pascual Boing con:\n\n✅ Imagen de tu pase de prueba (en tu celular o impresa)\n✅ Ropa completamente blanca\n✅ Zapatos de fútbol (tacos)\n✅ Tu propia hidratación\n\n━━━━━━━━━━━━━━━━━━\n📲 *SIGUIENTE PASO*\n━━━━━━━━━━━━━━━━━━\nPara confirmar tu asistencia y recibir las instrucciones exactas de acceso, comunícate ahora con el profesor:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽💪',
+  tdp: '📲 *SIGUIENTE PASO*\n\nPara confirmar tu asistencia, resolver dudas finales y recibir las instrucciones exactas de acceso a la cancha, comunícate ahora con el profesor:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽🔥',
+  piloto: '📲 *SIGUIENTE PASO*\n\nPara confirmar tu asistencia, resolver dudas finales y recibir las instrucciones exactas, comunícate ahora con el profesor:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha para demostrar tu talento! ⚽🔥',
+  verano: '📲 *SIGUIENTE PASO*\n\nPara confirmar tu inscripción al Curso de Verano, resolver dudas finales y recibir las instrucciones exactas, comunícate ahora con el profesor:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha este verano! ☀️⚽'
 };
 
 async function getOrCreateContact(phone, name) {
@@ -617,19 +618,40 @@ async function processIncomingMessage(messageData) {
 
   if (!selectedOption) {
     console.log(`[bot-engine] Input no valido: "${userInput}" en ${currentFlowKey}/${currentStepKey}`, Object.keys(options));
-    const helpMessage = buildHelpMessage(currentFlowKey, currentStepKey);
+
+    let replyText;
+    let sentBy = 'bot';
+    let helpSource = 'help';
+
+    if (isAIEnabled()) {
+      try {
+        const aiReply = await callAI(conversation.id, userInput, { flow: currentFlowKey, step: currentStepKey });
+        if (aiReply) {
+          replyText = aiReply;
+          sentBy = 'ai';
+          helpSource = 'ai';
+        }
+      } catch (aiErr) {
+        console.warn('[bot-engine] AI call failed, fallback a help:', aiErr.message);
+      }
+    }
+
+    if (!replyText) {
+      replyText = buildHelpMessage(currentFlowKey, currentStepKey);
+    }
+
     const sent = await sendAndStore({
       phone: from,
       conversationId: conversation.id,
-      content: helpMessage,
+      content: replyText,
       type: 'text',
-      sentBy: 'bot',
-      metadata: { flow: currentFlowKey, step: currentStepKey, help: true }
+      sentBy,
+      metadata: { flow: currentFlowKey, step: currentStepKey, help: true, source: helpSource }
     });
     return {
       handled: true,
       bot_active: true,
-      response: 'help',
+      response: helpSource,
       sent_ok: sent.ok,
       conversation_id: conversation.id
     };

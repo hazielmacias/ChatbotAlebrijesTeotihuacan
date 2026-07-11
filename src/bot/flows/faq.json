@@ -4,7 +4,7 @@
   "description": "Lista de preguntas frecuentes con respuestas predefinidas.",
   "steps": {
     "categories": {
-      "message": "❓ *Preguntas Frecuentes*\n\n1️⃣ Horarios y ubicación\n2️⃣ Requisitos para inscribirte\n3️⃣ Edades y categorías\n4️⃣ Qué necesitas traer\n5️⃣ Hablar con una persona\n\n_Responde con el número de tu pregunta._\n_Escribe 0 para volver al menú principal._",
+      "message": "❓ *PREGUNTAS FRECUENTES*\n\nSelecciona el tema que te interesa:\n\n1️⃣ Horarios y ubicación\n2️⃣ Requisitos para inscribirte\n3️⃣ Edades y categorías\n4️⃣ Qué necesitas traer\n5️⃣ Hablar con una persona\n\n_Responde con el número de tu pregunta._\n_Escribe 0 para volver al menú principal._",
       "options": {
         "1": { "next_flow": "faq", "next_step": "horarios" },
         "2": { "next_flow": "faq", "next_step": "requisitos" },
@@ -16,7 +16,7 @@
       }
     },
     "horarios": {
-      "message": "🕐 *Horarios y ubicación*\n\n📍 Estamos en el *Centro Recreativo Pascual Boing*, Teotihuacán, Estado de México.\n\n🗓️ Horarios de entrenamiento según tu categoría:\n• *Escuela - Turno Matutino:* Lunes a Viernes de 08:00 a 10:30 hrs.\n• *Escuela - Turno Vespertino:* Lunes a Viernes de 4:00 pm a 6:00 pm.\n• *Fuerzas Básicas / TDP / Piloto:* La fecha la da el asesor.\n\n📲 Ubicación: https://maps.app.goo.gl/nXnXtADvzofWVusk9",
+      "message": "🕐 *HORARIOS Y UBICACIÓN*\n\n📍 Estamos en el *Centro Recreativo Pascual Boing*, Teotihuacán, Estado de México.\n📲 https://maps.app.goo.gl/nXnXtADvzofWVusk9\n\n━━━━━━━━━━━━━━━━━━\n🕒 *ENTRENAMIENTOS POR CATEGORÍA*\n━━━━━━━━━━━━━━━━━━\n🏫 *Escuela — Matutino:*\n   Lunes a Viernes · 08:00 a 10:30 hrs.\n🏫 *Escuela — Vespertino:*\n   Lunes a Viernes · 16:00 a 18:00 hrs.\n⚽ *Fuerzas Básicas / TDP / Piloto:*\n   La fecha la da el asesor.\n☀️ *Curso de Verano:*\n   Lunes a Viernes · 08:30 a 10:30 hrs.\n   Sábados: juego.",
       "options": {
         "5": { "next_flow": "menu", "next_step": "human_takeover" },
         "0": { "next_flow": "menu", "next_step": "start" },
@@ -25,27 +25,27 @@
       }
     },
     "requisitos": {
-      "message": "📝 *Requisitos para inscribirte*\n\nPara tu *Pase de Semana de Prueba* solo necesitas presentarte el día del entrenamiento con:\n\n✅ Imagen del pase (en tu celular o impresa)\n✅ Ropa completamente blanca\n✅ Zapatos de fútbol (tacos)\n✅ Tu propia hidratación\n\nPara la inscripción formal, posteriormente se te pedirían:\n✅ Acta de nacimiento (copia)\n✅ CURP del jugador y del tutor\n✅ Comprobante de domicilio\n✅ Certificado médico reciente",
+      "message": "📝 *REQUISITOS PARA INSCRIBIRTE*\n\nPara tu *Pase de Semana de Prueba* solo necesitas presentarte el día del entrenamiento con:\n\n✅ Imagen del pase (en tu celular o impresa)\n✅ Ropa completamente blanca\n✅ Zapatos de fútbol (tacos)\n✅ Tu propia hidratación\n\n━━━━━━━━━━━━━━━━━━\n📄 *INSCRIPCIÓN FORMAL*\n━━━━━━━━━━━━━━━━━━\nPosteriormente se te pedirían:\n✅ Acta de nacimiento (copia)\n✅ CURP del jugador y del tutor\n✅ Comprobante de domicilio\n✅ Certificado médico reciente",
       "options": {
-        "1": { "next_flow": "menu", "next_step": "human_takeover" },
+        "5": { "next_flow": "menu", "next_step": "human_takeover" },
         "9": { "next_flow": "faq", "next_step": "categories" },
         "0": { "next_flow": "menu", "next_step": "start" },
         "menu": { "next_flow": "menu", "next_step": "start" }
       }
     },
     "edades": {
-      "message": "👦 *Edades y categorías*\n\nContamos con 3 categorías según tu edad:\n\n🏫 *Centro de Iniciación Deportiva (Escuela):* Niños de 6 a 11 años\n⚽ *Fuerzas Básicas y Tercera División Profesional (Liga TDP):* Jóvenes de 12 a 18 años\n🏆 *Equipo Piloto (Liga de Expansión MX):* Jóvenes nacidos entre 2002 y 2004\n\nLos grupos se asignan según la edad y nivel del jugador.",
+      "message": "👦 *EDADES Y CATEGORÍAS*\n\nContamos con 4 categorías según tu edad y nivel:\n\n━━━━━━━━━━━━━━━━━━\n🏫 *Escuela:*\n   Niños de 6 a 11 años\n⚽ *Fuerzas Básicas / TDP:*\n   Jóvenes de 12 a 18 años (nacidos 2002-2012)\n🏆 *Equipo Piloto:*\n   Jóvenes nacidos entre 2002 y 2004\n☀️ *Curso de Verano:*\n   Abierto a todas las edades\n━━━━━━━━━━━━━━━━━━\n\nLos grupos se asignan según edad y nivel del jugador. 💪",
       "options": {
-        "1": { "next_flow": "menu", "next_step": "human_takeover" },
+        "5": { "next_flow": "menu", "next_step": "human_takeover" },
         "9": { "next_flow": "faq", "next_step": "categories" },
         "0": { "next_flow": "menu", "next_step": "start" },
         "menu": { "next_flow": "menu", "next_step": "start" }
       }
     },
     "que_traer": {
-      "message": "🎽 *Qué necesitas traer*\n\nPara los entrenamientos:\n• Ropa deportiva cómoda (preferentemente blanca para tu pase)\n• Zapatos de fútbol (tacos)\n• Tu propia hidratación\n• Positivo y muchas ganas de aprender ⚽\n\nEl club proporciona:\n• Balones para entrenar\n• Petos para juegos\n• Personal técnico calificado",
+      "message": "🎽 *QUÉ NECESITAS TRAER*\n\nPara los entrenamientos:\n• Ropa deportiva cómoda (preferentemente blanca para tu pase)\n• Zapatos de fútbol (tacos)\n• Tu propia hidratación\n• Positivo y muchas ganas de aprender ⚽\n\nEl club proporciona:\n• Balones para entrenar\n• Petos para juegos\n• Personal técnico calificado",
       "options": {
-        "1": { "next_flow": "menu", "next_step": "human_takeover" },
+        "5": { "next_flow": "menu", "next_step": "human_takeover" },
         "9": { "next_flow": "faq", "next_step": "categories" },
         "0": { "next_flow": "menu", "next_step": "start" },
         "menu": { "next_flow": "menu", "next_step": "start" }

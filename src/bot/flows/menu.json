@@ -4,18 +4,18 @@
   "description": "Punto de entrada. Muestra saludo y categorias disponibles.",
   "steps": {
     "start": {
-      "message": "¡Hola! Gracias por tu interés en *Alebrijes Teotihuacán* ⚽🔥. El inicio de tu carrera profesional comienza aquí.\n\nPor favor selecciona la categoría que te interesa escribiendo el número:\n\n1️⃣ Centro de Iniciación Deportiva (Escuela) - Niños de 6 a 11 años\n2️⃣ Fuerzas Básicas y Tercera División Profesional (Liga TDP) - Jóvenes de 12 a 18 años\n3️⃣ Equipo Piloto Liga de Expansión MX - Jóvenes nacidos entre 2002 y 2004\n4️⃣ Preguntas frecuentes\n5️⃣ Curso de Verano\n\n_Responde con el número de la opción._",
+      "message": "¡Hola! Gracias por tu interés en *Alebrijes Teotihuacán* ⚽🔥. El inicio de tu carrera profesional comienza aquí.\n\nSelecciona la opción que te interesa:\n\n1️⃣ *Escuela de Fútbol* — Centro de Iniciación Deportiva\n2️⃣ *Fuerzas Básicas* — TDP\n3️⃣ *Equipo Piloto* — Liga de Expansión MX (2002-2004)\n4️⃣ *Curso de Verano*\n5️⃣ *Preguntas Frecuentes*\n\n_Responde con el número de tu opción_\n_O escribe tu pregunta y te ayudo._",
       "options": {
         "1": { "next_flow": "escuela", "next_step": "info" },
         "2": { "next_flow": "tdp", "next_step": "info", "flow_data_update": { "category": "tdp" } },
         "3": { "next_flow": "tdp", "next_step": "info", "flow_data_update": { "category": "piloto" } },
-        "4": { "next_flow": "faq", "next_step": "categories" },
-        "5": { "next_flow": "verano", "next_step": "info", "flow_data_update": { "category": "verano" } },
+        "4": { "next_flow": "verano", "next_step": "info", "flow_data_update": { "category": "verano" } },
+        "5": { "next_flow": "faq", "next_step": "categories" },
         "0": { "next_flow": "menu", "next_step": "start" }
       }
     },
     "human_takeover": {
-      "message": "🔤 Perfecto, te conecto con una persona del equipo. En un momento te responderán.\n\nMientras tanto, si quieres volver al menú principal, escribe *menu* o *0*.",
+      "message": "👤 *HABLAR CON UNA PERSONA*\n\nPerfecto, te conecto con una persona del equipo. En un momento te responderán.\n\nMientras tanto, si quieres volver al menú principal, escribe *menu* o *0*.",
       "side_effects": { "set_bot_active": false },
       "options": {
         "0": { "next_flow": "menu", "next_step": "start" },

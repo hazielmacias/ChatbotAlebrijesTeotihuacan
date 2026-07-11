@@ -4,7 +4,7 @@
   "description": "Flujo de inscripción para la Escuela (niños de 6 a 11 años). El PDF informativo se envía junto con la info. Los requisitos y contacto se muestran antes del registro.",
   "steps": {
     "info": {
-      "message": "¡Excelente elección! Nuestra Escuela es el lugar ideal para los fundamentos y la pasión por el fútbol.\n\n*Información General*:\n✅ Costo de Inscripción: *$0*\n✅ Mensualidad fija: *$550 MXN*\n\n📄 Te adjuntamos nuestro PDF informativo con todos los detalles del programa.\n\n*Elige tu horario de entrenamiento:*\n\n*A* — Turno Matutino (Alto Rendimiento)\nLunes a Viernes de 08:00 a 10:30 hrs.\n\n*B* — Turno Vespertino (Iniciación y Desarrollo)\nLunes a Viernes de 4:00 pm a 6:00 pm\n\n👉 *Para continuar, responde con la letra de tu horario (A o B).*\n\n📲 *WhatsApp Business:* 55 2529 5501",
+      "message": "🏫 *ESCUELA DE FÚTBOL — CENTRO DE INICIACIÓN DEPORTIVA*\n\n¡Excelente elección! Nuestra Escuela es el lugar ideal para los fundamentos y la pasión por el fútbol. ⚽💪\n\n━━━━━━━━━━━━━━━━━━\n💰 *INVERSIÓN*\n━━━━━━━━━━━━━━━━━━\n✅ Inscripción: *$0* (Gratis)\n✅ Mensualidad fija: *$550 MXN*\n\n📄 _Te adjuntamos nuestro PDF informativo con todos los detalles._\n\n━━━━━━━━━━━━━━━━━━\n🕐 *ELIGE TU HORARIO*\n━━━━━━━━━━━━━━━━━━\n*A* — Matutino (Alto Rendimiento)\n     Lunes a Viernes · 08:00 a 10:30 hrs.\n\n*B* — Vespertino (Iniciación y Desarrollo)\n     Lunes a Viernes · 16:00 a 18:00 hrs.\n\n👉 _Responde con la letra de tu horario (A o B)._",
       "send_document": "escuela_pdf",
       "send_images": ["pase_escuela"],
       "options": {
@@ -15,7 +15,7 @@
       }
     },
     "collect_data": {
-      "message": "Para generar tu *Pase de Semana de Prueba sin costo*, por favor compárteme los siguientes datos en un solo mensaje:\n\n📋 *Nombre completo del jugador:*\n📋 *Edad:*\n📋 *Posición en la que juega:*\n📋 *Nombre del tutor o responsable:*",
+      "message": "Para generar tu *Pase de Semana de Prueba sin costo*, compárteme en un solo mensaje:\n\n📋 *Nombre completo del jugador:*\n📋 *Edad (6 a 11 años):*\n📋 *Posición en la que juega:*\n📋 *Nombre del tutor o responsable:*\n\n_💡 Tip: cada dato en una línea, como en el ejemplo:_\n_Juan Pérez García_\n_9_\n_Mediocampista_\n_María Pérez_",
       "input_type": "free_text",
       "validation": {
         "type": "age_range",
