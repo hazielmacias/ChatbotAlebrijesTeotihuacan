@@ -39,6 +39,8 @@ const POST_REGISTRATION_MESSAGES = {
   verano: '📲 *SIGUIENTE PASO*\n\nPara confirmar tu inscripción al Curso de Verano, resolver dudas finales y recibir las instrucciones exactas, comunícate ahora con el profesor:\n\n👉 *Prof. Haziel Alejandro:* 55 2529 5501\n📌 *WhatsApp Business*\n\n¡Te esperamos en la cancha este verano! ☀️⚽'
 };
 
+console.log(`[bot-engine:BOOT] AI enabled: ${isAIEnabled()} (GROQ_API_KEY ${process.env.GROQ_API_KEY ? 'present (len=' + process.env.GROQ_API_KEY.length + ')' : 'MISSING'})`);
+
 async function getOrCreateContact(phone, name) {
   const { data, error } = await supabaseAdmin
     .from('contacts')
