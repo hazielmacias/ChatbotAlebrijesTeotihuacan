@@ -26,8 +26,8 @@ const DEFAULT_TEMPLATES = {
     variables: []
   },
   'escuela.info': {
-    description: 'Informacion del plan Escuela (6-11 anos) con precios y horarios',
-    content: '¡Excelente eleccion! Nuestra Escuela es el lugar ideal para los fundamentos y la pasion por el futbol.\n\nTenemos una *Inversion Transparente*:\n✅ Costo de Inscripcion: *$0*\n✅ Mensualidad fija: *$550 MXN* (Sin letras chiquitas)\n\nContamos con dos horarios de entrenamiento, ¿cual prefieres? (Escribe *A* o *B*)\n\n*A. Turno Matutino (Alto Rendimiento):* Lunes a Viernes de 08:00 a 10:30 hrs.\n*B. Turno Vespertino (Iniciacion y Desarrollo):* Martes, Miercoles y Jueves de 16:00 a 18:30 hrs.',
+    description: 'Informacion del plan Escuela (6-11 anos) con precios y horarios. Solo turno matutino. Editable desde el dashboard.',
+    content: '¡Excelente eleccion! Nuestra Escuela es el lugar ideal para los fundamentos y la pasion por el futbol.\n\nTenemos una *Inversion Transparente*:\n✅ Costo de Inscripcion: *$0*\n✅ Mensualidad fija: *$550 MXN* (Sin letras chiquitas)\n\nNuestro horario de entrenamiento es de *Lun a Vie de 08:00 a 10:30 hrs* (turno matutino).',
     variables: []
   },
   'help.invalid': {

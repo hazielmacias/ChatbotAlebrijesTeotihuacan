@@ -1,15 +1,14 @@
 {
   "flow_key": "escuela",
   "name": "Centro de Iniciación Deportiva (Escuela)",
-  "description": "Flujo de inscripción para la Escuela (niños de 6 a 11 años). El PDF informativo se envía junto con la info. Los requisitos y contacto se muestran antes del registro.",
+  "description": "Flujo de inscripción para la Escuela (niños de 6 a 11 años). El PDF informativo se envía junto con la info. Los requisitos y contacto se muestran antes del registro. NOTA: a partir del cambio a solo turno matutino, la opción 'b' (vespertino) fue retirada del flujo; el PDF informativo (escuela_pdf) y la imagen del pase (pase_escuela) en /public siguen mostrando el horario anterior hasta que se regeneren los assets.",
   "steps": {
     "info": {
-      "message": "🏫 *ESCUELA DE FÚTBOL — CENTRO DE INICIACIÓN DEPORTIVA*\n\n¡Excelente elección! Nuestra Escuela es el lugar ideal para los fundamentos y la pasión por el fútbol. ⚽💪\n\n━━━━━━━━━━━━━━━━━━\n💰 *INVERSIÓN*\n━━━━━━━━━━━━━━━━━━\n✅ Inscripción: *$0* (Gratis)\n✅ Mensualidad fija: *$550 MXN*\n\n📄 _Te adjuntamos nuestro PDF informativo con todos los detalles._\n\n━━━━━━━━━━━━━━━━━━\n🕐 *ELIGE TU HORARIO*\n━━━━━━━━━━━━━━━━━━\n*A* — Matutino (Alto Rendimiento)\n     Lunes a Viernes · 08:00 a 10:30 hrs.\n\n*B* — Vespertino (Iniciación y Desarrollo)\n     Lunes a Viernes · 16:00 a 18:00 hrs.\n\n👉 _Responde con la letra de tu horario (A o B)._",
+      "message": "🏫 *ESCUELA DE FÚTBOL — CENTRO DE INICIACIÓN DEPORTIVA*\n\n¡Excelente elección! Nuestra Escuela es el lugar ideal para los fundamentos y la pasión por el fútbol. ⚽💪\n\n━━━━━━━━━━━━━━━━━━\n💰 *INVERSIÓN*\n━━━━━━━━━━━━━━━━━━\n✅ Inscripción: *$0* (Gratis)\n✅ Mensualidad fija: *$550 MXN*\n\n📄 _Te adjuntamos nuestro PDF informativo con todos los detalles._\n\n━━━━━━━━━━━━━━━━━━\n🕐 *HORARIO — SOLO TURNO MATUTINO*\n━━━━━━━━━━━━━━━━━━\n*A* — Matutino (Alto Rendimiento)\n     Lunes a Viernes · 08:00 a 10:30 hrs.\n\n👉 _Responde *A* para confirmar tu lugar en el turno matutino._",
       "send_document": "escuela_pdf",
       "send_images": ["pase_escuela"],
       "options": {
         "a": { "next_flow": "escuela", "next_step": "collect_data", "flow_data_update": { "category": "escuela", "schedule": "A" } },
-        "b": { "next_flow": "escuela", "next_step": "collect_data", "flow_data_update": { "category": "escuela", "schedule": "B" } },
         "0": { "next_flow": "menu", "next_step": "start" },
         "menu": { "next_flow": "menu", "next_step": "start" }
       }

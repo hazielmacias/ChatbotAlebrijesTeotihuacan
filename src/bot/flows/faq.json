@@ -16,7 +16,7 @@
       }
     },
     "horarios": {
-      "message": "🕐 *HORARIOS Y UBICACIÓN*\n\n📍 Estamos en el *Centro Recreativo Pascual Boing*, Teotihuacán, Estado de México.\n📲 https://maps.app.goo.gl/nXnXtADvzofWVusk9\n\n━━━━━━━━━━━━━━━━━━\n🕒 *ENTRENAMIENTOS POR CATEGORÍA*\n━━━━━━━━━━━━━━━━━━\n🏫 *Escuela — Matutino:*\n   Lunes a Viernes · 08:00 a 10:30 hrs.\n🏫 *Escuela — Vespertino:*\n   Lunes a Viernes · 16:00 a 18:00 hrs.\n⚽ *Fuerzas Básicas / TDP / Piloto:*\n   La fecha la da el asesor.\n☀️ *Curso de Verano:*\n   Lunes a Viernes · 08:30 a 10:30 hrs.\n   Sábados: juego.",
+      "message": "🕐 *HORARIOS Y UBICACIÓN*\n\n📍 Estamos en el *Centro Recreativo Pascual Boing*, Teotihuacán, Estado de México.\n📲 https://maps.app.goo.gl/nXnXtADvzofWVusk9\n\n━━━━━━━━━━━━━━━━━━\n🕒 *ENTRENAMIENTOS POR CATEGORÍA*\n━━━━━━━━━━━━━━━━━━\n🏫 *Escuela — Matutino:*\n   Lunes a Viernes · 08:00 a 10:30 hrs.\n⚽ *Fuerzas Básicas / TDP / Piloto:*\n   La fecha la da el asesor.\n☀️ *Curso de Verano:*\n   Lunes a Viernes · 08:30 a 10:30 hrs.\n   Sábados: juego.",
       "options": {
         "5": { "next_flow": "menu", "next_step": "human_takeover" },
         "0": { "next_flow": "menu", "next_step": "start" },

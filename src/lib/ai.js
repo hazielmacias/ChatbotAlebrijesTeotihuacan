@@ -22,7 +22,7 @@ Contacto: Prof. Haziel Alejandro, tel 55 2529 5501
 Publico: ninos de 6 a 11 anos
 Inscripcion: $0 MXN (gratis)
 Mensualidad: $550 MXN
-Horarios: A) Matutino L-V 08:00-10:30 hrs | B) Vespertino L-V 16:00-18:00 hrs
+Horarios: solo turno matutino L-V 08:00-10:30 hrs
 
 === FUERZAS BASICAS / TDP (Tercera Division Profesional) ===
 Publico: jovenes de 12 a 18 anos (nacidos 2002-2012)

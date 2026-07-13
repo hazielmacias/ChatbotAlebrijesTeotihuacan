@@ -28,8 +28,7 @@ module.exports = {
     inscripcion: '$0 MXN (Gratis)',
     mensualidad: '$550 MXN',
     horarios: [
-      { id: 'A', nombre: 'Matutino (Alto Rendimiento)', dias: 'Lunes a Viernes', hora: '08:00 a 10:30 hrs.' },
-      { id: 'B', nombre: 'Vespertino (Iniciacion y Desarrollo)', dias: 'Lunes a Viernes', hora: '16:00 a 18:00 hrs.' }
+      { id: 'A', nombre: 'Matutino (Alto Rendimiento)', dias: 'Lunes a Viernes', hora: '08:00 a 10:30 hrs.' }
     ],
     info: 'Incluye entrenamiento con metodologia, partidos internos y acceso a las instalaciones. Se entrega Pase de Semana de Prueba sin costo para probar antes de inscribirte formalmente.'
   },
@@ -74,7 +73,7 @@ module.exports = {
     ]
   },
   faq: {
-    horarios_ubicacion: 'Estamos en el Centro Recreativo Pascual Boing, Teotihuacan, EdoMex. Escuela: L-V 08:00-10:30 (matutino) o 16:00-18:00 (vespertino). TDP/Piloto: la fecha la da el asesor. Curso de Verano: L-V 08:30-10:30 + Sabados de juego.',
+    horarios_ubicacion: 'Estamos en el Centro Recreativo Pascual Boing, Teotihuacan, EdoMex. Escuela: solo turno matutino L-V 08:00-10:30 hrs. TDP/Piloto: la fecha la da el asesor. Curso de Verano: L-V 08:30-10:30 + Sabados de juego.',
     requisitos_pase: 'Para el Pase de Semana de Prueba solo necesitas presentarte con: imagen del pase (en tu celular o impresa), ropa blanca, zapatos de futbol e hidratacion propia.',
     requisitos_formales: 'Para la inscripcion formal se piden: acta de nacimiento, CURP del jugador y tutor, comprobante de domicilio y certificado medico reciente.',
     edades_categorias: 'Escuela: 6-11 anos. TDP: 12-18 anos (nacidos 2002-2012). Piloto: nacidos 2002-2004. Curso de Verano: cualquier edad.',
